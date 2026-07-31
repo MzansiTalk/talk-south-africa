@@ -79,11 +79,13 @@ function HomeFeed() {
           {items.map((item, index) => (
             <div key={item.id} className="space-y-4">
               <PostCard item={item} />
-              {(index + 1) % 5 === 0 ? <NativeAd /> : null}
+              {(index + 1) % 5 === 0 && !item.deleted_by_admin ? <NativeAd /> : null}
             </div>
           ))}
+          <BannerAd placement="home_banner" />
         </div>
       )}
     </Screen>
   );
 }
+
