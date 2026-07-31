@@ -11,8 +11,13 @@ export type Profile = {
   cover_url: string | null;
   is_viral: boolean;
   is_hidden: boolean;
+  strikes?: number;
+  is_banned?: boolean;
+  ban_reason?: string | null;
+  banned_at?: string | null;
   created_at: string;
 };
+
 
 export type Post = {
   id: string;
@@ -340,6 +345,29 @@ export async function createContent(input: {
 }) {
   const userId = await getCurrentUserId();
   if (!userId) throw new Error("Please log in");
+
+  const { addStrike, logCopyright, scanContent } = await import("@/lib/moderation");
+
+  const me = await fetchMyProfile();
+  if (me?.is_banned) {
+    throw new Error("Your account is banned. You can appeal from Settings.");
+  }
+
+  // Auto-Mod: every post/reel/status is scanned before publishing.
+  const scan = scanContent({ caption: input.caption, file: input.file });
+  if (!scan.allowed) {
+    if (scan.category === "copyright") {
+      await logCopyright({ userId, reason: "Copyright music or content", detail: scan.reason });
+    }
+    const strikes = await addStrike(userId, scan.reason);
+    if (strikes < 1) throw new Error(`${scan.reason}. This content was not published.`);
+    throw new Error(
+      strikes >= 3
+        ? `${scan.reason}. That is 3 strikes — your account has been banned. You can appeal from Settings.`
+        : `${scan.reason}. Strike ${strikes} of 3.`,
+    );
+  }
+
   let mediaPath: string | null = null;
   let mediaType: string | null = null;
   if (input.file) {
@@ -362,6 +390,9 @@ export async function createContent(input: {
 export async function updateMyProfile(patch: Partial<Profile>) {
   const userId = await getCurrentUserId();
   if (!userId) throw new Error("Please log in");
+  const roles = await fetchMyRoles();
+  // The Owner is always shown as "MzansiTalk Support".
+  if (roles.includes("owner")) patch = { ...patch, name: OWNER_DISPLAY_NAME };
   const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
   if (error) throw error;
 }
