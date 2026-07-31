@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Crown, Flame } from "lucide-react";
 
-import { NativeAd } from "@/components/Ads";
+import { BannerAd, NativeAd } from "@/components/Ads";
 import { PostCard } from "@/components/PostCard";
 import { Avatar } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
@@ -79,11 +79,13 @@ function HomeFeed() {
           {items.map((item, index) => (
             <div key={item.id} className="space-y-4">
               <PostCard item={item} />
-              {(index + 1) % 5 === 0 ? <NativeAd /> : null}
+              {(index + 1) % 5 === 0 && !item.deleted_by_admin ? <NativeAd /> : null}
             </div>
           ))}
+          <BannerAd placement="home_banner" />
         </div>
       )}
     </Screen>
   );
 }
+

@@ -4,6 +4,7 @@ import { Rocket, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { RewardedAdButton } from "@/components/Ads";
 import { Screen } from "@/components/Shell";
 import {
   BOOST_PACKAGES,
@@ -39,9 +40,11 @@ function BoostScreen() {
   const [amount, setAmount] = useState<number>(20);
   const [days, setDays] = useState<number>(1);
   const [custom, setCustom] = useState(false);
+  const [rewarded, setRewarded] = useState(false);
 
   const ready = useQuery({ queryKey: ["payments-ready"], queryFn: paymentsReady });
   const estimate = estimateBoost(amount, days);
+  const charge = rewarded ? Math.max(1, Math.round(amount / 2)) : amount;
 
   const pay = useMutation({
     mutationFn: () => createBoost({ postId, amount, days }),
@@ -149,6 +152,12 @@ function BoostScreen() {
         <p className="mt-3 text-xs text-muted-foreground">
           Higher payment means your content shows more often in the feed.
         </p>
+        <RewardedAdButton rewarded={rewarded} onReward={() => setRewarded(true)} />
+        {rewarded ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            You pay R{charge} instead of R{amount} and still get the full R{amount} boost.
+          </p>
+        ) : null}
       </section>
 
       {ready.data === false ? (
@@ -164,7 +173,7 @@ function BoostScreen() {
         onClick={() => pay.mutate()}
         className="btn-base btn-primary mt-4 w-full disabled:opacity-60"
       >
-        {pay.isPending ? "Processing…" : `Pay R${amount} and Boost`}
+        {pay.isPending ? "Processing…" : `Pay R${charge} and Boost`}
       </button>
     </Screen>
   );

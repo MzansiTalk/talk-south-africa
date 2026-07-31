@@ -4,7 +4,9 @@ import { Pencil, Settings } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { BannerAd } from "@/components/Ads";
 import { PostCard } from "@/components/PostCard";
+
 import { Avatar, useMediaUrl } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
 import {
@@ -231,6 +233,12 @@ function MyProfile() {
           items.map((item) => <PostCard key={item.id} item={item} />)
         )}
       </div>
+
+      <div className="mt-6">
+        <BannerAd placement="profile_banner" />
+      </div>
+
+
 
       <button
         type="button"

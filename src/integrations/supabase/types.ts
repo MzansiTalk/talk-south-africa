@@ -16,22 +16,28 @@ export type Database = {
     Tables: {
       ad_impressions: {
         Row: {
+          clicked: boolean
           created_at: string
           id: string
+          network: string
           placement: string
           revenue: number
           user_id: string | null
         }
         Insert: {
+          clicked?: boolean
           created_at?: string
           id?: string
+          network?: string
           placement: string
           revenue?: number
           user_id?: string | null
         }
         Update: {
+          clicked?: boolean
           created_at?: string
           id?: string
+          network?: string
           placement?: string
           revenue?: number
           user_id?: string | null
@@ -45,9 +51,18 @@ export type Database = {
           admob_interstitial_id: string | null
           admob_native_id: string | null
           admob_payment_email: string | null
+          admob_rewarded_id: string | null
           admob_status_id: string | null
+          ads_banner_enabled: boolean
+          ads_interstitial_enabled: boolean
+          ads_native_enabled: boolean
+          ads_rewarded_enabled: boolean
           id: string
           live_mode: boolean
+          meta_app_id: string | null
+          meta_banner_placement_id: string | null
+          meta_interstitial_placement_id: string | null
+          meta_rewarded_placement_id: string | null
           paystack_payout_email: string | null
           paystack_public_key: string | null
           paystack_secret_key: string | null
@@ -61,9 +76,18 @@ export type Database = {
           admob_interstitial_id?: string | null
           admob_native_id?: string | null
           admob_payment_email?: string | null
+          admob_rewarded_id?: string | null
           admob_status_id?: string | null
+          ads_banner_enabled?: boolean
+          ads_interstitial_enabled?: boolean
+          ads_native_enabled?: boolean
+          ads_rewarded_enabled?: boolean
           id?: string
           live_mode?: boolean
+          meta_app_id?: string | null
+          meta_banner_placement_id?: string | null
+          meta_interstitial_placement_id?: string | null
+          meta_rewarded_placement_id?: string | null
           paystack_payout_email?: string | null
           paystack_public_key?: string | null
           paystack_secret_key?: string | null
@@ -77,9 +101,18 @@ export type Database = {
           admob_interstitial_id?: string | null
           admob_native_id?: string | null
           admob_payment_email?: string | null
+          admob_rewarded_id?: string | null
           admob_status_id?: string | null
+          ads_banner_enabled?: boolean
+          ads_interstitial_enabled?: boolean
+          ads_native_enabled?: boolean
+          ads_rewarded_enabled?: boolean
           id?: string
           live_mode?: boolean
+          meta_app_id?: string | null
+          meta_banner_placement_id?: string | null
+          meta_interstitial_placement_id?: string | null
+          meta_rewarded_placement_id?: string | null
           paystack_payout_email?: string | null
           paystack_public_key?: string | null
           paystack_secret_key?: string | null
@@ -888,6 +921,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ad_config: { Args: never; Returns: Json }
       add_strike: {
         Args: { _post_id?: string; _reason: string; _user_id: string }
         Returns: number
