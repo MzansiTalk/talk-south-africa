@@ -360,6 +360,7 @@ export async function createContent(input: {
       await logCopyright({ userId, reason: "Copyright music or content", detail: scan.reason });
     }
     const strikes = await addStrike(userId, scan.reason);
+    if (strikes < 1) throw new Error(`${scan.reason}. This content was not published.`);
     throw new Error(
       strikes >= 3
         ? `${scan.reason}. That is 3 strikes — your account has been banned. You can appeal from Settings.`
