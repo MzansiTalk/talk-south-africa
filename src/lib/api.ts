@@ -710,9 +710,18 @@ export type AppSettings = {
   admob_app_id: string | null;
   admob_banner_id: string | null;
   admob_interstitial_id: string | null;
+  admob_rewarded_id: string | null;
   admob_native_id: string | null;
   admob_status_id: string | null;
   admob_payment_email: string | null;
+  meta_app_id: string | null;
+  meta_banner_placement_id: string | null;
+  meta_interstitial_placement_id: string | null;
+  meta_rewarded_placement_id: string | null;
+  ads_banner_enabled: boolean;
+  ads_interstitial_enabled: boolean;
+  ads_rewarded_enabled: boolean;
+  ads_native_enabled: boolean;
   paystack_public_key: string | null;
   paystack_secret_key: string | null;
   paystack_webhook_secret: string | null;
@@ -720,6 +729,7 @@ export type AppSettings = {
   test_mode: boolean;
   live_mode: boolean;
 };
+
 
 export async function saveAppSettings(patch: Partial<AppSettings>) {
   const { error } = await supabase.from("app_settings").update(patch).eq("id", "default");
