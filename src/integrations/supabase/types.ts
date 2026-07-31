@@ -89,6 +89,39 @@ export type Database = {
         }
         Relationships: []
       }
+      appeals: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          id: string
+          message: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          message: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          message?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       blocks: {
         Row: {
           blocked_id: string
@@ -251,6 +284,44 @@ export type Database = {
         }
         Relationships: []
       }
+      copyright_log: {
+        Row: {
+          created_at: string
+          detail: string | null
+          id: string
+          post_id: string | null
+          reason: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          post_id?: string | null
+          reason: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          post_id?: string | null
+          reason?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copyright_log_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       follows: {
         Row: {
           created_at: string
@@ -349,6 +420,44 @@ export type Database = {
           },
         ]
       }
+      moderation_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          target_post_id: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          target_post_id?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          target_post_id?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_log_target_post_id_fkey"
+            columns: ["target_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           actor_id: string | null
@@ -441,44 +550,106 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          ban_reason: string | null
+          banned_at: string | null
           bio: string | null
           cover_url: string | null
           created_at: string
           id: string
+          is_banned: boolean
           is_hidden: boolean
           is_viral: boolean
           name: string
+          strikes: number
           updated_at: string
           username: string
           viral_since: string | null
         }
         Insert: {
           avatar_url?: string | null
+          ban_reason?: string | null
+          banned_at?: string | null
           bio?: string | null
           cover_url?: string | null
           created_at?: string
           id: string
+          is_banned?: boolean
           is_hidden?: boolean
           is_viral?: boolean
           name?: string
+          strikes?: number
           updated_at?: string
           username: string
           viral_since?: string | null
         }
         Update: {
           avatar_url?: string | null
+          ban_reason?: string | null
+          banned_at?: string | null
           bio?: string | null
           cover_url?: string | null
           created_at?: string
           id?: string
+          is_banned?: boolean
           is_hidden?: boolean
           is_viral?: boolean
           name?: string
+          strikes?: number
           updated_at?: string
           username?: string
           viral_since?: string | null
         }
         Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          post_id: string | null
+          reason: string
+          reported_user_id: string | null
+          reporter_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          post_id?: string | null
+          reason: string
+          reported_user_id?: string | null
+          reporter_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          post_id?: string | null
+          reason?: string
+          reported_user_id?: string | null
+          reporter_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       saves: {
         Row: {
@@ -565,6 +736,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_strike: {
+        Args: { _post_id?: string; _reason: string; _user_id: string }
+        Returns: number
+      }
+      admin_set_viral: {
+        Args: { _on: boolean; _user_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -579,6 +758,28 @@ export type Database = {
         Returns: boolean
       }
       is_owner: { Args: { _user_id: string }; Returns: boolean }
+      log_copyright: {
+        Args: {
+          _detail?: string
+          _post_id?: string
+          _reason: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
+      log_moderation: {
+        Args: {
+          _action: string
+          _notes?: string
+          _target_post_id?: string
+          _target_user_id?: string
+        }
+        Returns: undefined
+      }
+      owner_set_ban: {
+        Args: { _banned: boolean; _reason?: string; _user_id: string }
+        Returns: undefined
+      }
       payments_ready: { Args: never; Returns: boolean }
       paystack_public_key: { Args: never; Returns: string }
     }
