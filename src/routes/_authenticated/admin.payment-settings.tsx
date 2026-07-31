@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/admin/payment-settings")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: MoneyCenter;
+  component: MoneyCenter,
 });
 
 const EMPTY: AppSettings = {
