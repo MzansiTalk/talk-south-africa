@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_impressions: {
+        Row: {
+          created_at: string
+          id: string
+          placement: string
+          revenue: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          placement: string
+          revenue?: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          placement?: string
+          revenue?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      app_settings: {
+        Row: {
+          admob_app_id: string | null
+          admob_banner_id: string | null
+          admob_interstitial_id: string | null
+          admob_native_id: string | null
+          admob_payment_email: string | null
+          admob_status_id: string | null
+          id: string
+          live_mode: boolean
+          paystack_payout_email: string | null
+          paystack_public_key: string | null
+          paystack_secret_key: string | null
+          paystack_webhook_secret: string | null
+          test_mode: boolean
+          updated_at: string
+        }
+        Insert: {
+          admob_app_id?: string | null
+          admob_banner_id?: string | null
+          admob_interstitial_id?: string | null
+          admob_native_id?: string | null
+          admob_payment_email?: string | null
+          admob_status_id?: string | null
+          id?: string
+          live_mode?: boolean
+          paystack_payout_email?: string | null
+          paystack_public_key?: string | null
+          paystack_secret_key?: string | null
+          paystack_webhook_secret?: string | null
+          test_mode?: boolean
+          updated_at?: string
+        }
+        Update: {
+          admob_app_id?: string | null
+          admob_banner_id?: string | null
+          admob_interstitial_id?: string | null
+          admob_native_id?: string | null
+          admob_payment_email?: string | null
+          admob_status_id?: string | null
+          id?: string
+          live_mode?: boolean
+          paystack_payout_email?: string | null
+          paystack_public_key?: string | null
+          paystack_secret_key?: string | null
+          paystack_webhook_secret?: string | null
+          test_mode?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blocks: {
         Row: {
           blocked_id: string
@@ -34,6 +109,59 @@ export type Database = {
           id?: string
         }
         Relationships: []
+      }
+      boosts: {
+        Row: {
+          amount: number
+          created_at: string
+          days: number
+          ends_at: string
+          id: string
+          post_id: string
+          reference: string | null
+          starts_at: string
+          status: string
+          updated_at: string
+          user_id: string
+          views_gained: number
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          days: number
+          ends_at: string
+          id?: string
+          post_id: string
+          reference?: string | null
+          starts_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          views_gained?: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          days?: number
+          ends_at?: string
+          id?: string
+          post_id?: string
+          reference?: string | null
+          starts_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          views_gained?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "boosts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       comments: {
         Row: {
@@ -66,6 +194,62 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      conversation_members: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_members_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          is_group: boolean
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          is_group?: boolean
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_group?: boolean
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       follows: {
         Row: {
@@ -111,6 +295,54 @@ export type Database = {
           {
             foreignKeyName: "likes_post_id_fkey"
             columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string | null
+          conversation_id: string
+          created_at: string
+          id: string
+          media_type: string | null
+          media_url: string | null
+          sender_id: string
+          shared_post_id: string | null
+        }
+        Insert: {
+          body?: string | null
+          conversation_id: string
+          created_at?: string
+          id?: string
+          media_type?: string | null
+          media_url?: string | null
+          sender_id: string
+          shared_post_id?: string | null
+        }
+        Update: {
+          body?: string | null
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          media_type?: string | null
+          media_url?: string | null
+          sender_id?: string
+          shared_post_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_shared_post_id_fkey"
+            columns: ["shared_post_id"]
             isOneToOne: false
             referencedRelation: "posts"
             referencedColumns: ["id"]
@@ -277,6 +509,33 @@ export type Database = {
           },
         ]
       }
+      support_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_staff_reply: boolean
+          sender_id: string
+          thread_user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_staff_reply?: boolean
+          sender_id: string
+          thread_user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_staff_reply?: boolean
+          sender_id?: string
+          thread_user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -311,7 +570,13 @@ export type Database = {
         Returns: boolean
       }
       is_blocked_pair: { Args: { _a: string; _b: string }; Returns: boolean }
+      is_conversation_member: {
+        Args: { _conversation_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_owner: { Args: { _user_id: string }; Returns: boolean }
+      payments_ready: { Args: never; Returns: boolean }
+      paystack_public_key: { Args: never; Returns: string }
     }
     Enums: {
       app_role: "owner" | "admin" | "user"
