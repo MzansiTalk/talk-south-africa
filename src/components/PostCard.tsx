@@ -15,6 +15,8 @@ import {
   toggleSave,
   type FeedItem,
 } from "@/lib/api";
+import { createReport } from "@/lib/moderation";
+
 
 export function PostCard({ item }: { item: FeedItem }) {
   const queryClient = useQueryClient();
@@ -67,11 +69,24 @@ export function PostCard({ item }: { item: FeedItem }) {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  const report = useMutation({
+    mutationFn: () =>
+      createReport({
+        postId: item.id,
+        reportedUserId: item.user_id,
+        reason: "Reported by a member",
+        details: item.caption ?? null,
+      }),
+    onSuccess: () => toast.success("Report sent to MzansiTalk Support"),
+    onError: (error: Error) => toast.error(error.message),
+  });
+
   const comments = useQuery({
     queryKey: ["comments", item.id],
     queryFn: () => fetchComments(item.id),
     enabled: showComments,
   });
+
 
   const post = useMutation({
     mutationFn: () => addComment(item.id, draft.trim()),
@@ -151,11 +166,13 @@ export function PostCard({ item }: { item: FeedItem }) {
             </button>
             <button
               type="button"
-              onClick={() => toast.success("Report sent to MzansiTalk Support")}
+              onClick={() => report.mutate()}
+              disabled={report.isPending}
               className="w-full px-3 py-2.5 text-left"
             >
               Report
             </button>
+
           </div>
         </details>
       </div>
