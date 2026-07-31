@@ -131,8 +131,8 @@ export function Screen({
   showSearch,
 }: {
   children: ReactNode;
-  title?: string;
-  showSearch?: boolean;
+  title?: string | undefined;
+  showSearch?: boolean | undefined;
 }) {
   return (
     <div className="min-h-screen bg-background pb-20">
