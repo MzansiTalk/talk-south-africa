@@ -1,0 +1,104 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { ShieldAlert, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+
+import { Avatar } from "@/components/SignedMedia";
+import { Screen, useIsAdmin } from "@/components/Shell";
+import { deletePost, fetchFeed, search } from "@/lib/api";
+
+export const Route = createFileRoute("/_authenticated/admin")({
+  head: () => ({
+    meta: [
+      { title: "Admin — MzansiTalk" },
+      {
+        name: "description",
+        content: "MzansiTalk admin tools: review recent content, remove posts and find members.",
+      },
+      { property: "og:title", content: "Admin — MzansiTalk" },
+      { property: "og:description", content: "Moderation tools for the MzansiTalk team." },
+    ],
+  }),
+  component: AdminPage,
+});
+
+function AdminPage() {
+  const { isAdmin } = useIsAdmin();
+  const queryClient = useQueryClient();
+
+  const recent = useQuery({ queryKey: ["feed", "admin"], queryFn: () => fetchFeed(), enabled: isAdmin });
+  const members = useQuery({ queryKey: ["search", ""], queryFn: () => search(""), enabled: isAdmin });
+
+  const remove = useMutation({
+    mutationFn: (input: { id: string; ownerId: string }) => deletePost(input.id, input.ownerId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["feed"] });
+      toast.success("Content removed");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  if (!isAdmin) {
+    return (
+      <Screen title="Admin">
+        <div className="rounded-2xl border border-border bg-card p-8 text-center">
+          <ShieldAlert className="mx-auto size-8 text-destructive" />
+          <p className="mt-3 text-sm text-muted-foreground">
+            This area is only available to the MzansiTalk team.
+          </p>
+        </div>
+      </Screen>
+    );
+  }
+
+  return (
+    <Screen title="Admin">
+      <section className="rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold">Recent Content</h2>
+        <ul className="mt-3 space-y-2">
+          {(recent.data ?? []).slice(0, 25).map((item) => (
+            <li key={item.id} className="flex items-center gap-3 rounded-xl bg-secondary/60 p-2">
+              <Avatar path={item.author?.avatar_url} name={item.author?.name ?? "M"} size={32} />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-xs font-semibold">
+                  @{item.author?.username} · {item.kind}
+                </span>
+                <span className="block truncate text-xs text-muted-foreground">
+                  {item.caption || "(no caption)"}
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={() => remove.mutate({ id: item.id, ownerId: item.user_id })}
+                className="btn-base bg-destructive px-2 py-1.5 text-destructive-foreground"
+                aria-label="Delete content"
+              >
+                <Trash2 className="size-3.5" />
+              </button>
+            </li>
+          ))}
+          {(recent.data ?? []).length === 0 ? (
+            <li className="text-sm text-muted-foreground">No content to review.</li>
+          ) : null}
+        </ul>
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold">Members</h2>
+        <ul className="mt-3 space-y-2">
+          {(members.data?.people ?? []).map((person) => (
+            <li key={person.id} className="flex items-center gap-3">
+              <Avatar path={person.avatar_url} name={person.name} size={32} />
+              <span className="text-sm">
+                {person.name} <span className="text-muted-foreground">@{person.username}</span>
+              </span>
+            </li>
+          ))}
+          {(members.data?.people ?? []).length === 0 ? (
+            <li className="text-sm text-muted-foreground">No members found.</li>
+          ) : null}
+        </ul>
+      </section>
+    </Screen>
+  );
+}
