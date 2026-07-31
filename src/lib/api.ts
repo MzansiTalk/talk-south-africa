@@ -30,7 +30,9 @@ export type Post = {
   boost_amount: number;
   boost_expires_at: string | null;
   expires_at: string | null;
+  deleted_by_admin?: boolean;
   views?: number;
+
   created_at: string;
 
   profiles?: Profile | null;
