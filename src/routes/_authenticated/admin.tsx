@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 function AdminPage() {
-  const { isAdmin, isLoading } = useIsAdmin();
+  const { isAdmin } = useIsAdmin();
   const queryClient = useQueryClient();
 
   const recent = useQuery({ queryKey: ["feed", "admin"], queryFn: () => fetchFeed(), enabled: isAdmin });
@@ -37,14 +37,6 @@ function AdminPage() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
-
-  if (isLoading) {
-    return (
-      <Screen title="Admin">
-        <div className="h-32 animate-pulse rounded-2xl bg-muted" />
-      </Screen>
-    );
-  }
 
   if (!isAdmin) {
     return (
