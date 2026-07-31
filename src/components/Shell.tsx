@@ -27,7 +27,13 @@ export function useIsAdmin() {
   };
 }
 
-export function TopBar({ title, showSearch = false }: { title?: string; showSearch?: boolean }) {
+export function TopBar({
+  title,
+  showSearch = false,
+}: {
+  title?: string | undefined;
+  showSearch?: boolean | undefined;
+}) {
   const router = useRouter();
   const { theme, toggle } = useTheme();
 
