@@ -725,7 +725,15 @@ export type AppSettings = {
   paystack_public_key: string | null;
   paystack_secret_key: string | null;
   paystack_webhook_secret: string | null;
+  paystack_webhook_url: string | null;
   paystack_payout_email: string | null;
+  price_per_1000_impressions: number;
+  price_sponsored_7_days: number;
+  price_sponsored_30_days: number;
+  price_boost_post: number;
+  price_boost_7_days: number;
+  admob_test_mode: boolean;
+  paystack_test_mode: boolean;
   test_mode: boolean;
   live_mode: boolean;
 };
@@ -733,6 +741,86 @@ export type AppSettings = {
 
 export async function saveAppSettings(patch: Partial<AppSettings>) {
   const { error } = await supabase.from("app_settings").update(patch).eq("id", "default");
+  if (error) throw error;
+}
+
+export type PublicPricing = {
+  price_per_1000_impressions: number;
+  price_sponsored_7_days: number;
+  price_sponsored_30_days: number;
+  price_boost_post: number;
+  price_boost_7_days: number;
+  paystack_public_key: string | null;
+  paystack_test_mode: boolean;
+};
+
+export const DEFAULT_PRICING: PublicPricing = {
+  price_per_1000_impressions: 50,
+  price_sponsored_7_days: 500,
+  price_sponsored_30_days: 1500,
+  price_boost_post: 20,
+  price_boost_7_days: 100,
+  paystack_public_key: null,
+  paystack_test_mode: true,
+};
+
+export async function fetchPublicPricing(): Promise<PublicPricing> {
+  const { data, error } = await supabase.rpc("public_pricing");
+  if (error || !data) return DEFAULT_PRICING;
+  return { ...DEFAULT_PRICING, ...(data as Partial<PublicPricing>) };
+}
+
+export type SponsoredOrder = {
+  id: string;
+  brand_name: string;
+  brand_email: string;
+  phone: string | null;
+  package: string;
+  amount: number;
+  days: number;
+  message: string | null;
+  reference: string | null;
+  status: string;
+  created_at: string;
+};
+
+export async function createSponsoredOrder(input: {
+  brandName: string;
+  brandEmail: string;
+  phone?: string;
+  package: string;
+  amount: number;
+  days: number;
+  message?: string;
+  reference?: string;
+}) {
+  const { data: auth } = await supabase.auth.getUser();
+  const { error } = await supabase.from("sponsored_orders").insert({
+    user_id: auth.user?.id ?? null,
+    brand_name: input.brandName,
+    brand_email: input.brandEmail,
+    phone: input.phone ?? null,
+    package: input.package,
+    amount: input.amount,
+    days: input.days,
+    message: input.message ?? null,
+    reference: input.reference ?? null,
+  });
+  if (error) throw error;
+}
+
+export async function fetchSponsoredOrders(): Promise<SponsoredOrder[]> {
+  const { data, error } = await supabase
+    .from("sponsored_orders")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  if (error) throw error;
+  return (data ?? []) as SponsoredOrder[];
+}
+
+export async function setSponsoredOrderStatus(id: string, status: string) {
+  const { error } = await supabase.from("sponsored_orders").update({ status }).eq("id", id);
   if (error) throw error;
 }
 
