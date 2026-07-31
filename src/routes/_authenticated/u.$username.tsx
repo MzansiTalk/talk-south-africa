@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import { PostCard } from "@/components/PostCard";
 import { Avatar, useMediaUrl } from "@/components/SignedMedia";
-import { Screen } from "@/components/Shell";
+import { Screen, useIsAdmin } from "@/components/Shell";
 import {
   fetchFollowCounts,
   fetchProfileByUsername,
@@ -104,7 +104,13 @@ function UserProfile() {
           </div>
           <h1 className="mt-2 font-display text-xl font-bold">{target.name}</h1>
           <p className="text-sm text-muted-foreground">@{target.username}</p>
+          {isAdmin ? (
+            <p className="mt-1 text-xs font-bold text-destructive">
+              Strikes: {target.strikes ?? 0}/3{target.is_banned ? " · BANNED" : ""}
+            </p>
+          ) : null}
           {target.bio ? <p className="mt-2 text-sm">{target.bio}</p> : null}
+
 
           <div className="mt-3 flex gap-5 text-sm">
             <span>

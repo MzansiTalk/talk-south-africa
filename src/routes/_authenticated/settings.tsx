@@ -107,6 +107,10 @@ function SettingsPage() {
         <Link to="/support" className="btn-base btn-primary mt-3">
           <LifeBuoy className="size-4" /> Contact Support
         </Link>
+        <Link to="/appeal" className="btn-base mt-2 bg-secondary text-secondary-foreground">
+          Account Status &amp; Appeal a Ban
+        </Link>
+
       </section>
 
       <button type="button" onClick={signOut} className="btn-base mt-4 w-full bg-destructive text-destructive-foreground">
