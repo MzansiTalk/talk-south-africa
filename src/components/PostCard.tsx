@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Bookmark, Heart, MessageCircle, MoreHorizontal, Share2, Trash2 } from "lucide-react";
+import { Bookmark, Heart, MessageCircle, MoreHorizontal, Rocket, Send, Share2, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -9,6 +9,8 @@ import {
   addComment,
   deletePost,
   fetchComments,
+  fetchConversations,
+  sharePostToChat,
   toggleLike,
   toggleSave,
   type FeedItem,
@@ -17,6 +19,7 @@ import {
 export function PostCard({ item }: { item: FeedItem }) {
   const queryClient = useQueryClient();
   const [showComments, setShowComments] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const [draft, setDraft] = useState("");
 
   const invalidate = () => {
@@ -45,6 +48,21 @@ export function PostCard({ item }: { item: FeedItem }) {
     onSuccess: (byAdmin) => {
       invalidate();
       toast.success(byAdmin ? "Deleted by MzansiTalk Support" : "Post deleted");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const chats = useQuery({
+    queryKey: ["conversations"],
+    queryFn: fetchConversations,
+    enabled: showShare,
+  });
+
+  const shareToChat = useMutation({
+    mutationFn: (conversationId: string) => sharePostToChat(item.id, conversationId),
+    onSuccess: () => {
+      setShowShare(false);
+      toast.success("Shared in chat");
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -117,6 +135,20 @@ export function PostCard({ item }: { item: FeedItem }) {
             >
               <Trash2 className="size-4" /> Delete
             </button>
+            <Link
+              to="/boost/$postId"
+              params={{ postId: item.id }}
+              className="flex w-full items-center gap-2 px-3 py-2.5 text-left"
+            >
+              <Rocket className="size-4 text-gold" /> Boost
+            </Link>
+            <button
+              type="button"
+              onClick={() => setShowShare(true)}
+              className="flex w-full items-center gap-2 px-3 py-2.5 text-left"
+            >
+              <Send className="size-4" /> Send in Chat
+            </button>
             <button
               type="button"
               onClick={() => toast.success("Report sent to MzansiTalk Support")}
@@ -170,6 +202,41 @@ export function PostCard({ item }: { item: FeedItem }) {
           <Bookmark className={`size-5 ${item.savedByMe ? "fill-current" : ""}`} />
         </button>
       </div>
+
+      {showShare ? (
+        <div className="border-t border-border p-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            Send this {item.kind} to a chat
+          </p>
+          <ul className="mt-2 space-y-2">
+            {(chats.data ?? []).map((chat) => (
+              <li key={chat.id}>
+                <button
+                  type="button"
+                  onClick={() => shareToChat.mutate(chat.id)}
+                  className="btn-base w-full justify-start bg-secondary text-secondary-foreground"
+                >
+                  {chat.is_group
+                    ? chat.title || "Group Chat"
+                    : (chat.members.map((member) => member.name).join(", ") || "Chat")}
+                </button>
+              </li>
+            ))}
+            {(chats.data ?? []).length === 0 ? (
+              <li className="text-sm text-muted-foreground">
+                No chats yet. Start one from the Chats tab.
+              </li>
+            ) : null}
+          </ul>
+          <button
+            type="button"
+            onClick={() => setShowShare(false)}
+            className="btn-base mt-2 bg-transparent text-xs text-muted-foreground"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : null}
 
       {showComments ? (
         <div className="border-t border-border p-3">

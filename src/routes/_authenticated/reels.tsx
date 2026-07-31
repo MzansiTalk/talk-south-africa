@@ -3,7 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useState } from "react";
 
-import { AdSlot, PostCard } from "@/components/PostCard";
+import { BannerAd, VideoAd } from "@/components/Ads";
+import { PostCard } from "@/components/PostCard";
 import { Screen } from "@/components/Shell";
 import { fetchFeed } from "@/lib/api";
 
@@ -51,14 +52,14 @@ function Reels() {
           {items.map((item, index) => (
             <div key={item.id} className="space-y-4">
               <PostCard item={item} />
-              {(index + 1) % 3 === 0 ? <AdSlot /> : null}
+              {(index + 1) % 3 === 0 ? <VideoAd /> : null}
             </div>
           ))}
         </div>
       )}
 
-      <div className="mt-4">
-        <AdSlot />
+      <div className="fixed inset-x-0 bottom-[3.6rem] z-20 mx-auto w-full max-w-2xl px-3">
+        <BannerAd />
       </div>
     </Screen>
   );

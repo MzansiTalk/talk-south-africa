@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { ShieldAlert, Trash2 } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { BarChart3, Inbox, Rocket, ShieldAlert, Trash2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
@@ -53,7 +53,22 @@ function AdminPage() {
 
   return (
     <Screen title="Admin">
-      <section className="rounded-2xl border border-border bg-card p-4">
+      <section className="grid grid-cols-2 gap-2">
+        <Link to="/admin/boosts" className="btn-base bg-secondary text-secondary-foreground">
+          <Rocket className="size-4" /> Boost Manager
+        </Link>
+        <Link to="/admin/support" className="btn-base bg-secondary text-secondary-foreground">
+          <Inbox className="size-4" /> Support Inbox
+        </Link>
+        <Link to="/admin/payment-settings" className="btn-base bg-secondary text-secondary-foreground">
+          <Wallet className="size-4" /> Payment Settings
+        </Link>
+        <Link to="/admin/earnings" className="btn-base bg-secondary text-secondary-foreground">
+          <BarChart3 className="size-4" /> Earnings
+        </Link>
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold">Recent Content</h2>
         <ul className="mt-3 space-y-2">
           {(recent.data ?? []).slice(0, 25).map((item) => (

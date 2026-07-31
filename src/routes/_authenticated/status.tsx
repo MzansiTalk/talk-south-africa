@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { AdSlot, PostCard } from "@/components/PostCard";
+import { StatusAd } from "@/components/Ads";
+import { PostCard } from "@/components/PostCard";
 import { Avatar } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
 import { fetchFeed } from "@/lib/api";
@@ -49,7 +50,7 @@ function StatusPage() {
         {items.map((item, index) => (
           <div key={item.id} className="space-y-4">
             <PostCard item={item} />
-            {(index + 1) % 4 === 0 ? <AdSlot /> : null}
+            {(index + 1) % 4 === 0 ? <StatusAd /> : null}
           </div>
         ))}
       </div>

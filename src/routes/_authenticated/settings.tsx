@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { LogOut, Moon, ShieldOff, Sun } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { CreditCard, LifeBuoy, LogOut, Moon, ShieldOff, Sun } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
@@ -85,17 +85,28 @@ function SettingsPage() {
       </section>
 
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold">Payments</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Manage the cards you use to pay for boosts.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link to="/payment-methods" className="btn-base bg-secondary text-secondary-foreground">
+            <CreditCard className="size-4" /> Payment Methods
+          </Link>
+          <Link to="/my-boosts" className="btn-base bg-secondary text-secondary-foreground">
+            My Boosts
+          </Link>
+        </div>
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold">Help and Support</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Message MzansiTalk Support and the team replies inside the app.
         </p>
-        <button
-          type="button"
-          onClick={() => toast.info("Support inbox arrives with the chat release")}
-          className="btn-base btn-primary mt-3"
-        >
-          Contact Support
-        </button>
+        <Link to="/support" className="btn-base btn-primary mt-3">
+          <LifeBuoy className="size-4" /> Contact Support
+        </Link>
       </section>
 
       <button type="button" onClick={signOut} className="btn-base mt-4 w-full bg-destructive text-destructive-foreground">

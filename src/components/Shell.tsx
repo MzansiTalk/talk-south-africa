@@ -5,6 +5,7 @@ import {
   ChevronLeft,
   Film,
   Home,
+  MessageCircle,
   Moon,
   PlusCircle,
   Search,
@@ -69,6 +70,13 @@ export function TopBar({
           >
             {theme === "dark" ? <Sun className="size-5" /> : <Moon className="size-5" />}
           </button>
+          <Link
+            to="/chat"
+            aria-label="Chats"
+            className="btn-base bg-transparent px-2 text-muted-foreground"
+          >
+            <MessageCircle className="size-5" />
+          </Link>
           <Link
             to="/notifications"
             aria-label="Notifications"
