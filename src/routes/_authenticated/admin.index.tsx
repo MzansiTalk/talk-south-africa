@@ -7,7 +7,7 @@ import { Avatar } from "@/components/SignedMedia";
 import { Screen, useIsAdmin } from "@/components/Shell";
 import { deletePost, fetchFeed, search } from "@/lib/api";
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
     meta: [
       { title: "Admin — MzansiTalk" },

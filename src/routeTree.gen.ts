@@ -25,6 +25,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedStatusRouteImport } from './routes/_authenticated/status'
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminPaymentSettingsRouteImport } from './routes/_authenticated/admin.payment-settings'
 import { Route as AuthenticatedBoostPostIdRouteImport } from './routes/_authenticated/boost.$postId'
 import { Route as AuthenticatedChatIndexRouteImport } from './routes/_authenticated/chat.index'
 import { Route as AuthenticatedChatIdRouteImport } from './routes/_authenticated/chat.$id'
@@ -111,6 +112,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminPaymentSettingsRoute =
+  AuthenticatedAdminPaymentSettingsRouteImport.update({
+    id: '/admin/payment-settings',
+    path: '/admin/payment-settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedBoostPostIdRoute =
   AuthenticatedBoostPostIdRouteImport.update({
     id: '/boost/$postId',
@@ -148,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/status': typeof AuthenticatedStatusRoute
   '/support': typeof AuthenticatedSupportRoute
+  '/admin/payment-settings': typeof AuthenticatedAdminPaymentSettingsRoute
   '/boost/$postId': typeof AuthenticatedBoostPostIdRoute
   '/chat/$id': typeof AuthenticatedChatIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
@@ -169,6 +177,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/status': typeof AuthenticatedStatusRoute
   '/support': typeof AuthenticatedSupportRoute
+  '/admin/payment-settings': typeof AuthenticatedAdminPaymentSettingsRoute
   '/boost/$postId': typeof AuthenticatedBoostPostIdRoute
   '/chat/$id': typeof AuthenticatedChatIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
@@ -192,6 +201,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/status': typeof AuthenticatedStatusRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
+  '/_authenticated/admin/payment-settings': typeof AuthenticatedAdminPaymentSettingsRoute
   '/_authenticated/boost/$postId': typeof AuthenticatedBoostPostIdRoute
   '/_authenticated/chat/$id': typeof AuthenticatedChatIdRoute
   '/_authenticated/u/$username': typeof AuthenticatedUUsernameRoute
@@ -215,6 +225,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/status'
     | '/support'
+    | '/admin/payment-settings'
     | '/boost/$postId'
     | '/chat/$id'
     | '/u/$username'
@@ -236,6 +247,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/status'
     | '/support'
+    | '/admin/payment-settings'
     | '/boost/$postId'
     | '/chat/$id'
     | '/u/$username'
@@ -258,6 +270,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/status'
     | '/_authenticated/support'
+    | '/_authenticated/admin/payment-settings'
     | '/_authenticated/boost/$postId'
     | '/_authenticated/chat/$id'
     | '/_authenticated/u/$username'
@@ -386,6 +399,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/payment-settings': {
+      id: '/_authenticated/admin/payment-settings'
+      path: '/admin/payment-settings'
+      fullPath: '/admin/payment-settings'
+      preLoaderRoute: typeof AuthenticatedAdminPaymentSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/boost/$postId': {
       id: '/_authenticated/boost/$postId'
       path: '/boost/$postId'
@@ -429,6 +449,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedStatusRoute: typeof AuthenticatedStatusRoute
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
+  AuthenticatedAdminPaymentSettingsRoute: typeof AuthenticatedAdminPaymentSettingsRoute
   AuthenticatedBoostPostIdRoute: typeof AuthenticatedBoostPostIdRoute
   AuthenticatedChatIdRoute: typeof AuthenticatedChatIdRoute
   AuthenticatedUUsernameRoute: typeof AuthenticatedUUsernameRoute
@@ -448,6 +469,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedStatusRoute: AuthenticatedStatusRoute,
   AuthenticatedSupportRoute: AuthenticatedSupportRoute,
+  AuthenticatedAdminPaymentSettingsRoute:
+    AuthenticatedAdminPaymentSettingsRoute,
   AuthenticatedBoostPostIdRoute: AuthenticatedBoostPostIdRoute,
   AuthenticatedChatIdRoute: AuthenticatedChatIdRoute,
   AuthenticatedUUsernameRoute: AuthenticatedUUsernameRoute,
