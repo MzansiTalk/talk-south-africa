@@ -83,6 +83,11 @@ function SearchPage() {
       {term.trim().length > 1 && !results.isLoading && (results.data?.people ?? []).length === 0 && (results.data?.content ?? []).length === 0 ? (
         <p className="mt-6 text-center text-sm text-muted-foreground">No results for “{term}”.</p>
       ) : null}
+
+      <div className="mt-6">
+        <BannerAd placement="search_banner" />
+      </div>
     </Screen>
   );
 }
+
