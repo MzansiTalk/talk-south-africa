@@ -35,9 +35,18 @@ const EMPTY: AppSettings = {
   admob_app_id: "",
   admob_banner_id: "",
   admob_interstitial_id: "",
+  admob_rewarded_id: "",
   admob_native_id: "",
   admob_status_id: "",
   admob_payment_email: OWNER_EMAIL,
+  meta_app_id: "",
+  meta_banner_placement_id: "",
+  meta_interstitial_placement_id: "",
+  meta_rewarded_placement_id: "",
+  ads_banner_enabled: true,
+  ads_interstitial_enabled: true,
+  ads_rewarded_enabled: true,
+  ads_native_enabled: true,
   paystack_public_key: "",
   paystack_secret_key: "",
   paystack_webhook_secret: "",
@@ -45,6 +54,7 @@ const EMPTY: AppSettings = {
   test_mode: true,
   live_mode: false,
 };
+
 
 function Field({
   label,
