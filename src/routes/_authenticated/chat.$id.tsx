@@ -1,13 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useParams } from "@tanstack/react-router";
-import { ImagePlus, Mic, Send, Square } from "lucide-react";
+import { CheckCheck, ImagePlus, Mic, Send, ShieldOff, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Avatar, SignedMedia, useMediaUrl } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchConversation, fetchMessages, fetchMyProfile, sendMessage } from "@/lib/api";
+import {
+  fetchConversation,
+  fetchMessages,
+  fetchMyProfile,
+  sendMessage,
+  setBlock,
+} from "@/lib/api";
+import { fetchOthersReadAt, isOnline, markConversationRead } from "@/lib/creators";
+
 
 export const Route = createFileRoute("/_authenticated/chat/$id")({
   head: () => ({
@@ -64,7 +72,17 @@ function ChatThread() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.data?.length]);
+    void markConversationRead(id).then(() =>
+      queryClient.invalidateQueries({ queryKey: ["seen", id] }),
+    );
+  }, [messages.data?.length, id, queryClient]);
+
+  const seenAt = useQuery({
+    queryKey: ["seen", id],
+    queryFn: () => fetchOthersReadAt(id),
+    refetchInterval: 20_000,
+  });
+
 
   const send = useMutation({
     mutationFn: (input: { body?: string; file?: File; mediaType?: "image" | "video" | "voice" }) =>
@@ -112,10 +130,38 @@ function ChatThread() {
   const title = meta.data?.conversation?.is_group
     ? meta.data.conversation.title || "Group Chat"
     : (other?.name ?? "Chat");
+  const otherOnline = isOnline(
+    (other as (typeof other & { last_seen_at?: string | null }) | undefined)?.last_seen_at,
+  );
+
+  const block = useMutation({
+    mutationFn: () => setBlock(other?.id ?? "", true),
+    onSuccess: () => toast.success("User blocked. They can no longer message you."),
+    onError: (error: Error) => toast.error(error.message),
+  });
 
   return (
     <Screen title={title}>
+      {!meta.data?.conversation?.is_group && other ? (
+        <div className="mb-3 flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2">
+          <span
+            className={`size-2 rounded-full ${otherOnline ? "bg-green-500" : "bg-muted-foreground/50"}`}
+          />
+          <span className="text-xs text-muted-foreground">
+            {otherOnline ? "Online" : "Offline"}
+          </span>
+          <button
+            type="button"
+            onClick={() => block.mutate()}
+            className="btn-base ml-auto bg-secondary px-3 py-1.5 text-xs text-secondary-foreground"
+          >
+            <ShieldOff className="size-3.5" /> Block
+          </button>
+        </div>
+      ) : null}
+
       <ul className="space-y-3 pb-24">
+
         {(messages.data ?? []).map((message) => {
           const mine = message.sender_id === me.data?.id;
           return (
@@ -167,8 +213,19 @@ function ChatThread() {
                     ) : null}
                   </div>
                 ) : null}
+                {mine ? (
+                  <span className="mt-1 flex items-center justify-end gap-1 text-[0.6rem] opacity-80">
+                    <CheckCheck
+                      className={`size-3 ${
+                        seenAt.data && seenAt.data >= message.created_at ? "text-gold" : ""
+                      }`}
+                    />
+                    {seenAt.data && seenAt.data >= message.created_at ? "Seen" : "Sent"}
+                  </span>
+                ) : null}
               </div>
             </li>
+
           );
         })}
         <div ref={bottomRef} />

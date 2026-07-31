@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import { Screen } from "@/components/Shell";
-import { fetchNotifications } from "@/lib/api";
+import { fetchNotifications, markNotificationsRead } from "@/lib/api";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
@@ -20,7 +21,15 @@ export const Route = createFileRoute("/_authenticated/notifications")({
 });
 
 function NotificationsPage() {
+  const queryClient = useQueryClient();
   const items = useQuery({ queryKey: ["notifications"], queryFn: fetchNotifications });
+
+  useEffect(() => {
+    void markNotificationsRead().then(() =>
+      queryClient.invalidateQueries({ queryKey: ["notifications-unread"] }),
+    );
+  }, [queryClient]);
+
 
   return (
     <Screen title="Notifications">

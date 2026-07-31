@@ -263,6 +263,7 @@ export type Database = {
           created_by: string
           id: string
           is_group: boolean
+          photo_url: string | null
           title: string | null
           updated_at: string
         }
@@ -271,6 +272,7 @@ export type Database = {
           created_by: string
           id?: string
           is_group?: boolean
+          photo_url?: string | null
           title?: string | null
           updated_at?: string
         }
@@ -279,6 +281,7 @@ export type Database = {
           created_by?: string
           id?: string
           is_group?: boolean
+          photo_url?: string | null
           title?: string | null
           updated_at?: string
         }
@@ -321,6 +324,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      creator_applications: {
+        Row: {
+          account_number: string
+          bank_name: string
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          full_name: string
+          id: string
+          id_number: string
+          phone: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_number: string
+          bank_name: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          full_name: string
+          id?: string
+          id_number: string
+          phone: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_number?: string
+          bank_name?: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          full_name?: string
+          id?: string
+          id_number?: string
+          phone?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       follows: {
         Row: {
@@ -368,6 +416,41 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_reads: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          last_read_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          last_read_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          last_read_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reads_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
         ]
@@ -499,6 +582,45 @@ export type Database = {
           },
         ]
       }
+      payout_requests: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          created_at: string
+          creator_share: number
+          id: string
+          paid_at: string | null
+          platform_share: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          approved_at?: string | null
+          created_at?: string
+          creator_share?: number
+          id?: string
+          paid_at?: string | null
+          platform_share?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          created_at?: string
+          creator_share?: number
+          id?: string
+          paid_at?: string | null
+          platform_share?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           boost_amount: number
@@ -514,6 +636,7 @@ export type Database = {
           media_url: string | null
           updated_at: string
           user_id: string
+          views: number
         }
         Insert: {
           boost_amount?: number
@@ -529,6 +652,7 @@ export type Database = {
           media_url?: string | null
           updated_at?: string
           user_id: string
+          views?: number
         }
         Update: {
           boost_amount?: number
@@ -544,6 +668,7 @@ export type Database = {
           media_url?: string | null
           updated_at?: string
           user_id?: string
+          views?: number
         }
         Relationships: []
       }
@@ -559,7 +684,9 @@ export type Database = {
           is_banned: boolean
           is_hidden: boolean
           is_viral: boolean
+          last_seen_at: string
           name: string
+          notifications_enabled: boolean
           strikes: number
           updated_at: string
           username: string
@@ -576,7 +703,9 @@ export type Database = {
           is_banned?: boolean
           is_hidden?: boolean
           is_viral?: boolean
+          last_seen_at?: string
           name?: string
+          notifications_enabled?: boolean
           strikes?: number
           updated_at?: string
           username: string
@@ -593,11 +722,34 @@ export type Database = {
           is_banned?: boolean
           is_hidden?: boolean
           is_viral?: boolean
+          last_seen_at?: string
           name?: string
+          notifications_enabled?: boolean
           strikes?: number
           updated_at?: string
           username?: string
           viral_since?: string | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          referred_id: string
+          referrer_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referred_id: string
+          referrer_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referred_id?: string
+          referrer_id?: string
         }
         Relationships: []
       }
@@ -751,6 +903,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_post_view: { Args: { _post_id: string }; Returns: undefined }
       is_active_staff: { Args: { _user_id: string }; Returns: boolean }
       is_blocked_pair: { Args: { _a: string; _b: string }; Returns: boolean }
       is_conversation_member: {
@@ -780,8 +933,17 @@ export type Database = {
         Args: { _banned: boolean; _reason?: string; _user_id: string }
         Returns: undefined
       }
+      owner_set_creator_status: {
+        Args: { _application_id: string; _status: string }
+        Returns: undefined
+      }
+      owner_set_payout_status: {
+        Args: { _payout_id: string; _status: string }
+        Returns: undefined
+      }
       payments_ready: { Args: never; Returns: boolean }
       paystack_public_key: { Args: never; Returns: string }
+      touch_presence: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "owner" | "admin" | "user"

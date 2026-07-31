@@ -5,6 +5,8 @@ import { toast } from "sonner";
 
 import logo from "@/assets/mzansitalk-logo.png";
 import { supabase } from "@/integrations/supabase/client";
+import { claimStoredReferral } from "@/lib/creators";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -57,9 +59,11 @@ function AuthWall() {
           toast.success("Check your email to confirm your MzansiTalk account.");
           return;
         }
+        await claimStoredReferral();
         toast.success("Welcome to MzansiTalk");
         void navigate({ to: "/home", replace: true });
         return;
+
       }
 
       const { error } = await supabase.auth.signInWithPassword({

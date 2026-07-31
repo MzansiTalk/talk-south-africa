@@ -30,7 +30,9 @@ export type Post = {
   boost_amount: number;
   boost_expires_at: string | null;
   expires_at: string | null;
+  views?: number;
   created_at: string;
+
   profiles?: Profile | null;
 };
 
@@ -185,7 +187,17 @@ export async function toggleLike(postId: string, liked: boolean) {
   }
   const { error } = await supabase.from("likes").insert({ post_id: postId, user_id: userId });
   if (error) throw error;
+  const { data: post } = await supabase
+    .from("posts")
+    .select("user_id")
+    .eq("id", postId)
+    .maybeSingle();
+  const ownerId = (post as { user_id: string } | null)?.user_id;
+  if (ownerId) {
+    await notify({ userId: ownerId, kind: "like", message: "liked your post", postId });
+  }
 }
+
 
 export async function toggleSave(postId: string, saved: boolean) {
   const userId = await getCurrentUserId();
@@ -238,7 +250,17 @@ export async function addComment(postId: string, body: string) {
     .from("comments")
     .insert({ post_id: postId, user_id: userId, body });
   if (error) throw error;
+  const { data: post } = await supabase
+    .from("posts")
+    .select("user_id")
+    .eq("id", postId)
+    .maybeSingle();
+  const ownerId = (post as { user_id: string } | null)?.user_id;
+  if (ownerId) {
+    await notify({ userId: ownerId, kind: "comment", message: "commented on your post", postId });
+  }
 }
+
 
 export async function isFollowing(targetId: string) {
   const userId = await getCurrentUserId();
@@ -260,12 +282,8 @@ export async function setFollow(targetId: string, follow: boolean) {
       .from("follows")
       .insert({ follower_id: userId, following_id: targetId });
     if (error) throw error;
-    await supabase.from("notifications").insert({
-      user_id: targetId,
-      actor_id: userId,
-      kind: "follow",
-      message: "started following you",
-    });
+    await notify({ userId: targetId, kind: "follow", message: "started following you" });
+
     return;
   }
   const { error } = await supabase
@@ -397,6 +415,60 @@ export async function updateMyProfile(patch: Partial<Profile>) {
   if (error) throw error;
 }
 
+/** Sends an in-app notification (and a push when the browser allows it). */
+export async function notify(input: {
+  userId: string;
+  kind: string;
+  message: string;
+  postId?: string | null;
+}) {
+  const actorId = await getCurrentUserId();
+  if (!actorId || actorId === input.userId) return;
+  const { data: target } = await supabase
+    .from("profiles")
+    .select("notifications_enabled")
+    .eq("id", input.userId)
+    .maybeSingle();
+  if ((target as { notifications_enabled?: boolean } | null)?.notifications_enabled === false) return;
+  await supabase.from("notifications").insert({
+    user_id: input.userId,
+    actor_id: actorId,
+    kind: input.kind,
+    message: input.message,
+    post_id: input.postId ?? null,
+  });
+}
+
+/** Browser push permission, used by the Settings notification toggle. */
+export async function enablePushNotifications() {
+  if (typeof window === "undefined" || !("Notification" in window)) return false;
+  const result = await Notification.requestPermission();
+  return result === "granted";
+}
+
+export function pushNotification(title: string, body: string) {
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+  new Notification(title, { body });
+}
+
+export async function fetchNotificationsEnabled(): Promise<boolean> {
+  const profile = await fetchMyProfile();
+  return (profile as (Profile & { notifications_enabled?: boolean }) | null)
+    ?.notifications_enabled !== false;
+}
+
+export async function setNotificationsEnabled(enabled: boolean) {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error("Please log in");
+  const { error } = await supabase
+    .from("profiles")
+    .update({ notifications_enabled: enabled })
+    .eq("id", userId);
+  if (error) throw error;
+  if (enabled) await enablePushNotifications();
+}
+
 export async function fetchNotifications() {
   const userId = await getCurrentUserId();
   if (!userId) return [];
@@ -409,6 +481,28 @@ export async function fetchNotifications() {
   if (error) throw error;
   return data ?? [];
 }
+
+export async function fetchUnreadNotificationCount(): Promise<number> {
+  const userId = await getCurrentUserId();
+  if (!userId) return 0;
+  const { count } = await supabase
+    .from("notifications")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("is_read", false);
+  return count ?? 0;
+}
+
+export async function markNotificationsRead() {
+  const userId = await getCurrentUserId();
+  if (!userId) return;
+  await supabase
+    .from("notifications")
+    .update({ is_read: true })
+    .eq("user_id", userId)
+    .eq("is_read", false);
+}
+
 
 // ==================== PHASE 2: BOOSTS ====================
 
@@ -541,7 +635,21 @@ export async function setBoostStatus(boostId: string, status: "active" | "paused
       .update({ boost_amount: 0, boost_expires_at: null })
       .eq("id", (boost as Boost).post_id);
   }
+  if (boost) {
+    await notify({
+      userId: (boost as Boost).user_id,
+      kind: "boost",
+      message:
+        status === "active"
+          ? "Your boost was approved and is now running"
+          : status === "paused"
+            ? "Your boost was paused by the MzansiTalk team"
+            : "Your boost was refunded",
+      postId: (boost as Boost).post_id,
+    });
+  }
 }
+
 
 /** Top 10 spenders for the current week, used by the Home leaderboard. */
 export async function fetchTopBoosters(): Promise<
@@ -668,10 +776,12 @@ export type Conversation = {
   id: string;
   is_group: boolean;
   title: string | null;
+  photo_url: string | null;
   created_by: string;
   created_at: string;
   updated_at: string;
 };
+
 
 export type Message = {
   id: string;
@@ -819,12 +929,22 @@ export async function startDirectChat(targetId: string): Promise<string> {
   return conversationId;
 }
 
-export async function createGroupChat(title: string, memberIds: string[]): Promise<string> {
+export async function createGroupChat(
+  title: string,
+  memberIds: string[],
+  photo?: File | null,
+): Promise<string> {
   const userId = await getCurrentUserId();
   if (!userId) throw new Error("Please log in");
+  const photoPath = photo ? await uploadMedia(photo) : null;
   const { data, error } = await supabase
     .from("conversations")
-    .insert({ created_by: userId, is_group: true, title: title || "New Group" })
+    .insert({
+      created_by: userId,
+      is_group: true,
+      title: title || "New Group",
+      photo_url: photoPath,
+    })
     .select("id")
     .single();
   if (error) throw error;
@@ -872,7 +992,26 @@ export async function sendMessage(input: {
     .from("conversations")
     .update({ updated_at: new Date().toISOString() })
     .eq("id", input.conversationId);
+
+  // Notify every other member about the new message.
+  const { data: members } = await supabase
+    .from("conversation_members")
+    .select("user_id")
+    .eq("conversation_id", input.conversationId);
+  const me = await fetchMyProfile();
+  await Promise.all(
+    ((members ?? []) as { user_id: string }[])
+      .filter((row) => row.user_id !== userId)
+      .map((row) =>
+        notify({
+          userId: row.user_id,
+          kind: "message",
+          message: `${me?.name ?? "Someone"} sent you a message`,
+        }),
+      ),
+  );
 }
+
 
 export async function sharePostToChat(postId: string, conversationId: string) {
   await sendMessage({ conversationId, sharedPostId: postId });
