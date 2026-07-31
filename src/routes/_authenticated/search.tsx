@@ -3,7 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search as SearchIcon } from "lucide-react";
 import { useState } from "react";
 
+import { BannerAd } from "@/components/Ads";
 import { PostCard } from "@/components/PostCard";
+
 import { Avatar } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
 import { search } from "@/lib/api";
