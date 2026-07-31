@@ -27,7 +27,10 @@ export const Route = createFileRoute("/_authenticated/reels")({
 
 function Reels() {
   const [term, setTerm] = useState("");
+  const [watched, setWatched] = useState(0);
+  const seen = useRef(new Set<string>());
   const reels = useQuery({ queryKey: ["feed", "reels"], queryFn: () => fetchFeed("reel") });
+  const interstitial = useInterstitialAfterEvery(watched, 3);
 
   const items = (reels.data ?? []).filter((item) =>
     term.trim() ? (item.caption ?? "").toLowerCase().includes(term.trim().toLowerCase()) : true,
@@ -38,9 +41,28 @@ function Reels() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reels.data]);
 
+  /** Counts a reel as "watched" once it is mostly on screen. */
+  const observe = (id: string) => (node: HTMLDivElement | null) => {
+    if (!node || seen.current.has(id)) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && !seen.current.has(id)) {
+            seen.current.add(id);
+            setWatched((current) => current + 1);
+            observer.disconnect();
+          }
+        }
+      },
+      { threshold: 0.6 },
+    );
+    observer.observe(node);
+  };
 
   return (
     <Screen title="Reels">
+      {interstitial.open ? <InterstitialAd onClose={interstitial.close} /> : null}
+
       <div className="field field-focus mb-4 flex items-center gap-2">
         <Search className="size-4 text-muted-foreground" />
         <input
@@ -58,17 +80,18 @@ function Reels() {
       ) : (
         <div className="space-y-4">
           {items.map((item, index) => (
-            <div key={item.id} className="space-y-4">
+            <div key={item.id} ref={observe(item.id)} className="space-y-4">
               <PostCard item={item} />
-              {(index + 1) % 3 === 0 ? <VideoAd /> : null}
+              {(index + 1) % 3 === 0 && !item.deleted_by_admin ? <VideoAd /> : null}
             </div>
           ))}
         </div>
       )}
 
       <div className="fixed inset-x-0 bottom-[3.6rem] z-20 mx-auto w-full max-w-2xl px-3">
-        <BannerAd />
+        <BannerAd placement="reel_banner" />
       </div>
     </Screen>
   );
 }
+
