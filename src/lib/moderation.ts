@@ -64,7 +64,7 @@ export async function addStrike(userId: string, reason: string, postId?: string 
   const { data, error } = await supabase.rpc("add_strike", {
     _user_id: userId,
     _reason: reason,
-    _post_id: postId ?? undefined,
+    ...(postId ? { _post_id: postId } : {}),
   });
   if (error) throw error;
   return Number(data ?? 0);
@@ -79,8 +79,8 @@ export async function logCopyright(input: {
   const { error } = await supabase.rpc("log_copyright", {
     _user_id: input.userId,
     _reason: input.reason,
-    _detail: input.detail ?? undefined,
-    _post_id: input.postId ?? undefined,
+    ...(input.detail ? { _detail: input.detail } : {}),
+    ...(input.postId ? { _post_id: input.postId } : {}),
   });
   if (error) throw error;
 }
@@ -93,9 +93,9 @@ export async function logModeration(input: {
 }) {
   const { error } = await supabase.rpc("log_moderation", {
     _action: input.action,
-    _target_user_id: input.targetUserId ?? undefined,
-    _target_post_id: input.targetPostId ?? undefined,
-    _notes: input.notes ?? undefined,
+    ...(input.targetUserId ? { _target_user_id: input.targetUserId } : {}),
+    ...(input.targetPostId ? { _target_post_id: input.targetPostId } : {}),
+    ...(input.notes ? { _notes: input.notes } : {}),
   });
   if (error) throw error;
 }
@@ -313,7 +313,7 @@ export async function setBanned(userId: string, banned: boolean, reason?: string
   const { error } = await supabase.rpc("owner_set_ban", {
     _user_id: userId,
     _banned: banned,
-    _reason: reason ?? undefined,
+    ...(reason ? { _reason: reason } : {}),
   });
   if (error) throw error;
 }
