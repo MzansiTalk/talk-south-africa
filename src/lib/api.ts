@@ -345,6 +345,28 @@ export async function createContent(input: {
 }) {
   const userId = await getCurrentUserId();
   if (!userId) throw new Error("Please log in");
+
+  const { addStrike, logCopyright, scanContent } = await import("@/lib/moderation");
+
+  const me = await fetchMyProfile();
+  if (me?.is_banned) {
+    throw new Error("Your account is banned. You can appeal from Settings.");
+  }
+
+  // Auto-Mod: every post/reel/status is scanned before publishing.
+  const scan = scanContent({ caption: input.caption, file: input.file });
+  if (!scan.allowed) {
+    if (scan.category === "copyright") {
+      await logCopyright({ userId, reason: "Copyright music or content", detail: scan.reason });
+    }
+    const strikes = await addStrike(userId, scan.reason);
+    throw new Error(
+      strikes >= 3
+        ? `${scan.reason}. That is 3 strikes — your account has been banned. You can appeal from Settings.`
+        : `${scan.reason}. Strike ${strikes} of 3.`,
+    );
+  }
+
   let mediaPath: string | null = null;
   let mediaType: string | null = null;
   if (input.file) {
