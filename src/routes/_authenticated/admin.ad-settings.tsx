@@ -31,7 +31,24 @@ export const Route = createFileRoute("/_authenticated/admin/ad-settings")({
   component: AdSettingsPage,
 });
 
-const EMPTY = {
+type AdForm = {
+  admob_app_id: string;
+  admob_banner_id: string;
+  admob_interstitial_id: string;
+  admob_rewarded_id: string;
+  admob_native_id: string;
+  admob_status_id: string;
+  meta_app_id: string;
+  meta_banner_placement_id: string;
+  meta_interstitial_placement_id: string;
+  meta_rewarded_placement_id: string;
+  ads_banner_enabled: boolean;
+  ads_interstitial_enabled: boolean;
+  ads_rewarded_enabled: boolean;
+  ads_native_enabled: boolean;
+};
+
+const EMPTY: AdForm = {
   admob_app_id: "",
   admob_banner_id: "",
   admob_interstitial_id: "",
@@ -46,9 +63,8 @@ const EMPTY = {
   ads_interstitial_enabled: true,
   ads_rewarded_enabled: true,
   ads_native_enabled: true,
-} satisfies Partial<AppSettings>;
+};
 
-type AdForm = typeof EMPTY;
 
 function Field({
   label,
