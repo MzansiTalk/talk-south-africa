@@ -1,0 +1,106 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { LogOut, Moon, ShieldOff, Sun } from "lucide-react";
+import { toast } from "sonner";
+
+import { Avatar } from "@/components/SignedMedia";
+import { Screen } from "@/components/Shell";
+import { supabase } from "@/integrations/supabase/client";
+import { fetchBlockedUsers, setBlock } from "@/lib/api";
+import { useTheme } from "@/lib/theme";
+
+export const Route = createFileRoute("/_authenticated/settings")({
+  head: () => ({
+    meta: [
+      { title: "Settings — MzansiTalk" },
+      {
+        name: "description",
+        content: "Manage your MzansiTalk appearance, blocked users, support and log out.",
+      },
+      { property: "og:title", content: "Settings — MzansiTalk" },
+      { property: "og:description", content: "Your MzansiTalk account settings." },
+    ],
+  }),
+  component: SettingsPage,
+});
+
+function SettingsPage() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { theme, toggle } = useTheme();
+
+  const blocked = useQuery({ queryKey: ["blocked"], queryFn: fetchBlockedUsers });
+
+  const unblock = useMutation({
+    mutationFn: (id: string) => setBlock(id, false),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["blocked"] });
+      toast.success("User unblocked");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const signOut = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    void navigate({ to: "/", replace: true });
+  };
+
+  return (
+    <Screen title="Settings">
+      <section className="rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold">Appearance</h2>
+        <button
+          type="button"
+          onClick={toggle}
+          className="btn-base mt-3 bg-secondary text-secondary-foreground"
+        >
+          {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+          {theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        </button>
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold">Blocked Users</h2>
+        {(blocked.data ?? []).length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground">You have not blocked anyone.</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {(blocked.data ?? []).map((person) => (
+              <li key={person.id} className="flex items-center gap-3">
+                <Avatar path={person.avatar_url} name={person.name} size={32} />
+                <span className="text-sm">@{person.username}</span>
+                <button
+                  type="button"
+                  onClick={() => unblock.mutate(person.id)}
+                  className="btn-base ml-auto bg-secondary px-3 py-1.5 text-xs text-secondary-foreground"
+                >
+                  <ShieldOff className="size-3.5" /> Unblock
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold">Help and Support</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Message MzansiTalk Support and the team replies inside the app.
+        </p>
+        <button
+          type="button"
+          onClick={() => toast.info("Support inbox arrives with the chat release")}
+          className="btn-base btn-primary mt-3"
+        >
+          Contact Support
+        </button>
+      </section>
+
+      <button type="button" onClick={signOut} className="btn-base mt-4 w-full bg-destructive text-destructive-foreground">
+        <LogOut className="size-4" /> Log Out
+      </button>
+    </Screen>
+  );
+}
