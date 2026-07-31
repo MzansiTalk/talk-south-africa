@@ -16,6 +16,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAppealRouteImport } from './routes/_authenticated/appeal'
 import { Route as AuthenticatedCreateRouteImport } from './routes/_authenticated/create'
+import { Route as AuthenticatedCreatorProgramRouteImport } from './routes/_authenticated/creator-program'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedMyBoostsRouteImport } from './routes/_authenticated/my-boosts'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
@@ -26,6 +27,7 @@ import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedStatusRouteImport } from './routes/_authenticated/status'
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
+import { Route as RUsernameRouteImport } from './routes/r.$username'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAppealsRouteImport } from './routes/_authenticated/admin.appeals'
 import { Route as AuthenticatedAdminBoostsRouteImport } from './routes/_authenticated/admin.boosts'
@@ -34,6 +36,7 @@ import { Route as AuthenticatedAdminEarningsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminManagementRouteImport } from './routes/_authenticated/admin.management'
 import { Route as AuthenticatedAdminModerationLogRouteImport } from './routes/_authenticated/admin.moderation-log'
 import { Route as AuthenticatedAdminPaymentSettingsRouteImport } from './routes/_authenticated/admin.payment-settings'
+import { Route as AuthenticatedAdminPayoutsRouteImport } from './routes/_authenticated/admin.payouts'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin.support'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
@@ -76,6 +79,12 @@ const AuthenticatedCreateRoute = AuthenticatedCreateRouteImport.update({
   path: '/create',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCreatorProgramRoute =
+  AuthenticatedCreatorProgramRouteImport.update({
+    id: '/creator-program',
+    path: '/creator-program',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -128,6 +137,11 @@ const AuthenticatedSupportRoute = AuthenticatedSupportRouteImport.update({
   path: '/support',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const RUsernameRoute = RUsernameRouteImport.update({
+  id: '/r/$username',
+  path: '/r/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -173,6 +187,12 @@ const AuthenticatedAdminPaymentSettingsRoute =
   AuthenticatedAdminPaymentSettingsRouteImport.update({
     id: '/admin/payment-settings',
     path: '/admin/payment-settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminPayoutsRoute =
+  AuthenticatedAdminPayoutsRouteImport.update({
+    id: '/admin/payouts',
+    path: '/admin/payouts',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminReportsRoute =
@@ -221,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/appeal': typeof AuthenticatedAppealRoute
   '/create': typeof AuthenticatedCreateRoute
+  '/creator-program': typeof AuthenticatedCreatorProgramRoute
   '/home': typeof AuthenticatedHomeRoute
   '/my-boosts': typeof AuthenticatedMyBoostsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -231,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/status': typeof AuthenticatedStatusRoute
   '/support': typeof AuthenticatedSupportRoute
+  '/r/$username': typeof RUsernameRoute
   '/admin/appeals': typeof AuthenticatedAdminAppealsRoute
   '/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
@@ -238,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/admin/management': typeof AuthenticatedAdminManagementRoute
   '/admin/moderation-log': typeof AuthenticatedAdminModerationLogRoute
   '/admin/payment-settings': typeof AuthenticatedAdminPaymentSettingsRoute
+  '/admin/payouts': typeof AuthenticatedAdminPayoutsRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -254,6 +277,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/appeal': typeof AuthenticatedAppealRoute
   '/create': typeof AuthenticatedCreateRoute
+  '/creator-program': typeof AuthenticatedCreatorProgramRoute
   '/home': typeof AuthenticatedHomeRoute
   '/my-boosts': typeof AuthenticatedMyBoostsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -264,6 +288,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/status': typeof AuthenticatedStatusRoute
   '/support': typeof AuthenticatedSupportRoute
+  '/r/$username': typeof RUsernameRoute
   '/admin/appeals': typeof AuthenticatedAdminAppealsRoute
   '/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
@@ -271,6 +296,7 @@ export interface FileRoutesByTo {
   '/admin/management': typeof AuthenticatedAdminManagementRoute
   '/admin/moderation-log': typeof AuthenticatedAdminModerationLogRoute
   '/admin/payment-settings': typeof AuthenticatedAdminPaymentSettingsRoute
+  '/admin/payouts': typeof AuthenticatedAdminPayoutsRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -289,6 +315,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/appeal': typeof AuthenticatedAppealRoute
   '/_authenticated/create': typeof AuthenticatedCreateRoute
+  '/_authenticated/creator-program': typeof AuthenticatedCreatorProgramRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/my-boosts': typeof AuthenticatedMyBoostsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
@@ -299,6 +326,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/status': typeof AuthenticatedStatusRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
+  '/r/$username': typeof RUsernameRoute
   '/_authenticated/admin/appeals': typeof AuthenticatedAdminAppealsRoute
   '/_authenticated/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/_authenticated/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
@@ -306,6 +334,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/management': typeof AuthenticatedAdminManagementRoute
   '/_authenticated/admin/moderation-log': typeof AuthenticatedAdminModerationLogRoute
   '/_authenticated/admin/payment-settings': typeof AuthenticatedAdminPaymentSettingsRoute
+  '/_authenticated/admin/payouts': typeof AuthenticatedAdminPayoutsRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -324,6 +353,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/appeal'
     | '/create'
+    | '/creator-program'
     | '/home'
     | '/my-boosts'
     | '/notifications'
@@ -334,6 +364,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/status'
     | '/support'
+    | '/r/$username'
     | '/admin/appeals'
     | '/admin/boosts'
     | '/admin/copyright'
@@ -341,6 +372,7 @@ export interface FileRouteTypes {
     | '/admin/management'
     | '/admin/moderation-log'
     | '/admin/payment-settings'
+    | '/admin/payouts'
     | '/admin/reports'
     | '/admin/support'
     | '/admin/users'
@@ -357,6 +389,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/appeal'
     | '/create'
+    | '/creator-program'
     | '/home'
     | '/my-boosts'
     | '/notifications'
@@ -367,6 +400,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/status'
     | '/support'
+    | '/r/$username'
     | '/admin/appeals'
     | '/admin/boosts'
     | '/admin/copyright'
@@ -374,6 +408,7 @@ export interface FileRouteTypes {
     | '/admin/management'
     | '/admin/moderation-log'
     | '/admin/payment-settings'
+    | '/admin/payouts'
     | '/admin/reports'
     | '/admin/support'
     | '/admin/users'
@@ -391,6 +426,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/appeal'
     | '/_authenticated/create'
+    | '/_authenticated/creator-program'
     | '/_authenticated/home'
     | '/_authenticated/my-boosts'
     | '/_authenticated/notifications'
@@ -401,6 +437,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/status'
     | '/_authenticated/support'
+    | '/r/$username'
     | '/_authenticated/admin/appeals'
     | '/_authenticated/admin/boosts'
     | '/_authenticated/admin/copyright'
@@ -408,6 +445,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/management'
     | '/_authenticated/admin/moderation-log'
     | '/_authenticated/admin/payment-settings'
+    | '/_authenticated/admin/payouts'
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/support'
     | '/_authenticated/admin/users'
@@ -424,6 +462,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RUsernameRoute: typeof RUsernameRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -475,6 +514,13 @@ declare module '@tanstack/react-router' {
       path: '/create'
       fullPath: '/create'
       preLoaderRoute: typeof AuthenticatedCreateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/creator-program': {
+      id: '/_authenticated/creator-program'
+      path: '/creator-program'
+      fullPath: '/creator-program'
+      preLoaderRoute: typeof AuthenticatedCreatorProgramRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/home': {
@@ -547,6 +593,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupportRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/r/$username': {
+      id: '/r/$username'
+      path: '/r/$username'
+      fullPath: '/r/$username'
+      preLoaderRoute: typeof RUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/admin'
@@ -601,6 +654,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/payment-settings'
       fullPath: '/admin/payment-settings'
       preLoaderRoute: typeof AuthenticatedAdminPaymentSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/payouts': {
+      id: '/_authenticated/admin/payouts'
+      path: '/admin/payouts'
+      fullPath: '/admin/payouts'
+      preLoaderRoute: typeof AuthenticatedAdminPayoutsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/reports': {
@@ -658,6 +718,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppealRoute: typeof AuthenticatedAppealRoute
   AuthenticatedCreateRoute: typeof AuthenticatedCreateRoute
+  AuthenticatedCreatorProgramRoute: typeof AuthenticatedCreatorProgramRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedMyBoostsRoute: typeof AuthenticatedMyBoostsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
@@ -675,6 +736,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminManagementRoute: typeof AuthenticatedAdminManagementRoute
   AuthenticatedAdminModerationLogRoute: typeof AuthenticatedAdminModerationLogRoute
   AuthenticatedAdminPaymentSettingsRoute: typeof AuthenticatedAdminPaymentSettingsRoute
+  AuthenticatedAdminPayoutsRoute: typeof AuthenticatedAdminPayoutsRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminSupportRoute: typeof AuthenticatedAdminSupportRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
@@ -688,6 +750,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppealRoute: AuthenticatedAppealRoute,
   AuthenticatedCreateRoute: AuthenticatedCreateRoute,
+  AuthenticatedCreatorProgramRoute: AuthenticatedCreatorProgramRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedMyBoostsRoute: AuthenticatedMyBoostsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
@@ -706,6 +769,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminModerationLogRoute: AuthenticatedAdminModerationLogRoute,
   AuthenticatedAdminPaymentSettingsRoute:
     AuthenticatedAdminPaymentSettingsRoute,
+  AuthenticatedAdminPayoutsRoute: AuthenticatedAdminPayoutsRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminSupportRoute: AuthenticatedAdminSupportRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
@@ -725,6 +789,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RUsernameRoute: RUsernameRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

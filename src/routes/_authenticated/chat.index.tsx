@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { MessageSquarePlus, Users } from "lucide-react";
+import { ImagePlus, MessageSquarePlus, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -13,6 +13,8 @@ import {
   search,
   startDirectChat,
 } from "@/lib/api";
+import { isOnline } from "@/lib/creators";
+
 
 export const Route = createFileRoute("/_authenticated/chat/")({
   head: () => ({
@@ -38,7 +40,9 @@ function ChatList() {
   const [term, setTerm] = useState("");
   const [groupMode, setGroupMode] = useState(false);
   const [groupTitle, setGroupTitle] = useState("");
+  const [groupPhoto, setGroupPhoto] = useState<File | null>(null);
   const [picked, setPicked] = useState<string[]>([]);
+
 
   const me = useQuery({ queryKey: ["my-profile"], queryFn: fetchMyProfile });
   const chats = useQuery({ queryKey: ["conversations"], queryFn: fetchConversations });
@@ -58,14 +62,16 @@ function ChatList() {
   });
 
   const makeGroup = useMutation({
-    mutationFn: () => createGroupChat(groupTitle.trim(), picked),
+    mutationFn: () => createGroupChat(groupTitle.trim(), picked, groupPhoto),
     onSuccess: (id) => {
       setGroupMode(false);
       setPicked([]);
       setGroupTitle("");
+      setGroupPhoto(null);
       void queryClient.invalidateQueries({ queryKey: ["conversations"] });
       void navigate({ to: "/chat/$id", params: { id } });
     },
+
     onError: (error: Error) => toast.error(error.message),
   });
 
@@ -107,9 +113,20 @@ function ChatList() {
             onChange={(event) => setGroupTitle(event.target.value)}
             maxLength={60}
           />
+          <label className="btn-base mt-2 w-full cursor-pointer bg-secondary text-secondary-foreground">
+            <ImagePlus className="size-4" />
+            {groupPhoto ? groupPhoto.name : "Group photo (optional)"}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(event) => setGroupPhoto(event.target.files?.[0] ?? null)}
+            />
+          </label>
           <p className="mt-2 text-xs text-muted-foreground">
             Search above and tap people to add them. Groups take unlimited members.
           </p>
+
           <button
             type="button"
             onClick={() => makeGroup.mutate()}
@@ -165,34 +182,42 @@ function ChatList() {
         </p>
       ) : (
         <ul className="mt-3 space-y-2">
-          {(chats.data ?? []).map((chat) => (
-            <li key={chat.id}>
-              <Link
-                to="/chat/$id"
-                params={{ id: chat.id }}
-                className="flex items-center gap-3 rounded-xl border border-border bg-card p-3"
-              >
-                <Avatar
-                  path={
-                    chat.is_group
-                      ? null
-                      : (chat.members.find((member) => member.id !== me.data?.id)?.avatar_url ?? null)
-                  }
-                  name={title(chat)}
-                  size={40}
-                />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">{title(chat)}</span>
-                  <span className="block truncate text-xs text-muted-foreground">
-                    {chat.lastMessage?.body ??
-                      (chat.lastMessage?.media_type
-                        ? `Sent a ${chat.lastMessage.media_type}`
-                        : "No messages yet")}
+          {(chats.data ?? []).map((chat) => {
+            const other = chat.members.find((member) => member.id !== me.data?.id);
+            const online =
+              !chat.is_group &&
+              isOnline((other as (typeof other & { last_seen_at?: string | null }) | undefined)?.last_seen_at);
+            return (
+              <li key={chat.id}>
+                <Link
+                  to="/chat/$id"
+                  params={{ id: chat.id }}
+                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3"
+                >
+                  <span className="relative">
+                    <Avatar
+                      path={chat.is_group ? chat.photo_url : (other?.avatar_url ?? null)}
+                      name={title(chat)}
+                      size={40}
+                    />
+                    {online ? (
+                      <span className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card bg-green-500" />
+                    ) : null}
                   </span>
-                </span>
-              </Link>
-            </li>
-          ))}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold">{title(chat)}</span>
+                    <span className="block truncate text-xs text-muted-foreground">
+                      {chat.lastMessage?.body ??
+                        (chat.lastMessage?.media_type
+                          ? `Sent a ${chat.lastMessage.media_type}`
+                          : "No messages yet")}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+
         </ul>
       )}
     </Screen>

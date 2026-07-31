@@ -13,10 +13,11 @@ import {
   Sun,
   User,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import logo from "@/assets/mzansitalk-logo.png";
-import { fetchMyRoles } from "@/lib/api";
+import { fetchMyRoles, fetchUnreadNotificationCount } from "@/lib/api";
+import { touchPresence } from "@/lib/creators";
 import { useTheme } from "@/lib/theme";
 
 export function useIsAdmin() {
@@ -28,6 +29,18 @@ export function useIsAdmin() {
   };
 }
 
+/** Keeps the member's "Online" status fresh while the app is open. */
+function usePresenceHeartbeat() {
+  useEffect(() => {
+    void touchPresence();
+    const timer = window.setInterval(() => {
+      void touchPresence();
+    }, 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+}
+
+
 export function TopBar({
   title,
   showSearch = false,
@@ -37,6 +50,12 @@ export function TopBar({
 }) {
   const router = useRouter();
   const { theme, toggle } = useTheme();
+  const unread = useQuery({
+    queryKey: ["notifications-unread"],
+    queryFn: fetchUnreadNotificationCount,
+    refetchInterval: 45_000,
+  });
+
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
@@ -80,10 +99,16 @@ export function TopBar({
           <Link
             to="/notifications"
             aria-label="Notifications"
-            className="btn-base bg-transparent px-2 text-muted-foreground"
+            className="btn-base relative bg-transparent px-2 text-muted-foreground"
           >
             <Bell className="size-5" />
+            {(unread.data ?? 0) > 0 ? (
+              <span className="absolute right-0.5 top-0.5 min-w-4 rounded-full bg-gold px-1 text-[0.6rem] font-bold leading-4 text-background">
+                {(unread.data ?? 0) > 9 ? "9+" : unread.data}
+              </span>
+            ) : null}
           </Link>
+
         </div>
       </div>
 
@@ -104,15 +129,18 @@ export function TopBar({
 
 export function BottomNav() {
   const { isAdmin } = useIsAdmin();
+  usePresenceHeartbeat();
 
   const items = [
     { to: "/home", label: "Home", icon: Home },
     { to: "/reels", label: "Reels", icon: Film },
     { to: "/create", label: "Create", icon: PlusCircle },
+    { to: "/chat", label: "Messages", icon: MessageCircle },
     { to: "/status", label: "Status", icon: Search },
     { to: "/profile", label: "Profile", icon: User },
     ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: Shield }] : []),
   ] as const;
+
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur">

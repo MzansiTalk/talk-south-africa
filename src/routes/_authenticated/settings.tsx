@@ -1,12 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { CreditCard, LifeBuoy, LogOut, Moon, ShieldOff, Sun } from "lucide-react";
+import { Bell, BellOff, CreditCard, LifeBuoy, LogOut, Moon, ShieldOff, Sparkles, Sun } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchBlockedUsers, setBlock } from "@/lib/api";
+import {
+  fetchBlockedUsers,
+  fetchNotificationsEnabled,
+  setBlock,
+  setNotificationsEnabled,
+} from "@/lib/api";
 import { useTheme } from "@/lib/theme";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -15,7 +20,8 @@ export const Route = createFileRoute("/_authenticated/settings")({
       { title: "Settings — MzansiTalk" },
       {
         name: "description",
-        content: "Manage your MzansiTalk appearance, blocked users, support and log out.",
+        content:
+          "Manage your MzansiTalk appearance, notifications, Creator Program, blocked users, support and log out.",
       },
       { property: "og:title", content: "Settings — MzansiTalk" },
       { property: "og:description", content: "Your MzansiTalk account settings." },
@@ -30,6 +36,19 @@ function SettingsPage() {
   const { theme, toggle } = useTheme();
 
   const blocked = useQuery({ queryKey: ["blocked"], queryFn: fetchBlockedUsers });
+  const notifications = useQuery({
+    queryKey: ["notifications-enabled"],
+    queryFn: fetchNotificationsEnabled,
+  });
+
+  const toggleNotifications = useMutation({
+    mutationFn: (enabled: boolean) => setNotificationsEnabled(enabled),
+    onSuccess: (_data, enabled) => {
+      void queryClient.invalidateQueries({ queryKey: ["notifications-enabled"] });
+      toast.success(enabled ? "Notifications turned on" : "Notifications turned off");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
 
   const unblock = useMutation({
     mutationFn: (id: string) => setBlock(id, false),
@@ -39,6 +58,7 @@ function SettingsPage() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
+
 
   const signOut = async () => {
     await queryClient.cancelQueries();
@@ -60,6 +80,39 @@ function SettingsPage() {
           {theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
         </button>
       </section>
+
+      <section className="mt-4 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold">Notifications</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Likes, comments, follows, boosts, new messages and payout updates.
+        </p>
+        <button
+          type="button"
+          onClick={() => toggleNotifications.mutate(!(notifications.data ?? true))}
+          className="btn-base mt-3 bg-secondary text-secondary-foreground"
+        >
+          {notifications.data === false ? (
+            <>
+              <BellOff className="size-4" /> Notifications are OFF — Turn ON
+            </>
+          ) : (
+            <>
+              <Bell className="size-4" /> Notifications are ON — Turn OFF
+            </>
+          )}
+        </button>
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold">Creator Program</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Track your views and invites, apply, and request payouts (80% you / 20% MzansiTalk).
+        </p>
+        <Link to="/creator-program" className="btn-base btn-gold mt-3">
+          <Sparkles className="size-4" /> Open Creator Program
+        </Link>
+      </section>
+
 
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold">Blocked Users</h2>

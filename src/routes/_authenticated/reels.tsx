@@ -1,12 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { BannerAd, VideoAd } from "@/components/Ads";
 import { PostCard } from "@/components/PostCard";
 import { Screen } from "@/components/Shell";
 import { fetchFeed } from "@/lib/api";
+import { countView } from "@/lib/creators";
+
 
 export const Route = createFileRoute("/_authenticated/reels")({
   head: () => ({
@@ -30,6 +32,12 @@ function Reels() {
   const items = (reels.data ?? []).filter((item) =>
     term.trim() ? (item.caption ?? "").toLowerCase().includes(term.trim().toLowerCase()) : true,
   );
+
+  useEffect(() => {
+    for (const item of items.slice(0, 5)) void countView(item);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reels.data]);
+
 
   return (
     <Screen title="Reels">

@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
+  Banknote,
   BarChart3,
+
   Flag,
   Flame,
   Gavel,
@@ -106,6 +108,12 @@ function AdminPage() {
             <BarChart3 className="size-4" /> Earnings
           </Link>
         ) : null}
+        {isOwner ? (
+          <Link to="/admin/payouts" className="btn-base bg-secondary text-secondary-foreground">
+            <Banknote className="size-4 text-gold" /> Payouts (Owner)
+          </Link>
+        ) : null}
+
       </section>
 
 
