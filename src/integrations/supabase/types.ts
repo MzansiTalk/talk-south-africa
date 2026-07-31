@@ -14,16 +14,308 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          kind: string
+          message: string
+          post_id: string | null
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          kind: string
+          message: string
+          post_id?: string | null
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          kind?: string
+          message?: string
+          post_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          boost_amount: number
+          boost_expires_at: string | null
+          caption: string | null
+          created_at: string
+          deleted_by_admin: boolean
+          expires_at: string | null
+          id: string
+          is_trending: boolean
+          kind: Database["public"]["Enums"]["content_kind"]
+          media_type: string | null
+          media_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          boost_amount?: number
+          boost_expires_at?: string | null
+          caption?: string | null
+          created_at?: string
+          deleted_by_admin?: boolean
+          expires_at?: string | null
+          id?: string
+          is_trending?: boolean
+          kind?: Database["public"]["Enums"]["content_kind"]
+          media_type?: string | null
+          media_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          boost_amount?: number
+          boost_expires_at?: string | null
+          caption?: string | null
+          created_at?: string
+          deleted_by_admin?: boolean
+          expires_at?: string | null
+          id?: string
+          is_trending?: boolean
+          kind?: Database["public"]["Enums"]["content_kind"]
+          media_type?: string | null
+          media_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          cover_url: string | null
+          created_at: string
+          id: string
+          is_hidden: boolean
+          is_viral: boolean
+          name: string
+          updated_at: string
+          username: string
+          viral_since: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          cover_url?: string | null
+          created_at?: string
+          id: string
+          is_hidden?: boolean
+          is_viral?: boolean
+          name?: string
+          updated_at?: string
+          username: string
+          viral_since?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          is_viral?: boolean
+          name?: string
+          updated_at?: string
+          username?: string
+          viral_since?: string | null
+        }
+        Relationships: []
+      }
+      saves: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saves_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_blocked_pair: { Args: { _a: string; _b: string }; Returns: boolean }
+      is_owner: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "owner" | "admin" | "user"
+      content_kind: "post" | "reel" | "status"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +442,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["owner", "admin", "user"],
+      content_kind: ["post", "reel", "status"],
+    },
   },
 } as const
