@@ -28,6 +28,8 @@ export const Route = createFileRoute("/_authenticated/u/$username")({
 });
 
 function UserProfile() {
+  const { isAdmin } = useIsAdmin();
+
   const { username } = Route.useParams();
   const queryClient = useQueryClient();
 
