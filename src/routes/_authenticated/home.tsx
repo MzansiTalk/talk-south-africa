@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Crown, Flame } from "lucide-react";
 
-import { NativeAd } from "@/components/Ads";
+import { BannerAd, NativeAd } from "@/components/Ads";
 import { PostCard } from "@/components/PostCard";
 import { Avatar } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
