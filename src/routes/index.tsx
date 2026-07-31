@@ -159,6 +159,12 @@ function AuthWall() {
             <ShieldCheck className="size-3.5" /> 100% free to watch
           </span>
         </div>
+
+        <p className="mt-3 text-center text-xs">
+          <Link to="/advertise" className="font-semibold text-gold underline">
+            Advertise With Us
+          </Link>
+        </p>
       </div>
     </div>
   );
