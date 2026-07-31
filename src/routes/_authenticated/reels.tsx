@@ -1,9 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { BannerAd, VideoAd } from "@/components/Ads";
+import {
+  BannerAd,
+  InterstitialAd,
+  useInterstitialAfterEvery,
+  VideoAd,
+} from "@/components/Ads";
+
 import { PostCard } from "@/components/PostCard";
 import { Screen } from "@/components/Shell";
 import { fetchFeed } from "@/lib/api";
