@@ -55,9 +55,14 @@ export async function fetchMyProfile(): Promise<Profile | null> {
 export async function fetchMyRoles(): Promise<string[]> {
   const userId = await getCurrentUserId();
   if (!userId) return [];
-  const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("role, approved")
+    .eq("user_id", userId);
   if (error) throw error;
-  return (data ?? []).map((row) => row.role as string);
+  return (data ?? [])
+    .filter((row) => (row as { approved?: boolean }).approved !== false)
+    .map((row) => row.role as string);
 }
 
 export async function fetchProfileByUsername(username: string): Promise<Profile | null> {

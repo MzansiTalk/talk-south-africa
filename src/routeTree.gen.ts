@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedCreateRouteImport } from './routes/_authenticated/create'
@@ -27,6 +28,7 @@ import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminBoostsRouteImport } from './routes/_authenticated/admin.boosts'
 import { Route as AuthenticatedAdminEarningsRouteImport } from './routes/_authenticated/admin.earnings'
+import { Route as AuthenticatedAdminManagementRouteImport } from './routes/_authenticated/admin.management'
 import { Route as AuthenticatedAdminPaymentSettingsRouteImport } from './routes/_authenticated/admin.payment-settings'
 import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin.support'
 import { Route as AuthenticatedBoostPostIdRouteImport } from './routes/_authenticated/boost.$postId'
@@ -41,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin-login',
+  path: '/admin-login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -127,6 +134,12 @@ const AuthenticatedAdminEarningsRoute =
     path: '/admin/earnings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminManagementRoute =
+  AuthenticatedAdminManagementRouteImport.update({
+    id: '/admin/management',
+    path: '/admin/management',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminPaymentSettingsRoute =
   AuthenticatedAdminPaymentSettingsRouteImport.update({
     id: '/admin/payment-settings',
@@ -163,6 +176,7 @@ const AuthenticatedUUsernameRoute = AuthenticatedUUsernameRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin-login': typeof AdminLoginRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/create': typeof AuthenticatedCreateRoute
@@ -178,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/support': typeof AuthenticatedSupportRoute
   '/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/admin/earnings': typeof AuthenticatedAdminEarningsRoute
+  '/admin/management': typeof AuthenticatedAdminManagementRoute
   '/admin/payment-settings': typeof AuthenticatedAdminPaymentSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/boost/$postId': typeof AuthenticatedBoostPostIdRoute
@@ -188,6 +203,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin-login': typeof AdminLoginRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/create': typeof AuthenticatedCreateRoute
@@ -203,6 +219,7 @@ export interface FileRoutesByTo {
   '/support': typeof AuthenticatedSupportRoute
   '/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/admin/earnings': typeof AuthenticatedAdminEarningsRoute
+  '/admin/management': typeof AuthenticatedAdminManagementRoute
   '/admin/payment-settings': typeof AuthenticatedAdminPaymentSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/boost/$postId': typeof AuthenticatedBoostPostIdRoute
@@ -215,6 +232,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/admin-login': typeof AdminLoginRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/create': typeof AuthenticatedCreateRoute
@@ -230,6 +248,7 @@ export interface FileRoutesById {
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/_authenticated/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/_authenticated/admin/earnings': typeof AuthenticatedAdminEarningsRoute
+  '/_authenticated/admin/management': typeof AuthenticatedAdminManagementRoute
   '/_authenticated/admin/payment-settings': typeof AuthenticatedAdminPaymentSettingsRoute
   '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
   '/_authenticated/boost/$postId': typeof AuthenticatedBoostPostIdRoute
@@ -242,6 +261,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin-login'
     | '/forgot-password'
     | '/reset-password'
     | '/create'
@@ -257,6 +277,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/admin/boosts'
     | '/admin/earnings'
+    | '/admin/management'
     | '/admin/payment-settings'
     | '/admin/support'
     | '/boost/$postId'
@@ -267,6 +288,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin-login'
     | '/forgot-password'
     | '/reset-password'
     | '/create'
@@ -282,6 +304,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/admin/boosts'
     | '/admin/earnings'
+    | '/admin/management'
     | '/admin/payment-settings'
     | '/admin/support'
     | '/boost/$postId'
@@ -293,6 +316,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/admin-login'
     | '/forgot-password'
     | '/reset-password'
     | '/_authenticated/create'
@@ -308,6 +332,7 @@ export interface FileRouteTypes {
     | '/_authenticated/support'
     | '/_authenticated/admin/boosts'
     | '/_authenticated/admin/earnings'
+    | '/_authenticated/admin/management'
     | '/_authenticated/admin/payment-settings'
     | '/_authenticated/admin/support'
     | '/_authenticated/boost/$postId'
@@ -320,6 +345,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AdminLoginRoute: typeof AdminLoginRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
 }
@@ -338,6 +364,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-login': {
+      id: '/admin-login'
+      path: '/admin-login'
+      fullPath: '/admin-login'
+      preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -452,6 +485,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminEarningsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/management': {
+      id: '/_authenticated/admin/management'
+      path: '/admin/management'
+      fullPath: '/admin/management'
+      preLoaderRoute: typeof AuthenticatedAdminManagementRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/payment-settings': {
       id: '/_authenticated/admin/payment-settings'
       path: '/admin/payment-settings'
@@ -511,6 +551,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
   AuthenticatedAdminBoostsRoute: typeof AuthenticatedAdminBoostsRoute
   AuthenticatedAdminEarningsRoute: typeof AuthenticatedAdminEarningsRoute
+  AuthenticatedAdminManagementRoute: typeof AuthenticatedAdminManagementRoute
   AuthenticatedAdminPaymentSettingsRoute: typeof AuthenticatedAdminPaymentSettingsRoute
   AuthenticatedAdminSupportRoute: typeof AuthenticatedAdminSupportRoute
   AuthenticatedBoostPostIdRoute: typeof AuthenticatedBoostPostIdRoute
@@ -534,6 +575,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSupportRoute: AuthenticatedSupportRoute,
   AuthenticatedAdminBoostsRoute: AuthenticatedAdminBoostsRoute,
   AuthenticatedAdminEarningsRoute: AuthenticatedAdminEarningsRoute,
+  AuthenticatedAdminManagementRoute: AuthenticatedAdminManagementRoute,
   AuthenticatedAdminPaymentSettingsRoute:
     AuthenticatedAdminPaymentSettingsRoute,
   AuthenticatedAdminSupportRoute: AuthenticatedAdminSupportRoute,
@@ -550,6 +592,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AdminLoginRoute: AdminLoginRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,
 }
