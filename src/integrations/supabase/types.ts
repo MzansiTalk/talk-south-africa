@@ -53,6 +53,7 @@ export type Database = {
           admob_payment_email: string | null
           admob_rewarded_id: string | null
           admob_status_id: string | null
+          admob_test_mode: boolean
           ads_banner_enabled: boolean
           ads_interstitial_enabled: boolean
           ads_native_enabled: boolean
@@ -66,7 +67,14 @@ export type Database = {
           paystack_payout_email: string | null
           paystack_public_key: string | null
           paystack_secret_key: string | null
+          paystack_test_mode: boolean
           paystack_webhook_secret: string | null
+          paystack_webhook_url: string | null
+          price_boost_7_days: number
+          price_boost_post: number
+          price_per_1000_impressions: number
+          price_sponsored_30_days: number
+          price_sponsored_7_days: number
           test_mode: boolean
           updated_at: string
         }
@@ -78,6 +86,7 @@ export type Database = {
           admob_payment_email?: string | null
           admob_rewarded_id?: string | null
           admob_status_id?: string | null
+          admob_test_mode?: boolean
           ads_banner_enabled?: boolean
           ads_interstitial_enabled?: boolean
           ads_native_enabled?: boolean
@@ -91,7 +100,14 @@ export type Database = {
           paystack_payout_email?: string | null
           paystack_public_key?: string | null
           paystack_secret_key?: string | null
+          paystack_test_mode?: boolean
           paystack_webhook_secret?: string | null
+          paystack_webhook_url?: string | null
+          price_boost_7_days?: number
+          price_boost_post?: number
+          price_per_1000_impressions?: number
+          price_sponsored_30_days?: number
+          price_sponsored_7_days?: number
           test_mode?: boolean
           updated_at?: string
         }
@@ -103,6 +119,7 @@ export type Database = {
           admob_payment_email?: string | null
           admob_rewarded_id?: string | null
           admob_status_id?: string | null
+          admob_test_mode?: boolean
           ads_banner_enabled?: boolean
           ads_interstitial_enabled?: boolean
           ads_native_enabled?: boolean
@@ -116,7 +133,14 @@ export type Database = {
           paystack_payout_email?: string | null
           paystack_public_key?: string | null
           paystack_secret_key?: string | null
+          paystack_test_mode?: boolean
           paystack_webhook_secret?: string | null
+          paystack_webhook_url?: string | null
+          price_boost_7_days?: number
+          price_boost_post?: number
+          price_per_1000_impressions?: number
+          price_sponsored_30_days?: number
+          price_sponsored_7_days?: number
           test_mode?: boolean
           updated_at?: string
         }
@@ -865,6 +889,54 @@ export type Database = {
           },
         ]
       }
+      sponsored_orders: {
+        Row: {
+          amount: number
+          brand_email: string
+          brand_name: string
+          created_at: string
+          days: number
+          id: string
+          message: string | null
+          package: string
+          phone: string | null
+          reference: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          brand_email: string
+          brand_name: string
+          created_at?: string
+          days?: number
+          id?: string
+          message?: string | null
+          package: string
+          phone?: string | null
+          reference?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          brand_email?: string
+          brand_name?: string
+          created_at?: string
+          days?: number
+          id?: string
+          message?: string | null
+          package?: string
+          phone?: string | null
+          reference?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       support_messages: {
         Row: {
           body: string
@@ -977,6 +1049,7 @@ export type Database = {
       }
       payments_ready: { Args: never; Returns: boolean }
       paystack_public_key: { Args: never; Returns: string }
+      public_pricing: { Args: never; Returns: Json }
       touch_presence: { Args: never; Returns: undefined }
     }
     Enums: {
