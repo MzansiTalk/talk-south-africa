@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BarChart3, Inbox, Rocket, ShieldAlert, Trash2, Wallet } from "lucide-react";
+import { BarChart3, Inbox, Rocket, ShieldAlert, Trash2, UserCog, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 });
 
 function AdminPage() {
-  const { isAdmin } = useIsAdmin();
+  const { isAdmin, isOwner } = useIsAdmin();
   const queryClient = useQueryClient();
 
   const recent = useQuery({ queryKey: ["feed", "admin"], queryFn: () => fetchFeed(), enabled: isAdmin });
@@ -63,6 +63,11 @@ function AdminPage() {
         <Link to="/admin/payment-settings" className="btn-base bg-secondary text-secondary-foreground">
           <Wallet className="size-4" /> Payment Settings
         </Link>
+        {isOwner ? (
+          <Link to="/admin/management" className="btn-base bg-secondary text-secondary-foreground">
+            <UserCog className="size-4" /> Admin Management
+          </Link>
+        ) : null}
         <Link to="/admin/earnings" className="btn-base bg-secondary text-secondary-foreground">
           <BarChart3 className="size-4" /> Earnings
         </Link>
