@@ -389,6 +389,9 @@ export async function createContent(input: {
 export async function updateMyProfile(patch: Partial<Profile>) {
   const userId = await getCurrentUserId();
   if (!userId) throw new Error("Please log in");
+  const roles = await fetchMyRoles();
+  // The Owner is always shown as "MzansiTalk Support".
+  if (roles.includes("owner")) patch = { ...patch, name: OWNER_DISPLAY_NAME };
   const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
   if (error) throw error;
 }
