@@ -98,7 +98,7 @@ function AdminPage() {
         ) : null}
         {isOwner ? (
           <Link to="/admin/payment-settings" className="btn-base bg-secondary text-secondary-foreground">
-            <Wallet className="size-4" /> Payment Settings
+            <Wallet className="size-4 text-gold" /> Owner Money Center
           </Link>
         ) : null}
         {isOwner ? (

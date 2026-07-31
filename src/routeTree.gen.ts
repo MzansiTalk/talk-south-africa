@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
+import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAppealRouteImport } from './routes/_authenticated/appeal'
@@ -59,6 +60,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin-login',
   path: '/admin-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdvertiseRoute = AdvertiseRouteImport.update({
+  id: '/advertise',
+  path: '/advertise',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -251,6 +257,7 @@ const AuthenticatedUUsernameRoute = AuthenticatedUUsernameRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin-login': typeof AdminLoginRoute
+  '/advertise': typeof AdvertiseRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/appeal': typeof AuthenticatedAppealRoute
@@ -289,6 +296,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin-login': typeof AdminLoginRoute
+  '/advertise': typeof AdvertiseRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/appeal': typeof AuthenticatedAppealRoute
@@ -329,6 +337,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin-login': typeof AdminLoginRoute
+  '/advertise': typeof AdvertiseRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/appeal': typeof AuthenticatedAppealRoute
@@ -369,6 +378,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin-login'
+    | '/advertise'
     | '/forgot-password'
     | '/reset-password'
     | '/appeal'
@@ -407,6 +417,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin-login'
+    | '/advertise'
     | '/forgot-password'
     | '/reset-password'
     | '/appeal'
@@ -446,6 +457,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/admin-login'
+    | '/advertise'
     | '/forgot-password'
     | '/reset-password'
     | '/_authenticated/appeal'
@@ -486,6 +498,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
+  AdvertiseRoute: typeof AdvertiseRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RUsernameRoute: typeof RUsernameRoute
@@ -512,6 +525,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-login'
       fullPath: '/admin-login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/advertise': {
+      id: '/advertise'
+      path: '/advertise'
+      fullPath: '/advertise'
+      preLoaderRoute: typeof AdvertiseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -831,6 +851,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
+  AdvertiseRoute: AdvertiseRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RUsernameRoute: RUsernameRoute,
