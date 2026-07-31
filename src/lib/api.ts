@@ -11,8 +11,13 @@ export type Profile = {
   cover_url: string | null;
   is_viral: boolean;
   is_hidden: boolean;
+  strikes?: number;
+  is_banned?: boolean;
+  ban_reason?: string | null;
+  banned_at?: string | null;
   created_at: string;
 };
+
 
 export type Post = {
   id: string;
