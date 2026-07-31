@@ -4,7 +4,9 @@ import { Pencil, Settings } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { BannerAd } from "@/components/Ads";
 import { PostCard } from "@/components/PostCard";
+
 import { Avatar, useMediaUrl } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
 import {
