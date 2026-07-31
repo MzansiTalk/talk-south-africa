@@ -32,7 +32,9 @@ export const Route = createFileRoute("/_authenticated/admin/earnings")({
 });
 
 function EarningsPage() {
+  const [period, setPeriod] = useState<"daily" | "weekly" | "monthly">("daily");
   const email = useQuery({ queryKey: ["my-email"], queryFn: getMyEmail });
+
   const isOwner = email.data?.toLowerCase() === OWNER_EMAIL;
   const earnings = useQuery({ queryKey: ["earnings"], queryFn: fetchEarnings, enabled: isOwner });
 
