@@ -232,6 +232,12 @@ function MyProfile() {
         )}
       </div>
 
+      <div className="mt-6">
+        <BannerAd placement="profile_banner" />
+      </div>
+
+
+
       <button
         type="button"
         className="mt-6 hidden"
