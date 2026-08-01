@@ -17,32 +17,49 @@ export type Database = {
       ad_impressions: {
         Row: {
           clicked: boolean
+          content_kind: string | null
+          content_owner_id: string | null
           created_at: string
           id: string
           network: string
           placement: string
+          post_id: string | null
           revenue: number
           user_id: string | null
         }
         Insert: {
           clicked?: boolean
+          content_kind?: string | null
+          content_owner_id?: string | null
           created_at?: string
           id?: string
           network?: string
           placement: string
+          post_id?: string | null
           revenue?: number
           user_id?: string | null
         }
         Update: {
           clicked?: boolean
+          content_kind?: string | null
+          content_owner_id?: string | null
           created_at?: string
           id?: string
           network?: string
           placement?: string
+          post_id?: string | null
           revenue?: number
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ad_impressions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       app_settings: {
         Row: {
@@ -996,6 +1013,7 @@ export type Database = {
         Args: { _on: boolean; _user_id: string }
         Returns: undefined
       }
+      creator_ad_stats: { Args: never; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1011,6 +1029,17 @@ export type Database = {
         Returns: boolean
       }
       is_owner: { Args: { _user_id: string }; Returns: boolean }
+      log_ad_click: { Args: { _impression_id: string }; Returns: undefined }
+      log_ad_impression: {
+        Args: {
+          _content_kind?: string
+          _content_owner_id?: string
+          _network?: string
+          _placement: string
+          _post_id?: string
+        }
+        Returns: string
+      }
       log_copyright: {
         Args: {
           _detail?: string

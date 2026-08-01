@@ -50,7 +50,9 @@ function StatusPage() {
         {items.map((item, index) => (
           <div key={item.id} className="space-y-4">
             <PostCard item={item} />
-            {(index + 1) % 4 === 0 ? <StatusAd /> : null}
+            {(index + 1) % 3 === 0 ? (
+              <StatusAd target={{ postId: item.id, contentKind: "status", ownerId: item.user_id }} />
+            ) : null}
           </div>
         ))}
       </div>

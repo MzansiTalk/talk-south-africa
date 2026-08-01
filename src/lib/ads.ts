@@ -13,8 +13,17 @@ export type AdPlacementSlot =
   | "reel_video"
   | "reel_banner"
   | "reel_interstitial"
+  | "video_interstitial"
+  | "comments_banner"
   | "rewarded_boost"
   | "status_ad";
+
+/** Which piece of content the ad was shown on, so 20% of the revenue is attributed to its creator. */
+export type AdTarget = {
+  postId?: string | null;
+  contentKind?: string | null;
+  ownerId?: string | null;
+};
 
 export type AdConfig = {
   admob_app_id: string | null;
@@ -102,18 +111,62 @@ export function useAds() {
 
 // ==================== IMPRESSIONS, CLICKS, FREQUENCY CAP ====================
 
-export async function logAdImpression(placement: AdPlacementSlot, network: AdNetwork = "admob") {
-  const userId = await getCurrentUserId();
-  const { data } = await supabase
-    .from("ad_impressions")
-    .insert({ user_id: userId, placement, network })
-    .select("id")
-    .maybeSingle();
-  return data?.id ?? null;
+export async function logAdImpression(
+  placement: AdPlacementSlot,
+  network: AdNetwork = "admob",
+  target: AdTarget = {},
+) {
+  const args: {
+    _placement: string;
+    _network: string;
+    _post_id?: string;
+    _content_kind?: string;
+    _content_owner_id?: string;
+  } = { _placement: placement, _network: network };
+  if (target.postId) args._post_id = target.postId;
+  if (target.contentKind) args._content_kind = target.contentKind;
+  if (target.ownerId) args._content_owner_id = target.ownerId;
+  const { data } = await supabase.rpc("log_ad_impression", args);
+  return (data as string | null) ?? null;
 }
 
 export async function logAdClick(impressionId: string) {
-  await supabase.from("ad_impressions").update({ clicked: true }).eq("id", impressionId);
+  await supabase.rpc("log_ad_click", { _impression_id: impressionId });
+}
+
+// ==================== CREATOR AD EARNINGS (20% CREATOR / 80% MZANSITALK) ====================
+
+export type CreatorAdRow = {
+  kind: string;
+  views: number;
+  impressions: number;
+  clicks: number;
+  revenue: number;
+  creator_earnings: number;
+};
+
+export type CreatorAdStats = {
+  totals: CreatorAdRow;
+  breakdown: CreatorAdRow[];
+};
+
+const EMPTY_ROW: CreatorAdRow = {
+  kind: "all",
+  views: 0,
+  impressions: 0,
+  clicks: 0,
+  revenue: 0,
+  creator_earnings: 0,
+};
+
+export async function fetchCreatorAdStats(): Promise<CreatorAdStats> {
+  const { data, error } = await supabase.rpc("creator_ad_stats");
+  if (error || !data) return { totals: EMPTY_ROW, breakdown: [] };
+  const parsed = data as { totals?: Partial<CreatorAdRow>; breakdown?: CreatorAdRow[] };
+  return {
+    totals: { ...EMPTY_ROW, ...(parsed.totals ?? {}) },
+    breakdown: parsed.breakdown ?? [],
+  };
 }
 
 const CAP_KEY = "mzansitalk:last-interstitial";
