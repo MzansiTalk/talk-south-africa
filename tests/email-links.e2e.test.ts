@@ -5,10 +5,11 @@
  * through the backend auth API, then triggers a password reset for the same
  * address. For each email it asserts:
  *   1. the message actually arrives, and
- *   2. the body contains a standalone 6-digit code.
+ *   2. the body contains a working action link (confirm / recovery) pointing
+ *      at the backend auth verify endpoint with a token.
  *
  * Network + real auth rate limits are involved, so it is opt-in:
- *   RUN_EMAIL_E2E=1 bunx vitest run tests/email-codes.e2e.test.ts
+ *   RUN_EMAIL_E2E=1 bunx vitest run tests/email-links.e2e.test.ts
  */
 import { describe, expect, it } from "vitest";
 
@@ -18,21 +19,44 @@ const ANON_KEY =
   process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] ?? process.env["SUPABASE_PUBLISHABLE_KEY"] ?? "";
 
 const MAIL_TM = "https://api.mail.tm";
-/** A standalone 6-digit code, e.g. "123456" but not part of a longer number. */
-const SIX_DIGIT_CODE = /(?<!\d)\d{6}(?!\d)/;
-
-/**
- * Strips URLs, HTML tags/attributes and entities before looking for a code.
- * Opaque confirmation-link tokens contain digit runs that would otherwise
- * make the assertion pass without any real code being shown to the user.
- */
-function visibleText(body: string) {
-  return body
-    .replace(/https?:\/\/\S+/g, " ")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&#?\w+;/g, " ");
+/** Every http(s) URL in the email body, with HTML entities decoded. */
+function extractLinks(body: string) {
+  const decoded = body.replace(/&amp;/g, "&").replace(/&#x2F;/gi, "/");
+  return (decoded.match(/https?:\/\/[^\s"'<>)\]]+/g) ?? [])
+    .map((url) => url.replace(/[.,;)]+$/, ""))
+    .filter((url) => !/fonts\.googleapis|w3\.org/.test(url));
 }
 
+/**
+ * Action links are wrapped by the mail provider's click tracker, so the token
+ * only shows up after following the redirect. `redirect: "manual"` reads the
+ * Location header without actually consuming the one-time token.
+ */
+async function resolveLink(url: string, hops = 5): Promise<string> {
+  let current = url;
+  for (let hop = 0; hop < hops; hop += 1) {
+    const response = await fetch(current, { redirect: "manual" });
+    const next = response.headers.get("location");
+    if (!next) return current;
+    current = new URL(next, current).toString();
+    if (/\/auth\/v1\/verify/.test(current)) return current;
+  }
+  return current;
+}
+
+/**
+ * Finds the auth action link for a given email type and returns both the link
+ * as shown in the email and the auth verify URL it resolves to.
+ */
+async function findActionLink(body: string, type: "signup" | "recovery") {
+  for (const link of extractLinks(body)) {
+    const resolved = await resolveLink(link);
+    if (/\/auth\/v1\/verify/.test(resolved) && new RegExp(`type=${type}`).test(resolved)) {
+      return { link, resolved };
+    }
+  }
+  return null;
+}
 
 type Inbox = { address: string; token: string };
 
@@ -98,7 +122,12 @@ async function waitForEmail(inbox: Inbox, match: RegExp, timeoutMs = 90_000) {
     const hit = messages.find((message) => match.test(message.subject));
     if (hit) {
       const full = await json(`${MAIL_TM}/messages/${hit.id}`, { headers });
-      return { subject: full.subject as string, body: `${full.text ?? ""}\n${full.html ?? ""}` };
+      const body = `${full.text ?? ""}\n${full.html ?? ""}`;
+      if (process.env["DUMP_EMAILS"]) {
+        const { writeFileSync } = await import("node:fs");
+        writeFileSync(`/tmp/mail/${hit.id}.txt`, body);
+      }
+      return { subject: full.subject as string, body };
     }
     await sleep(3000);
   }
@@ -113,7 +142,7 @@ const authFetch = (path: string, body: unknown) =>
   });
 
 describe.runIf(RUN)("MzansiTalk auth emails", () => {
-  it("delivers a signup verification email containing a 6-digit code", async () => {
+  it("delivers a signup verification email containing a confirmation link", async () => {
     const inbox = await createInbox();
     await authFetch("/signup", {
       email: inbox.address,
@@ -123,10 +152,16 @@ describe.runIf(RUN)("MzansiTalk auth emails", () => {
 
     const email = await waitForEmail(inbox, /confirm|verif/i);
     expect(email.body.length).toBeGreaterThan(0);
-    expect(visibleText(email.body)).toMatch(SIX_DIGIT_CODE);
+
+    const action = await findActionLink(email.body, "signup");
+    expect(action, `no signup confirmation link found in:\n${email.body}`).toBeTruthy();
+    expect(action!.link).toMatch(/^https:\/\//);
+    expect(action!.resolved).toContain("/auth/v1/verify");
+    expect(action!.resolved).toMatch(/[?&](token|token_hash)=[^&]+/);
+    expect(action!.resolved).toContain("type=signup");
   }, 120_000);
 
-  it("delivers a password reset email containing a 6-digit code", async () => {
+  it("delivers a password reset email containing a recovery link", async () => {
     const inbox = await createInbox();
     await authFetch("/signup", {
       email: inbox.address,
@@ -139,6 +174,12 @@ describe.runIf(RUN)("MzansiTalk auth emails", () => {
 
     const email = await waitForEmail(inbox, /reset|recovery|password/i);
     expect(email.body.length).toBeGreaterThan(0);
-    expect(visibleText(email.body)).toMatch(SIX_DIGIT_CODE);
+
+    const action = await findActionLink(email.body, "recovery");
+    expect(action, `no recovery link found in:\n${email.body}`).toBeTruthy();
+    expect(action!.link).toMatch(/^https:\/\//);
+    expect(action!.resolved).toContain("/auth/v1/verify");
+    expect(action!.resolved).toMatch(/[?&](token|token_hash)=[^&]+/);
+    expect(action!.resolved).toContain("type=recovery");
   }, 180_000);
 });
