@@ -359,9 +359,17 @@ export function PostCard({ item }: { item: FeedItem }) {
           <div className="space-y-3">
             {(comments.data ?? []).map((comment) => (
               <div key={comment.id} className="flex items-start gap-2">
-                <Avatar path={comment.author?.avatar_url} name={comment.author?.name ?? "M"} size={28} />
+                <Link to="/u/$username" params={{ username: comment.author?.username ?? "" }}>
+                  <Avatar path={comment.author?.avatar_url} name={comment.author?.name ?? "M"} size={28} />
+                </Link>
                 <p className="text-sm">
-                  <span className="font-semibold">{comment.author?.name ?? "User"}</span>{" "}
+                  <Link
+                    to="/u/$username"
+                    params={{ username: comment.author?.username ?? "" }}
+                    className="font-semibold"
+                  >
+                    {comment.author?.name ?? "User"}
+                  </Link>{" "}
                   {comment.body}
                 </p>
               </div>
