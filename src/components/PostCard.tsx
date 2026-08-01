@@ -237,8 +237,9 @@ export function PostCard({ item }: { item: FeedItem }) {
         </button>
         <button
           type="button"
-          onClick={share}
+          onClick={() => setShowShare((value) => !value)}
           className="btn-base bg-transparent text-sm text-muted-foreground"
+          aria-label="Share"
         >
           <Share2 className="size-5" />
         </button>
@@ -256,39 +257,102 @@ export function PostCard({ item }: { item: FeedItem }) {
       </div>
 
       {showShare ? (
-        <div className="border-t border-border p-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-            Send this {item.kind} to a chat
-          </p>
-          <ul className="mt-2 space-y-2">
-            {(chats.data ?? []).map((chat) => (
-              <li key={chat.id}>
-                <button
-                  type="button"
-                  onClick={() => shareToChat.mutate(chat.id)}
-                  className="btn-base w-full justify-start bg-secondary text-secondary-foreground"
-                >
-                  {chat.is_group
-                    ? chat.title || "Group Chat"
-                    : (chat.members.map((member) => member.name).join(", ") || "Chat")}
-                </button>
-              </li>
-            ))}
-            {(chats.data ?? []).length === 0 ? (
-              <li className="text-sm text-muted-foreground">
-                No chats yet. Start one from the Chats tab.
-              </li>
-            ) : null}
-          </ul>
+        <div className="space-y-3 border-t border-border p-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Share this {item.kind}
+            </p>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-base justify-start bg-secondary text-secondary-foreground"
+              >
+                <MessageCircle className="size-4" /> WhatsApp
+              </a>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-base justify-start bg-secondary text-secondary-foreground"
+              >
+                <Facebook className="size-4" /> Facebook
+              </a>
+              <button
+                type="button"
+                onClick={copyLink}
+                className="btn-base justify-start bg-secondary text-secondary-foreground"
+              >
+                <Link2 className="size-4" /> Vidmate
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowShare(true)}
+                className="btn-base justify-start bg-secondary text-secondary-foreground"
+              >
+                <Users className="size-4" /> Groups below
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Share to my own timeline
+            </p>
+            <textarea
+              className="field field-focus mt-2 min-h-16"
+              placeholder="Write something about this..."
+              value={repostCaption}
+              onChange={(event) => setRepostCaption(event.target.value)}
+              maxLength={500}
+            />
+            <button
+              type="button"
+              onClick={() => repost.mutate()}
+              disabled={repost.isPending}
+              className="btn-base btn-primary mt-2 w-full"
+            >
+              Post to My Timeline
+            </button>
+          </div>
+
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Groups and chats in MzansiTalk
+            </p>
+            <ul className="mt-2 space-y-2">
+              {(chats.data ?? []).map((chat) => (
+                <li key={chat.id}>
+                  <button
+                    type="button"
+                    onClick={() => shareToChat.mutate(chat.id)}
+                    className="btn-base w-full justify-start bg-secondary text-secondary-foreground"
+                  >
+                    {chat.is_group
+                      ? chat.title || "Group Chat"
+                      : (chat.members.map((member) => member.name).join(", ") || "Chat")}
+                  </button>
+                </li>
+              ))}
+              {(chats.data ?? []).length === 0 ? (
+                <li className="text-sm text-muted-foreground">
+                  No chats or groups yet. Start one from the Messages tab.
+                </li>
+              ) : null}
+            </ul>
+          </div>
+
           <button
             type="button"
             onClick={() => setShowShare(false)}
-            className="btn-base mt-2 bg-transparent text-xs text-muted-foreground"
+            className="btn-base bg-transparent text-xs text-muted-foreground"
           >
             Cancel
           </button>
         </div>
       ) : null}
+
 
       {showComments ? (
         <div className="border-t border-border p-3">
