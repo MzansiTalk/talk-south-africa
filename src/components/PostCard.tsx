@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Bookmark, Heart, MessageCircle, MoreHorizontal, Rocket, Send, Share2, Trash2 } from "lucide-react";
+import { Bookmark, Eye, Heart, MessageCircle, MoreHorizontal, Rocket, Send, Share2, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
