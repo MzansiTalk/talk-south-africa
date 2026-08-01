@@ -41,11 +41,24 @@ async function createInbox(): Promise<Inbox> {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ address, password }),
   });
-  const { token } = await json(`${MAIL_TM}/token`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ address, password }),
-  });
+  // mail.tm briefly 401s a freshly created account, so retry the token call.
+  let token = "";
+  for (let attempt = 0; attempt < 6 && !token; attempt += 1) {
+    await sleep(1500);
+    try {
+      token = (
+        await json(`${MAIL_TM}/token`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ address, password }),
+        })
+      ).token;
+    } catch {
+      // keep retrying until the sandbox account is usable
+    }
+  }
+  if (!token) throw new Error(`Could not obtain a sandbox inbox token for ${address}`);
+
   return { address, token };
 }
 
