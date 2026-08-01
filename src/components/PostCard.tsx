@@ -288,10 +288,10 @@ export function PostCard({ item }: { item: FeedItem }) {
               </button>
               <button
                 type="button"
-                onClick={() => setShowShare(true)}
+                onClick={copyLink}
                 className="btn-base justify-start bg-secondary text-secondary-foreground"
               >
-                <Users className="size-4" /> Groups below
+                <Users className="size-4" /> Copy link
               </button>
             </div>
           </div>
