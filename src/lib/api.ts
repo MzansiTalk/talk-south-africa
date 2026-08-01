@@ -723,8 +723,6 @@ export type AppSettings = {
   ads_rewarded_enabled: boolean;
   ads_native_enabled: boolean;
   paystack_public_key: string | null;
-  paystack_secret_key: string | null;
-  paystack_webhook_secret: string | null;
   paystack_webhook_url: string | null;
   paystack_payout_email: string | null;
   price_per_1000_impressions: number;

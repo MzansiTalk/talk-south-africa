@@ -50,8 +50,6 @@ const EMPTY: AppSettings = {
   ads_rewarded_enabled: true,
   ads_native_enabled: true,
   paystack_public_key: "",
-  paystack_secret_key: "",
-  paystack_webhook_secret: "",
   paystack_webhook_url: "",
   paystack_payout_email: OWNER_EMAIL,
   price_per_1000_impressions: 50,
