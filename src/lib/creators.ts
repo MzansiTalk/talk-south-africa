@@ -6,8 +6,8 @@ import { getCurrentUserId, uploadMedia, type Post, type Profile } from "@/lib/ap
 
 export const CREATOR_VIEW_TARGET = 90_000;
 export const CREATOR_INVITE_TARGET = 60;
-export const CREATOR_SHARE = 0.8;
-export const PLATFORM_SHARE = 0.2;
+export const CREATOR_SHARE = 0.2;
+export const PLATFORM_SHARE = 0.8;
 
 export type CreatorApplication = {
   id: string;
