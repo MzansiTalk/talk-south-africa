@@ -30,6 +30,7 @@ export type AdConfig = {
   admob_banner_id: string | null;
   admob_interstitial_id: string | null;
   admob_rewarded_id: string | null;
+  admob_rewarded_interstitial_id: string | null;
   admob_native_id: string | null;
   admob_status_id: string | null;
   meta_app_id: string | null;
