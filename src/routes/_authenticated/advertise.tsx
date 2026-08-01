@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import { createSponsoredOrder, fetchPublicPricing } from "@/lib/api";
 
-export const Route = createFileRoute("/advertise")({
+export const Route = createFileRoute("/_authenticated/advertise")({
   head: () => ({
     meta: [
       { title: "Advertise With Us — MzansiTalk" },
