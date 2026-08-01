@@ -123,7 +123,7 @@ describe.runIf(RUN)("MzansiTalk auth emails", () => {
 
     const email = await waitForEmail(inbox, /confirm|verif/i);
     expect(email.body.length).toBeGreaterThan(0);
-    expect(email.body).toMatch(SIX_DIGIT_CODE);
+    expect(visibleText(email.body)).toMatch(SIX_DIGIT_CODE);
   }, 120_000);
 
   it("delivers a password reset email containing a 6-digit code", async () => {
@@ -139,6 +139,6 @@ describe.runIf(RUN)("MzansiTalk auth emails", () => {
 
     const email = await waitForEmail(inbox, /reset|recovery|password/i);
     expect(email.body.length).toBeGreaterThan(0);
-    expect(email.body).toMatch(SIX_DIGIT_CODE);
+    expect(visibleText(email.body)).toMatch(SIX_DIGIT_CODE);
   }, 180_000);
 });
