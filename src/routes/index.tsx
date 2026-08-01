@@ -102,8 +102,7 @@ function AuthWall() {
           return;
         }
         setMode("verify");
-        setAttempts(0);
-        toast.success("We sent a 6-digit code to your email");
+        toast.success("Check your email to confirm your account");
         return;
       }
 
@@ -115,38 +114,12 @@ function AuthWall() {
         const message = error.message.toLowerCase();
         if (message.includes("not confirmed")) {
           setMode("verify");
-          setAttempts(0);
-          toast.error("Please verify your email first");
+          toast.error("Please confirm your email first");
           return;
         }
         throw new Error("Incorrect email or password");
       }
       void navigate({ to: "/home", replace: true });
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const verify = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (attempts >= 5) {
-      toast.error("Too many attempts. Please wait 15 minutes and try again.");
-      return;
-    }
-    setBusy(true);
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        email: email.trim().toLowerCase(),
-        token: code.trim(),
-        type: "signup",
-      });
-      if (error) {
-        setAttempts((prev) => prev + 1);
-        throw new Error("That code is wrong or has expired. Tap Resend Code.");
-      }
-      await enterApp();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
     } finally {
@@ -163,10 +136,9 @@ function AuthWall() {
         options: { emailRedirectTo: window.location.origin },
       });
       if (error) throw error;
-      setAttempts(0);
-      toast.success("New code sent. Check your inbox.");
+      toast.success("New confirmation link sent. Check your inbox.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not resend code");
+      toast.error(error instanceof Error ? error.message : "Could not resend the email");
     } finally {
       setBusy(false);
     }
