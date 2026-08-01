@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import logo from "@/assets/mzansitalk-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { claimStoredReferral } from "@/lib/creators";
+import { signUpWithPassKey } from "@/lib/passkey.functions";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -64,10 +66,11 @@ function PasswordField({
 
 function AuthWall() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup" | "verify">("login");
+  const [mode, setMode] = useState<"login" | "signup">("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passKey, setPassKey] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -76,9 +79,16 @@ function AuthWall() {
     });
   }, [navigate]);
 
-  const enterApp = async () => {
-    await claimStoredReferral();
-    toast.success("Welcome to MzansiTalk");
+  const signIn = async (welcome: boolean) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
+    if (error) throw new Error("Incorrect email or password");
+    if (welcome) {
+      await claimStoredReferral();
+      toast.success("Welcome to MzansiTalk");
+    }
     void navigate({ to: "/home", replace: true });
   };
 
@@ -88,57 +98,23 @@ function AuthWall() {
     try {
       if (mode === "signup") {
         if (password.length < 8) throw new Error("Password must be at least 8 characters");
-        const { data, error } = await supabase.auth.signUp({
-          email: email.trim().toLowerCase(),
-          password,
-          options: {
-            data: { name: name.trim() },
-            emailRedirectTo: window.location.origin,
+        if (passKey.trim().length < 6) throw new Error("Pass Key must be at least 6 characters");
+        const result = await signUpWithPassKey({
+          data: {
+            name: name.trim(),
+            email: email.trim().toLowerCase(),
+            password,
+            passKey: passKey.trim(),
           },
         });
-        if (error) throw error;
-        if (data.session) {
-          await enterApp();
-          return;
-        }
-        setMode("verify");
-        toast.success("Check your email to confirm your account");
+        if (!result.ok) throw new Error(result.message);
+        await signIn(true);
         return;
       }
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
-      });
-      if (error) {
-        const message = error.message.toLowerCase();
-        if (message.includes("not confirmed")) {
-          setMode("verify");
-          toast.error("Please confirm your email first");
-          return;
-        }
-        throw new Error("Incorrect email or password");
-      }
-      void navigate({ to: "/home", replace: true });
+      await signIn(false);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const resend = async () => {
-    setBusy(true);
-    try {
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: email.trim().toLowerCase(),
-        options: { emailRedirectTo: window.location.origin },
-      });
-      if (error) throw error;
-      toast.success("New confirmation link sent. Check your inbox.");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not resend the email");
     } finally {
       setBusy(false);
     }
@@ -166,93 +142,79 @@ function AuthWall() {
           </p>
         </div>
 
-        {mode === "verify" ? (
-          <div className="mt-6 space-y-3">
-            <h2 className="font-display text-lg font-bold">Confirm Your Email</h2>
-            <p className="text-sm text-muted-foreground">
-              We emailed a confirmation link to {email || "your email"}. Open the email and tap the
-              link to activate your account — it brings you straight into MzansiTalk. The link
-              expires in 10 minutes.
-            </p>
+        <div className="mt-6 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+          {(["login", "signup"] as const).map((value) => (
             <button
+              key={value}
               type="button"
-              onClick={() => void resend()}
-              disabled={busy}
-              className="btn-base btn-gold w-full"
+              onClick={() => setMode(value)}
+              className={`btn-base py-2 text-sm ${
+                mode === value ? "btn-primary" : "bg-transparent text-muted-foreground"
+              }`}
             >
-              {busy ? "Sending…" : "Resend Confirmation Email"}
+              {value === "login" ? "Log In" : "Sign Up"}
             </button>
-            <button
-              type="button"
-              onClick={() => setMode("login")}
-              className="w-full text-sm text-muted-foreground underline"
-            >
-              Back to Log In
-            </button>
-          </div>
-        ) : (
-          <>
-            <div className="mt-6 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
-              {(["login", "signup"] as const).map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setMode(value)}
-                  className={`btn-base py-2 text-sm ${
-                    mode === value ? "btn-primary" : "bg-transparent text-muted-foreground"
-                  }`}
-                >
-                  {value === "login" ? "Log In" : "Sign Up"}
-                </button>
-              ))}
-            </div>
+          ))}
+        </div>
 
-            <form onSubmit={submit} className="mt-4 space-y-3">
-              {mode === "signup" ? (
-                <input
-                  className="field field-focus"
-                  placeholder="Full name"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  required
-                  maxLength={60}
-                />
-              ) : null}
-              <input
-                className="field field-focus"
-                type="email"
-                placeholder="Email address"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-                maxLength={255}
-              />
+        <form onSubmit={submit} className="mt-4 space-y-3">
+          {mode === "signup" ? (
+            <input
+              className="field field-focus"
+              placeholder="Full name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              required
+              maxLength={60}
+            />
+          ) : null}
+          <input
+            className="field field-focus"
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+            maxLength={255}
+          />
+          <PasswordField
+            value={password}
+            onChange={setPassword}
+            placeholder={mode === "signup" ? "Password (min 8 characters)" : "Password"}
+            minLength={mode === "signup" ? 8 : 6}
+          />
+          {mode === "signup" ? (
+            <div className="space-y-1.5">
               <PasswordField
-                value={password}
-                onChange={setPassword}
-                placeholder={mode === "signup" ? "Password (min 8 characters)" : "Password"}
-                minLength={mode === "signup" ? 8 : 6}
+                value={passKey}
+                onChange={setPassKey}
+                placeholder="Create Pass Key (min 6 characters)"
+                minLength={6}
               />
-              <button type="submit" disabled={busy} className="btn-base btn-gold w-full">
-                {busy ? "Please wait…" : mode === "login" ? "Log In" : "Create Account"}
-              </button>
-            </form>
-
-            <div className="mt-4 flex items-center justify-between text-sm">
-              <Link to="/forgot-password" className="text-muted-foreground underline">
-                Forgot Password?
-              </Link>
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <ShieldCheck className="size-3.5" /> 100% free to watch
-              </span>
+              <p className="text-xs text-gold">
+                ⚠️ Never share this Pass Key or forget it. You will need it to reset your password.
+              </p>
             </div>
+          ) : null}
+          <button type="submit" disabled={busy} className="btn-base btn-gold w-full">
+            {busy ? "Please wait…" : mode === "login" ? "Log In" : "Create Account"}
+          </button>
+        </form>
 
-            <p className="mt-3 text-center text-xs text-muted-foreground">
-              Want to advertise? Sign in first — pricing and checkout live inside the app.
-            </p>
-          </>
-        )}
+        <div className="mt-4 flex items-center justify-between text-sm">
+          <Link to="/forgot-password" className="text-muted-foreground underline">
+            Forgot Password?
+          </Link>
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            <ShieldCheck className="size-3.5" /> 100% free to watch
+          </span>
+        </div>
+
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          Want to advertise? Sign in first — pricing and checkout live inside the app.
+        </p>
       </div>
     </div>
   );
 }
+
