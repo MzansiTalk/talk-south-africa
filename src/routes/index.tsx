@@ -167,31 +167,20 @@ function AuthWall() {
         </div>
 
         {mode === "verify" ? (
-          <form onSubmit={verify} className="mt-6 space-y-3">
-            <h2 className="font-display text-lg font-bold">Enter Verification Code</h2>
+          <div className="mt-6 space-y-3">
+            <h2 className="font-display text-lg font-bold">Confirm Your Email</h2>
             <p className="text-sm text-muted-foreground">
-              We emailed a 6-digit code to {email || "your email"}. It expires in 10 minutes.
+              We emailed a confirmation link to {email || "your email"}. Open the email and tap the
+              link to activate your account — it brings you straight into MzansiTalk. The link
+              expires in 10 minutes.
             </p>
-            <input
-              className="field field-focus tracking-[0.3em]"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder="6-digit code"
-              value={code}
-              onChange={(event) => setCode(event.target.value)}
-              required
-              maxLength={10}
-            />
-            <button type="submit" disabled={busy} className="btn-base btn-gold w-full">
-              {busy ? "Checking…" : "Verify & Enter App"}
-            </button>
             <button
               type="button"
               onClick={() => void resend()}
               disabled={busy}
-              className="w-full text-sm text-muted-foreground underline"
+              className="btn-base btn-gold w-full"
             >
-              Resend Code
+              {busy ? "Sending…" : "Resend Confirmation Email"}
             </button>
             <button
               type="button"
@@ -200,7 +189,7 @@ function AuthWall() {
             >
               Back to Log In
             </button>
-          </form>
+          </div>
         ) : (
           <>
             <div className="mt-6 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
