@@ -332,7 +332,7 @@ function MoneyCenter() {
           onClick={() =>
             save.mutate({
               paystack_public_key: form.paystack_public_key,
-              paystack_secret_key: form.paystack_secret_key,
+              
               paystack_webhook_url: form.paystack_webhook_url,
               paystack_payout_email: form.paystack_payout_email,
               paystack_test_mode: form.paystack_test_mode,
