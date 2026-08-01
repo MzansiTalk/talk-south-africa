@@ -36,6 +36,7 @@ type AdForm = {
   admob_banner_id: string;
   admob_interstitial_id: string;
   admob_rewarded_id: string;
+  admob_rewarded_interstitial_id: string;
   admob_native_id: string;
   admob_status_id: string;
   meta_app_id: string;
@@ -53,6 +54,7 @@ const EMPTY: AdForm = {
   admob_banner_id: "",
   admob_interstitial_id: "",
   admob_rewarded_id: "",
+  admob_rewarded_interstitial_id: "",
   admob_native_id: "",
   admob_status_id: "",
   meta_app_id: "",
@@ -198,6 +200,11 @@ function AdSettingsPage() {
           label="AdMob Rewarded ID"
           value={form.admob_rewarded_id}
           onChange={(value) => set("admob_rewarded_id", value)}
+        />
+        <Field
+          label="AdMob Rewarded Interstitial ID"
+          value={form.admob_rewarded_interstitial_id}
+          onChange={(value) => set("admob_rewarded_interstitial_id", value)}
         />
         <Field
           label="AdMob Native ID"
