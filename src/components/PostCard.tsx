@@ -113,11 +113,25 @@ export function PostCard({ item }: { item: FeedItem }) {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  const share = async () => {
-    const link = `${window.location.origin}/post/${item.id}`;
-    await navigator.clipboard?.writeText(link).catch(() => undefined);
-    toast.success("Link copied. Share it in DMs or Groups.");
+  const shareLink = `${typeof window === "undefined" ? "" : window.location.origin}/u/${item.author?.username ?? ""}`;
+  const shareText = `${item.caption ?? "Check this out on MzansiTalk"} ${shareLink}`;
+
+  const repost = useMutation({
+    mutationFn: () => sharePostToTimeline(item.id, repostCaption),
+    onSuccess: () => {
+      setShowShare(false);
+      setRepostCaption("");
+      invalidate();
+      toast.success("Posted to your timeline");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const copyLink = async () => {
+    await navigator.clipboard?.writeText(shareLink).catch(() => undefined);
+    toast.success("Link copied — open Vidmate and paste it there.");
   };
+
 
   const author = item.author;
   const boostActive = item.boost_expires_at
