@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Play } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { signedUrl } from "@/lib/api";
 
@@ -21,9 +21,67 @@ type Props = {
   loop?: boolean;
 };
 
+/**
+ * Plays a video only while it is on screen AND the app/tab is in the foreground.
+ * Leaving the video (scroll away, app backgrounded, navigation) pauses and rewinds it,
+ * so it replays from the start when the viewer returns.
+ */
+function useViewportPlayback(enabled: boolean, autoPlay: boolean) {
+  const ref = useRef<HTMLVideoElement | null>(null);
+  const visibleRef = useRef(false);
+
+  const sync = useCallback(() => {
+    const video = ref.current;
+    if (!video) return;
+    const shouldPlay =
+      autoPlay && visibleRef.current && typeof document !== "undefined" && !document.hidden;
+    if (shouldPlay) {
+      void video.play().catch(() => undefined);
+    } else {
+      video.pause();
+      video.currentTime = 0;
+    }
+  }, [autoPlay]);
+
+  useEffect(() => {
+    const video = ref.current;
+    if (!enabled || !video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          visibleRef.current = entry.isIntersecting && entry.intersectionRatio >= 0.6;
+        }
+        sync();
+      },
+      { threshold: [0, 0.6, 1] },
+    );
+    observer.observe(video);
+
+    const onHidden = () => sync();
+    document.addEventListener("visibilitychange", onHidden);
+    window.addEventListener("blur", onHidden);
+    window.addEventListener("focus", onHidden);
+    window.addEventListener("pagehide", onHidden);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", onHidden);
+      window.removeEventListener("blur", onHidden);
+      window.removeEventListener("focus", onHidden);
+      window.removeEventListener("pagehide", onHidden);
+      video.pause();
+    };
+  }, [enabled, sync]);
+
+  return ref;
+}
+
 export function SignedMedia({ path, type, className, autoPlay = true, loop = false }: Props) {
   const { data: url } = useMediaUrl(path);
   const [fullscreen, setFullscreen] = useState(false);
+  const isVideo = type === "video";
+  const videoRef = useViewportPlayback(Boolean(url) && isVideo && !fullscreen, autoPlay);
 
   if (!path) return null;
 
@@ -31,15 +89,15 @@ export function SignedMedia({ path, type, className, autoPlay = true, loop = fal
     return <div className={`animate-pulse bg-muted ${className ?? "aspect-square w-full"}`} />;
   }
 
-  const isVideo = type === "video";
-
   const media = isVideo ? (
     <video
+      ref={videoRef}
       src={url}
       className={className ?? "h-full w-full object-cover"}
-      autoPlay={autoPlay}
       loop={loop}
+      muted
       playsInline
+      preload="metadata"
       controls={fullscreen}
     />
   ) : (
