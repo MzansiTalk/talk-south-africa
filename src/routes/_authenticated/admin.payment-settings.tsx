@@ -38,6 +38,7 @@ const EMPTY: AppSettings = {
   admob_banner_id: "",
   admob_interstitial_id: "",
   admob_rewarded_id: "",
+  admob_rewarded_interstitial_id: "",
   admob_native_id: "",
   admob_status_id: "",
   admob_payment_email: OWNER_EMAIL,
@@ -240,6 +241,11 @@ function MoneyCenter() {
           onChange={(v) => set("admob_rewarded_id", v)}
         />
         <Field
+          label="AdMob Rewarded Interstitial Ad Unit ID"
+          value={form.admob_rewarded_interstitial_id ?? ""}
+          onChange={(v) => set("admob_rewarded_interstitial_id", v)}
+        />
+        <Field
           label="AdMob Native Ad Unit ID"
           value={form.admob_native_id ?? ""}
           onChange={(v) => set("admob_native_id", v)}
@@ -278,6 +284,7 @@ function MoneyCenter() {
               admob_banner_id: form.admob_banner_id,
               admob_interstitial_id: form.admob_interstitial_id,
               admob_rewarded_id: form.admob_rewarded_id,
+              admob_rewarded_interstitial_id: form.admob_rewarded_interstitial_id,
               admob_native_id: form.admob_native_id,
               admob_payment_email: form.admob_payment_email,
               ads_banner_enabled: form.ads_banner_enabled,
