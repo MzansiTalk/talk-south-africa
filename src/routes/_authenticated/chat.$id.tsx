@@ -214,14 +214,20 @@ function ChatThread() {
                   </div>
                 ) : null}
                 {mine ? (
-                  <span className="mt-1 flex items-center justify-end gap-1 text-[0.6rem] opacity-80">
-                    <CheckCheck
-                      className={`size-3 ${
-                        seenAt.data && seenAt.data >= message.created_at ? "text-gold" : ""
-                      }`}
-                    />
-                    {seenAt.data && seenAt.data >= message.created_at ? "Seen" : "Sent"}
-                  </span>
+                  (() => {
+                    const seen = Boolean(seenAt.data && seenAt.data >= message.created_at);
+                    const delivered = seen || otherOnline;
+                    return (
+                      <span className="mt-1 flex items-center justify-end gap-1 text-[0.6rem] opacity-80">
+                        {delivered ? (
+                          <CheckCheck className={`size-3 ${seen ? "text-gold" : ""}`} />
+                        ) : (
+                          <Check className="size-3" />
+                        )}
+                        {seen ? "Seen" : delivered ? "Delivered" : "Sent"}
+                      </span>
+                    );
+                  })()
                 ) : null}
               </div>
             </li>
