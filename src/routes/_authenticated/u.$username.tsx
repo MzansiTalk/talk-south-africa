@@ -35,6 +35,8 @@ function UserProfile() {
 
   const { username } = Route.useParams();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
 
   const profile = useQuery({
     queryKey: ["profile", username],
