@@ -1,12 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Crown, Flame } from "lucide-react";
+import { useRef, useState } from "react";
 
-import { BannerAd, NativeAd } from "@/components/Ads";
+import {
+  BannerAd,
+  InterstitialAd,
+  NativeAd,
+  useInterstitialAfterEvery,
+  VideoAd,
+} from "@/components/Ads";
 import { PostCard } from "@/components/PostCard";
 import { Avatar } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
 import { fetchFeed, fetchTopBoosters } from "@/lib/api";
+
+/** 1-based position of a post among the long videos in the feed. */
+function videoIndex(items: { media_type: string | null }[], index: number) {
+  let count = 0;
+  for (let i = 0; i <= index; i += 1) {
+    if ((items[i]?.media_type ?? "").startsWith("video")) count += 1;
+  }
+  return count;
+}
 
 export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
@@ -29,8 +45,34 @@ function HomeFeed() {
   const boosters = useQuery({ queryKey: ["top-boosters"], queryFn: fetchTopBoosters });
   const topBoosters = boosters.data ?? [];
 
+  const [videosWatched, setVideosWatched] = useState(0);
+  const seenVideos = useRef(new Set<string>());
+  const videoInterstitial = useInterstitialAfterEvery(videosWatched, 3);
+
+  /** Counts a long video as watched once it is mostly on screen, so ads run every 3 videos. */
+  const observeVideo = (id: string) => (node: HTMLDivElement | null) => {
+    if (!node || seenVideos.current.has(id)) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && !seenVideos.current.has(id)) {
+            seenVideos.current.add(id);
+            setVideosWatched((current) => current + 1);
+            observer.disconnect();
+          }
+        }
+      },
+      { threshold: 0.6 },
+    );
+    observer.observe(node);
+  };
+
   return (
     <Screen showSearch>
+      {videoInterstitial.open ? (
+        <InterstitialAd onClose={videoInterstitial.close} placement="video_interstitial" />
+      ) : null}
+
       <section className="mb-4 overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-card">
         <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
           <Crown className="size-4 text-gold" /> Top Boosters This Week
@@ -76,12 +118,26 @@ function HomeFeed() {
         </div>
       ) : (
         <div className="space-y-4">
-          {items.map((item, index) => (
-            <div key={item.id} className="space-y-4">
-              <PostCard item={item} />
-              {(index + 1) % 5 === 0 && !item.deleted_by_admin ? <NativeAd /> : null}
-            </div>
-          ))}
+          {items.map((item, index) => {
+            const isVideo = (item.media_type ?? "").startsWith("video");
+            const target = { postId: item.id, contentKind: item.kind, ownerId: item.user_id };
+            const videoNumber = isVideo ? videoIndex(items, index) : 0;
+            return (
+              <div
+                key={item.id}
+                {...(isVideo ? { ref: observeVideo(item.id) } : {})}
+                className="space-y-4"
+              >
+                <PostCard item={item} />
+                {isVideo && videoNumber % 3 === 0 && !item.deleted_by_admin ? (
+                  <VideoAd target={target} />
+                ) : null}
+                {(index + 1) % 5 === 0 && !item.deleted_by_admin ? (
+                  <NativeAd target={target} />
+                ) : null}
+              </div>
+            );
+          })}
           <BannerAd placement="home_banner" />
         </div>
       )}
