@@ -67,7 +67,17 @@ function Reels() {
 
   return (
     <Screen title="Reels">
-      {interstitial.open ? <InterstitialAd onClose={interstitial.close} /> : null}
+      {interstitial.open ? (
+        <InterstitialAd
+          onClose={interstitial.close}
+          placement="reel_interstitial"
+          target={
+            items[0]
+              ? { postId: items[0].id, contentKind: "reel", ownerId: items[0].user_id }
+              : undefined
+          }
+        />
+      ) : null}
 
       <div className="field field-focus mb-4 flex items-center gap-2">
         <Search className="size-4 text-muted-foreground" />
@@ -88,14 +98,21 @@ function Reels() {
           {items.map((item, index) => (
             <div key={item.id} ref={observe(item.id)} className="space-y-4">
               <PostCard item={item} />
-              {(index + 1) % 3 === 0 && !item.deleted_by_admin ? <VideoAd /> : null}
+              {(index + 1) % 3 === 0 && !item.deleted_by_admin ? (
+                <VideoAd target={{ postId: item.id, contentKind: "reel", ownerId: item.user_id }} />
+              ) : null}
             </div>
           ))}
         </div>
       )}
 
       <div className="fixed inset-x-0 bottom-[3.6rem] z-20 mx-auto w-full max-w-2xl px-3">
-        <BannerAd placement="reel_banner" />
+        <BannerAd
+          placement="reel_banner"
+          {...(items[0]
+            ? { target: { postId: items[0].id, contentKind: "reel", ownerId: items[0].user_id } }
+            : {})}
+        />
       </div>
     </Screen>
   );
