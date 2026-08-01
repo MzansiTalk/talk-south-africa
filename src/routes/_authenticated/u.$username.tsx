@@ -157,7 +157,8 @@ function UserProfile() {
             </button>
             <button
               type="button"
-              onClick={() => toast.info("Direct messages arrive in the chat release")}
+              onClick={() => message.mutate()}
+              disabled={message.isPending}
               className="btn-base bg-secondary text-secondary-foreground"
             >
               <MessageSquare className="size-4" /> Message
@@ -167,7 +168,7 @@ function UserProfile() {
               onClick={() => block.mutate()}
               className="btn-base bg-transparent text-destructive"
             >
-              Block
+              {blocked.data ? "Unblock" : "Block"}
             </button>
           </div>
         </div>
