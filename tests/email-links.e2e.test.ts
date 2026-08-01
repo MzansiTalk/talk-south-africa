@@ -102,7 +102,12 @@ async function waitForEmail(inbox: Inbox, match: RegExp, timeoutMs = 90_000) {
     const hit = messages.find((message) => match.test(message.subject));
     if (hit) {
       const full = await json(`${MAIL_TM}/messages/${hit.id}`, { headers });
-      return { subject: full.subject as string, body: `${full.text ?? ""}\n${full.html ?? ""}` };
+      const body = `${full.text ?? ""}\n${full.html ?? ""}`;
+      if (process.env["DUMP_EMAILS"]) {
+        const { writeFileSync } = await import("node:fs");
+        writeFileSync(`/tmp/mail/${hit.id}.txt`, body);
+      }
+      return { subject: full.subject as string, body };
     }
     await sleep(3000);
   }
