@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import logo from "@/assets/mzansitalk-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { claimStoredReferral } from "@/lib/creators";
+import { signUpWithPassKey } from "@/lib/passkey.functions";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
