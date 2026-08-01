@@ -31,7 +31,7 @@ export const Route = createFileRoute("/_authenticated/creator-program")({
       { property: "og:title", content: "Creator Program — MzansiTalk" },
       {
         property: "og:description",
-        content: "Earn from your reels on MzansiTalk. 80% to you, 20% to MzansiTalk.",
+        content: "Earn from your reels on MzansiTalk. 20% to you, 80% to MzansiTalk.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -218,11 +218,11 @@ function CreatorProgramPage() {
         </h2>
         <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
           <div className="rounded-xl bg-secondary p-3">
-            <p className="text-xs text-muted-foreground">Your share (80%)</p>
+            <p className="text-xs text-muted-foreground">Your share (20%)</p>
             <p className="text-lg font-extrabold">R{(earnings * CREATOR_SHARE).toFixed(2)}</p>
           </div>
           <div className="rounded-xl bg-secondary p-3">
-            <p className="text-xs text-muted-foreground">MzansiTalk (20%)</p>
+            <p className="text-xs text-muted-foreground">MzansiTalk (80%)</p>
             <p className="text-lg font-extrabold">R{(earnings * PLATFORM_SHARE).toFixed(2)}</p>
           </div>
         </div>

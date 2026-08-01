@@ -106,7 +106,7 @@ function SettingsPage() {
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold">Creator Program</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Track your views and invites, apply, and request payouts (80% you / 20% MzansiTalk).
+          Track your views and invites, apply, and request payouts (20% you / 80% MzansiTalk).
         </p>
         <Link to="/creator-program" className="btn-base btn-gold mt-3">
           <Sparkles className="size-4" /> Open Creator Program

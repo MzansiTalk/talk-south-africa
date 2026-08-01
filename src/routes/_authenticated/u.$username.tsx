@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 
@@ -10,10 +10,13 @@ import {
   fetchFollowCounts,
   fetchProfileByUsername,
   fetchUserContent,
+  isBlocked,
   isFollowing,
   setBlock,
   setFollow,
+  startDirectChat,
 } from "@/lib/api";
+
 
 export const Route = createFileRoute("/_authenticated/u/$username")({
   head: () => ({
@@ -32,6 +35,8 @@ function UserProfile() {
 
   const { username } = Route.useParams();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
 
   const profile = useQuery({
     queryKey: ["profile", username],
@@ -65,14 +70,31 @@ function UserProfile() {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  const blocked = useQuery({
+    queryKey: ["is-blocked", target?.id],
+    queryFn: () => isBlocked(target!.id),
+    enabled: Boolean(target?.id),
+  });
+
   const block = useMutation({
-    mutationFn: () => setBlock(target!.id, true),
+    mutationFn: () => setBlock(target!.id, !blocked.data),
     onSuccess: () => {
-      toast.success("User blocked. They can no longer message you or see your posts.");
+      toast.success(
+        blocked.data
+          ? "User unblocked. You can see and message each other again."
+          : "User blocked. They can no longer message you or see your posts.",
+      );
       void queryClient.invalidateQueries();
     },
     onError: (error: Error) => toast.error(error.message),
   });
+
+  const message = useMutation({
+    mutationFn: () => startDirectChat(target!.id),
+    onSuccess: (id) => navigate({ to: "/chat/$id", params: { id } }),
+    onError: (error: Error) => toast.error(error.message),
+  });
+
 
   if (profile.isLoading) {
     return (
@@ -135,7 +157,8 @@ function UserProfile() {
             </button>
             <button
               type="button"
-              onClick={() => toast.info("Direct messages arrive in the chat release")}
+              onClick={() => message.mutate()}
+              disabled={message.isPending}
               className="btn-base bg-secondary text-secondary-foreground"
             >
               <MessageSquare className="size-4" /> Message
@@ -145,7 +168,7 @@ function UserProfile() {
               onClick={() => block.mutate()}
               className="btn-base bg-transparent text-destructive"
             >
-              Block
+              {blocked.data ? "Unblock" : "Block"}
             </button>
           </div>
         </div>

@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { Play } from "lucide-react";
+import { Play, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { signedUrl } from "@/lib/api";
+
 
 export function useMediaUrl(path: string | null | undefined) {
   return useQuery({
@@ -26,22 +27,41 @@ type Props = {
  * Leaving the video (scroll away, app backgrounded, navigation) pauses and rewinds it,
  * so it replays from the start when the viewer returns.
  */
-function useViewportPlayback(enabled: boolean, autoPlay: boolean) {
+function useViewportPlayback(
+  enabled: boolean,
+  autoPlay: boolean,
+  muted: boolean,
+  onAutoplayBlocked: () => void,
+) {
   const ref = useRef<HTMLVideoElement | null>(null);
   const visibleRef = useRef(false);
+  const mutedRef = useRef(muted);
+  mutedRef.current = muted;
 
   const sync = useCallback(() => {
     const video = ref.current;
     if (!video) return;
     const shouldPlay =
       autoPlay && visibleRef.current && typeof document !== "undefined" && !document.hidden;
+    video.muted = mutedRef.current;
     if (shouldPlay) {
-      void video.play().catch(() => undefined);
+      void video.play().catch(() => {
+        // Browsers block unmuted autoplay until the user interacts with the page.
+        if (!mutedRef.current) {
+          onAutoplayBlocked();
+          video.muted = true;
+          void video.play().catch(() => undefined);
+        }
+      });
     } else {
       video.pause();
       video.currentTime = 0;
     }
-  }, [autoPlay]);
+  }, [autoPlay, onAutoplayBlocked]);
+
+  useEffect(() => {
+    sync();
+  }, [muted, sync]);
 
   useEffect(() => {
     const video = ref.current;
@@ -80,8 +100,15 @@ function useViewportPlayback(enabled: boolean, autoPlay: boolean) {
 export function SignedMedia({ path, type, className, autoPlay = true, loop = false }: Props) {
   const { data: url } = useMediaUrl(path);
   const [fullscreen, setFullscreen] = useState(false);
+  const [muted, setMuted] = useState(false);
   const isVideo = type === "video";
-  const videoRef = useViewportPlayback(Boolean(url) && isVideo && !fullscreen, autoPlay);
+  const onAutoplayBlocked = useCallback(() => setMuted(true), []);
+  const videoRef = useViewportPlayback(
+    Boolean(url) && isVideo && !fullscreen,
+    autoPlay,
+    muted,
+    onAutoplayBlocked,
+  );
 
   if (!path) return null;
 
@@ -95,7 +122,7 @@ export function SignedMedia({ path, type, className, autoPlay = true, loop = fal
       src={url}
       className={className ?? "h-full w-full object-cover"}
       loop={loop}
-      muted
+      muted={muted}
       playsInline
       preload="metadata"
       controls={fullscreen}
@@ -111,19 +138,32 @@ export function SignedMedia({ path, type, className, autoPlay = true, loop = fal
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setFullscreen(true)}
-        className="relative block w-full cursor-zoom-in"
-        aria-label="Open in full screen"
-      >
-        {media}
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setFullscreen(true)}
+          className="relative block w-full cursor-zoom-in"
+          aria-label="Open in full screen"
+        >
+          {media}
+          {isVideo ? (
+            <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-background/70 p-2 text-foreground">
+              <Play className="size-4" />
+            </span>
+          ) : null}
+        </button>
         {isVideo ? (
-          <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-background/70 p-2 text-foreground">
-            <Play className="size-4" />
-          </span>
+          <button
+            type="button"
+            onClick={() => setMuted((value) => !value)}
+            aria-label={muted ? "Unmute video" : "Mute video"}
+            className="absolute bottom-3 left-3 rounded-full bg-background/70 p-2 text-foreground"
+          >
+            {muted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
+          </button>
         ) : null}
-      </button>
+      </div>
+
 
       {fullscreen ? (
         <div

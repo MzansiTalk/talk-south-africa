@@ -94,13 +94,13 @@ function EarningsPage() {
           </p>
         </div>
         <div className="rounded-2xl border border-border bg-card p-4">
-          <p className="text-xs text-muted-foreground">Creator Payouts (80%)</p>
+          <p className="text-xs text-muted-foreground">Creator share (20%)</p>
           <p className="mt-1 font-display text-xl font-bold text-gold">
             R{creatorPayouts.toFixed(2)}
           </p>
         </div>
         <div className="rounded-2xl border border-border bg-card p-4">
-          <p className="text-xs text-muted-foreground">MzansiTalk Share (20%)</p>
+          <p className="text-xs text-muted-foreground">MzansiTalk (80%)</p>
           <p className="mt-1 font-display text-xl font-bold">R{platformShare.toFixed(2)}</p>
         </div>
         <div className="col-span-2 rounded-2xl border border-border bg-card p-4">
@@ -117,7 +117,7 @@ function EarningsPage() {
           <div className="h-full w-4/5 bg-gold-gradient" />
           <div className="h-full w-1/5 bg-primary" />
         </div>
-        <p className="mt-2 text-muted-foreground">80% Creator · 20% MzansiTalk</p>
+        <p className="mt-2 text-muted-foreground">20% Creator · 80% MzansiTalk</p>
       </div>
 
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">

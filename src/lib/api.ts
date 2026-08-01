@@ -1175,3 +1175,36 @@ export async function replyToSupport(threadUserId: string, body: string) {
     .insert({ thread_user_id: threadUserId, sender_id: userId, body, is_staff_reply: true });
   if (error) throw error;
 }
+
+export async function isBlocked(targetId: string): Promise<boolean> {
+  const userId = await getCurrentUserId();
+  if (!userId) return false;
+  const { data } = await supabase
+    .from("blocks")
+    .select("id")
+    .eq("blocker_id", userId)
+    .eq("blocked_id", targetId)
+    .maybeSingle();
+  return Boolean(data);
+}
+
+/** Reposts someone else's post/reel/status onto my own timeline with my own words. */
+export async function sharePostToTimeline(postId: string, caption: string) {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error("Please log in");
+  const { data: original, error: readError } = await supabase
+    .from("posts")
+    .select("caption, media_url, media_type, kind")
+    .eq("id", postId)
+    .maybeSingle();
+  if (readError) throw readError;
+  if (!original) throw new Error("That post is no longer available");
+  const { error } = await supabase.from("posts").insert({
+    user_id: userId,
+    kind: original.kind === "status" ? "post" : original.kind,
+    caption: caption.trim() || original.caption,
+    media_url: original.media_url,
+    media_type: original.media_type,
+  });
+  if (error) throw error;
+}
