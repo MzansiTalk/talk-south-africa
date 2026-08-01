@@ -12,6 +12,7 @@ import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { installNativeAdMob } from "../lib/native-ads";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -117,6 +118,12 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+
+  // Inside the Android APK this hands the ad slots to the real AdMob SDK.
+  // On the web it does nothing.
+  useEffect(() => {
+    void installNativeAdMob().catch(() => undefined);
+  }, []);
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
