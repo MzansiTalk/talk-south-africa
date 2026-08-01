@@ -1,6 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Bookmark, Eye, Heart, MessageCircle, MoreHorizontal, Rocket, Send, Share2, Trash2 } from "lucide-react";
+import {
+  Bookmark,
+  Eye,
+  Facebook,
+  Heart,
+  Link2,
+  MessageCircle,
+  MoreHorizontal,
+  Rocket,
+  Send,
+  Share2,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -11,11 +24,13 @@ import {
   fetchComments,
   fetchConversations,
   sharePostToChat,
+  sharePostToTimeline,
   toggleLike,
   toggleSave,
   type FeedItem,
 } from "@/lib/api";
 import { createReport } from "@/lib/moderation";
+
 
 
 export function PostCard({ item }: { item: FeedItem }) {
