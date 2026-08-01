@@ -160,6 +160,9 @@ function AdminManagementPage() {
         Warning: Owner only. These settings control who can moderate MzansiTalk.
       </div>
 
+      <PromoteCard />
+
+
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-sm font-bold">Admins</h2>
