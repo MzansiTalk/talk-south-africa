@@ -68,9 +68,7 @@ function AuthWall() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
-  const [attempts, setAttempts] = useState(0);
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => {
