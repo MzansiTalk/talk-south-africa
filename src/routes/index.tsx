@@ -55,16 +55,20 @@ function AuthWall() {
           },
         });
         if (error) throw error;
+        // Email confirmation is not required at signup — go straight in.
         if (!data.session) {
-          toast.success("Check your email to confirm your MzansiTalk account.");
-          return;
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email: email.trim(),
+            password,
+          });
+          if (signInError) throw signInError;
         }
         await claimStoredReferral();
         toast.success("Welcome to MzansiTalk");
         void navigate({ to: "/home", replace: true });
         return;
-
       }
+
 
       const { error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
