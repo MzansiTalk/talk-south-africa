@@ -134,16 +134,25 @@ function AdminManagementPage() {
     );
   }
 
-  if (!isOwner) {
+  if (!isAdmin) {
     return (
       <Screen title="Admin Management">
         <div className="rounded-2xl border border-destructive bg-destructive/10 p-8 text-center">
           <ShieldAlert className="mx-auto size-8 text-destructive" />
-          <h2 className="mt-3 font-display text-lg font-bold">Access Denied. Owner Only.</h2>
+          <h2 className="mt-3 font-display text-lg font-bold">Access Denied. Staff Only.</h2>
         </div>
       </Screen>
     );
   }
+
+  if (!isOwner) {
+    return (
+      <Screen title="Admin Management">
+        <PromoteCard />
+      </Screen>
+    );
+  }
+
 
   return (
     <Screen title="Admin Management">
