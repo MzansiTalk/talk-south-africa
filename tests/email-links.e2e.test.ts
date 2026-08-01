@@ -22,21 +22,41 @@ const MAIL_TM = "https://api.mail.tm";
 /** Every http(s) URL in the email body, with HTML entities decoded. */
 function extractLinks(body: string) {
   const decoded = body.replace(/&amp;/g, "&").replace(/&#x2F;/gi, "/");
-  return (decoded.match(/https?:\/\/[^\s"'<>)\]]+/g) ?? []).map((url) =>
-    url.replace(/[.,;]+$/, ""),
-  );
+  return (decoded.match(/https?:\/\/[^\s"'<>)\]]+/g) ?? [])
+    .map((url) => url.replace(/[.,;)]+$/, ""))
+    .filter((url) => !/fonts\.googleapis|w3\.org/.test(url));
 }
 
 /**
- * Finds the auth action link for a given email type. Supabase sends links to
- * /auth/v1/verify (or a configured redirect) carrying a token and a type.
+ * Action links are wrapped by the mail provider's click tracker, so the token
+ * only shows up after following the redirect. `redirect: "manual"` reads the
+ * Location header without actually consuming the one-time token.
  */
-function findActionLink(body: string, type: "signup" | "recovery") {
-  return extractLinks(body).find(
-    (url) => /token=|token_hash=/.test(url) && new RegExp(`type=${type}`).test(url),
-  );
+async function resolveLink(url: string, hops = 5): Promise<string> {
+  let current = url;
+  for (let hop = 0; hop < hops; hop += 1) {
+    const response = await fetch(current, { redirect: "manual" });
+    const next = response.headers.get("location");
+    if (!next) return current;
+    current = new URL(next, current).toString();
+    if (/\/auth\/v1\/verify/.test(current)) return current;
+  }
+  return current;
 }
 
+/**
+ * Finds the auth action link for a given email type and returns both the link
+ * as shown in the email and the auth verify URL it resolves to.
+ */
+async function findActionLink(body: string, type: "signup" | "recovery") {
+  for (const link of extractLinks(body)) {
+    const resolved = await resolveLink(link);
+    if (/\/auth\/v1\/verify/.test(resolved) && new RegExp(`type=${type}`).test(resolved)) {
+      return { link, resolved };
+    }
+  }
+  return null;
+}
 
 type Inbox = { address: string; token: string };
 
@@ -133,10 +153,12 @@ describe.runIf(RUN)("MzansiTalk auth emails", () => {
     const email = await waitForEmail(inbox, /confirm|verif/i);
     expect(email.body.length).toBeGreaterThan(0);
 
-    const link = findActionLink(email.body, "signup");
-    expect(link, `no signup confirmation link found in:\n${email.body}`).toBeTruthy();
-    expect(link).toMatch(/^https:\/\//);
-    expect(link).toContain("/auth/v1/verify");
+    const action = await findActionLink(email.body, "signup");
+    expect(action, `no signup confirmation link found in:\n${email.body}`).toBeTruthy();
+    expect(action!.link).toMatch(/^https:\/\//);
+    expect(action!.resolved).toContain("/auth/v1/verify");
+    expect(action!.resolved).toMatch(/[?&](token|token_hash)=[^&]+/);
+    expect(action!.resolved).toContain("type=signup");
   }, 120_000);
 
   it("delivers a password reset email containing a recovery link", async () => {
@@ -153,9 +175,11 @@ describe.runIf(RUN)("MzansiTalk auth emails", () => {
     const email = await waitForEmail(inbox, /reset|recovery|password/i);
     expect(email.body.length).toBeGreaterThan(0);
 
-    const link = findActionLink(email.body, "recovery");
-    expect(link, `no recovery link found in:\n${email.body}`).toBeTruthy();
-    expect(link).toMatch(/^https:\/\//);
-    expect(link).toContain("/auth/v1/verify");
+    const action = await findActionLink(email.body, "recovery");
+    expect(action, `no recovery link found in:\n${email.body}`).toBeTruthy();
+    expect(action!.link).toMatch(/^https:\/\//);
+    expect(action!.resolved).toContain("/auth/v1/verify");
+    expect(action!.resolved).toMatch(/[?&](token|token_hash)=[^&]+/);
+    expect(action!.resolved).toContain("type=recovery");
   }, 180_000);
 });
