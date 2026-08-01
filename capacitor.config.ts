@@ -8,7 +8,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
  * with every deploy — publish the web app and the APK updates itself.
  */
 const config: CapacitorConfig = {
-  appId: "app.lovable.mzansitalk",
+  appId: "com.mzansitalk.app",
   appName: "MzansiTalk",
   webDir: "public",
   server: {
