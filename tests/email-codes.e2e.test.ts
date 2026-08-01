@@ -21,6 +21,19 @@ const MAIL_TM = "https://api.mail.tm";
 /** A standalone 6-digit code, e.g. "123456" but not part of a longer number. */
 const SIX_DIGIT_CODE = /(?<!\d)\d{6}(?!\d)/;
 
+/**
+ * Strips URLs, HTML tags/attributes and entities before looking for a code.
+ * Opaque confirmation-link tokens contain digit runs that would otherwise
+ * make the assertion pass without any real code being shown to the user.
+ */
+function visibleText(body: string) {
+  return body
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&#?\w+;/g, " ");
+}
+
+
 type Inbox = { address: string; token: string };
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
