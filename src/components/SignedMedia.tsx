@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { Play } from "lucide-react";
+import { Play, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { signedUrl } from "@/lib/api";
+
 
 export function useMediaUrl(path: string | null | undefined) {
   return useQuery({
