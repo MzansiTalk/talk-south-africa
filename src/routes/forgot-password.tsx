@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -20,11 +20,14 @@ export const Route = createFileRoute("/forgot-password")({
 });
 
 function ForgotPassword() {
+  const navigate = useNavigate();
+  const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+  const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const submit = async (event: React.FormEvent) => {
+  const sendCode = async (event: React.FormEvent) => {
     event.preventDefault();
     setBusy(true);
     try {
@@ -32,10 +35,33 @@ function ForgotPassword() {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
-      setSent(true);
-      toast.success("Reset code sent. Check your email.");
+      setStep("code");
+      toast.success("Code sent. Check your email.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const verify = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: code.trim(),
+        type: "recovery",
+      });
+      if (error) throw error;
+      if (password) {
+        const { error: updateError } = await supabase.auth.updateUser({ password });
+        if (updateError) throw updateError;
+      }
+      toast.success("You're in");
+      void navigate({ to: "/home", replace: true });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Invalid or expired code");
     } finally {
       setBusy(false);
     }
@@ -46,19 +72,13 @@ function ForgotPassword() {
       <div className="w-full max-w-sm">
         <h1 className="font-display text-2xl font-bold">Forgot Password</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Enter your email address. We send you a reset link with a code, then you set a new
-          password.
+          {step === "email"
+            ? "Enter your email. We send you a 6-digit code — or just tap the link in the email."
+            : "Paste the code from your email. You can set a new password now or leave it blank to just log in."}
         </p>
 
-        {sent ? (
-          <div className="mt-5 rounded-xl border border-border bg-card p-4 text-sm">
-            <p>
-              Email sent to <span className="font-semibold">{email}</span>. Open it on this device
-              and tap the link to set a new password.
-            </p>
-          </div>
-        ) : (
-          <form onSubmit={submit} className="mt-5 space-y-3">
+        {step === "email" ? (
+          <form onSubmit={sendCode} className="mt-5 space-y-3">
             <input
               className="field field-focus"
               type="email"
@@ -69,7 +89,39 @@ function ForgotPassword() {
               maxLength={255}
             />
             <button type="submit" disabled={busy} className="btn-base btn-primary w-full">
-              {busy ? "Sending…" : "Send Reset Code"}
+              {busy ? "Sending…" : "Send Code"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={verify} className="mt-5 space-y-3">
+            <input
+              className="field field-focus tracking-[0.3em]"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="6-digit code"
+              value={code}
+              onChange={(event) => setCode(event.target.value)}
+              required
+              maxLength={10}
+            />
+            <input
+              className="field field-focus"
+              type="password"
+              placeholder="New password (optional)"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              minLength={6}
+              maxLength={72}
+            />
+            <button type="submit" disabled={busy} className="btn-base btn-gold w-full">
+              {busy ? "Checking…" : "Confirm & Enter App"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setStep("email")}
+              className="w-full text-sm text-muted-foreground underline"
+            >
+              Use a different email
             </button>
           </form>
         )}
