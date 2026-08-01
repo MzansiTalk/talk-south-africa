@@ -50,6 +50,7 @@ const DEFAULT_CONFIG: AdConfig = {
   admob_banner_id: null,
   admob_interstitial_id: null,
   admob_rewarded_id: null,
+  admob_rewarded_interstitial_id: null,
   admob_native_id: null,
   admob_status_id: null,
   meta_app_id: null,
