@@ -5,8 +5,14 @@ import { ShieldAlert, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Screen } from "@/components/Shell";
-import { createAdmin, listAdmins, removeAdmin, setAdminApproved } from "@/lib/admin.functions";
+import { Screen, useIsAdmin } from "@/components/Shell";
+import {
+  createAdmin,
+  listAdmins,
+  promoteToAdmin,
+  removeAdmin,
+  setAdminApproved,
+} from "@/lib/admin.functions";
 import { getMyEmail, OWNER_EMAIL } from "@/lib/api";
 
 export const Route = createFileRoute("/_authenticated/admin/management")({
