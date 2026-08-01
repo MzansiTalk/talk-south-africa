@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useParams } from "@tanstack/react-router";
-import { CheckCheck, ImagePlus, Mic, Send, ShieldOff, Square } from "lucide-react";
+import { Check, CheckCheck, ImagePlus, Mic, Send, ShieldOff, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
