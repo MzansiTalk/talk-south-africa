@@ -33,9 +33,54 @@ export const Route = createFileRoute("/_authenticated/admin/management")({
   component: AdminManagementPage,
 });
 
+function PromoteCard() {
+  const promote = useServerFn(promoteToAdmin);
+  const [promoteEmail, setPromoteEmail] = useState("");
+
+  const run = useMutation({
+    mutationFn: (input: { email: string }) => promote({ data: input }),
+    onSuccess: (result) => {
+      toast.success(`${result.email} is now an admin.`);
+      setPromoteEmail("");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  return (
+    <section className="mt-4 rounded-2xl border border-border bg-card p-4">
+      <h2 className="text-sm font-bold">Promote a member to admin</h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Enter the email of an existing MzansiTalk member. Only admins can do this — nobody can make
+        themselves an admin.
+      </p>
+      <form
+        className="mt-3 space-y-2"
+        onSubmit={(event) => {
+          event.preventDefault();
+          run.mutate({ email: promoteEmail });
+        }}
+      >
+        <input
+          className="field field-focus"
+          type="email"
+          placeholder="Member email"
+          value={promoteEmail}
+          onChange={(event) => setPromoteEmail(event.target.value)}
+          required
+          maxLength={255}
+        />
+        <button type="submit" disabled={run.isPending} className="btn-base btn-primary w-full">
+          {run.isPending ? "Promoting…" : "Make Admin"}
+        </button>
+      </form>
+    </section>
+  );
+}
+
 function AdminManagementPage() {
   const queryClient = useQueryClient();
   const email = useQuery({ queryKey: ["my-email"], queryFn: getMyEmail });
+  const { isAdmin } = useIsAdmin();
   const isOwner = email.data?.toLowerCase() === OWNER_EMAIL;
 
   const fetchAdmins = useServerFn(listAdmins);
