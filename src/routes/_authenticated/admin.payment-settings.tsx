@@ -301,12 +301,12 @@ function MoneyCenter() {
           value={form.paystack_public_key ?? ""}
           onChange={(v) => set("paystack_public_key", v)}
         />
-        <Field
-          label="Paystack Secret Key"
-          type="password"
-          value={form.paystack_secret_key ?? ""}
-          onChange={(v) => set("paystack_secret_key", v)}
-        />
+        <p className="rounded-xl bg-secondary/60 p-3 text-xs text-muted-foreground">
+          Your Paystack <strong>Secret Key</strong> and <strong>Webhook Secret</strong> are no longer
+          kept in the app database. They are stored as secure environment variables on the server, so
+          nobody — not even a signed-in admin — can read them from the app.
+        </p>
+
         <Field
           label="Paystack Webhook URL"
           value={form.paystack_webhook_url ?? ""}
