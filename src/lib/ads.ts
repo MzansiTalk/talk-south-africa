@@ -119,9 +119,9 @@ export async function logAdImpression(
   const { data } = await supabase.rpc("log_ad_impression", {
     _placement: placement,
     _network: network,
-    _post_id: target.postId ?? null,
-    _content_kind: target.contentKind ?? null,
-    _content_owner_id: target.ownerId ?? null,
+    _post_id: target.postId ?? undefined,
+    _content_kind: target.contentKind ?? undefined,
+    _content_owner_id: target.ownerId ?? undefined,
   });
   return (data as string | null) ?? null;
 }
