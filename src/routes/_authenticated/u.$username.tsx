@@ -70,14 +70,31 @@ function UserProfile() {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  const blocked = useQuery({
+    queryKey: ["is-blocked", target?.id],
+    queryFn: () => isBlocked(target!.id),
+    enabled: Boolean(target?.id),
+  });
+
   const block = useMutation({
-    mutationFn: () => setBlock(target!.id, true),
+    mutationFn: () => setBlock(target!.id, !blocked.data),
     onSuccess: () => {
-      toast.success("User blocked. They can no longer message you or see your posts.");
+      toast.success(
+        blocked.data
+          ? "User unblocked. You can see and message each other again."
+          : "User blocked. They can no longer message you or see your posts.",
+      );
       void queryClient.invalidateQueries();
     },
     onError: (error: Error) => toast.error(error.message),
   });
+
+  const message = useMutation({
+    mutationFn: () => startDirectChat(target!.id),
+    onSuccess: (id) => navigate({ to: "/chat/$id", params: { id } }),
+    onError: (error: Error) => toast.error(error.message),
+  });
+
 
   if (profile.isLoading) {
     return (
