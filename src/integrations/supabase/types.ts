@@ -69,6 +69,7 @@ export type Database = {
           admob_native_id: string | null
           admob_payment_email: string | null
           admob_rewarded_id: string | null
+          admob_rewarded_interstitial_id: string | null
           admob_status_id: string | null
           admob_test_mode: boolean
           ads_banner_enabled: boolean
@@ -100,6 +101,7 @@ export type Database = {
           admob_native_id?: string | null
           admob_payment_email?: string | null
           admob_rewarded_id?: string | null
+          admob_rewarded_interstitial_id?: string | null
           admob_status_id?: string | null
           admob_test_mode?: boolean
           ads_banner_enabled?: boolean
@@ -131,6 +133,7 @@ export type Database = {
           admob_native_id?: string | null
           admob_payment_email?: string | null
           admob_rewarded_id?: string | null
+          admob_rewarded_interstitial_id?: string | null
           admob_status_id?: string | null
           admob_test_mode?: boolean
           ads_banner_enabled?: boolean
