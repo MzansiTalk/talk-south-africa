@@ -68,9 +68,7 @@ function AuthWall() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
-  const [attempts, setAttempts] = useState(0);
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => {
@@ -104,8 +102,7 @@ function AuthWall() {
           return;
         }
         setMode("verify");
-        setAttempts(0);
-        toast.success("We sent a 6-digit code to your email");
+        toast.success("Check your email to confirm your account");
         return;
       }
 
@@ -117,38 +114,12 @@ function AuthWall() {
         const message = error.message.toLowerCase();
         if (message.includes("not confirmed")) {
           setMode("verify");
-          setAttempts(0);
-          toast.error("Please verify your email first");
+          toast.error("Please confirm your email first");
           return;
         }
         throw new Error("Incorrect email or password");
       }
       void navigate({ to: "/home", replace: true });
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const verify = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (attempts >= 5) {
-      toast.error("Too many attempts. Please wait 15 minutes and try again.");
-      return;
-    }
-    setBusy(true);
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        email: email.trim().toLowerCase(),
-        token: code.trim(),
-        type: "signup",
-      });
-      if (error) {
-        setAttempts((prev) => prev + 1);
-        throw new Error("That code is wrong or has expired. Tap Resend Code.");
-      }
-      await enterApp();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
     } finally {
@@ -165,10 +136,9 @@ function AuthWall() {
         options: { emailRedirectTo: window.location.origin },
       });
       if (error) throw error;
-      setAttempts(0);
-      toast.success("New code sent. Check your inbox.");
+      toast.success("New confirmation link sent. Check your inbox.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not resend code");
+      toast.error(error instanceof Error ? error.message : "Could not resend the email");
     } finally {
       setBusy(false);
     }
@@ -197,31 +167,20 @@ function AuthWall() {
         </div>
 
         {mode === "verify" ? (
-          <form onSubmit={verify} className="mt-6 space-y-3">
-            <h2 className="font-display text-lg font-bold">Enter Verification Code</h2>
+          <div className="mt-6 space-y-3">
+            <h2 className="font-display text-lg font-bold">Confirm Your Email</h2>
             <p className="text-sm text-muted-foreground">
-              We emailed a 6-digit code to {email || "your email"}. It expires in 10 minutes.
+              We emailed a confirmation link to {email || "your email"}. Open the email and tap the
+              link to activate your account — it brings you straight into MzansiTalk. The link
+              expires in 10 minutes.
             </p>
-            <input
-              className="field field-focus tracking-[0.3em]"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder="6-digit code"
-              value={code}
-              onChange={(event) => setCode(event.target.value)}
-              required
-              maxLength={10}
-            />
-            <button type="submit" disabled={busy} className="btn-base btn-gold w-full">
-              {busy ? "Checking…" : "Verify & Enter App"}
-            </button>
             <button
               type="button"
               onClick={() => void resend()}
               disabled={busy}
-              className="w-full text-sm text-muted-foreground underline"
+              className="btn-base btn-gold w-full"
             >
-              Resend Code
+              {busy ? "Sending…" : "Resend Confirmation Email"}
             </button>
             <button
               type="button"
@@ -230,7 +189,7 @@ function AuthWall() {
             >
               Back to Log In
             </button>
-          </form>
+          </div>
         ) : (
           <>
             <div className="mt-6 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
