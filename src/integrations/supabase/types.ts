@@ -975,6 +975,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_pass_keys: {
+        Row: {
+          created_at: string
+          pass_key_hash: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          pass_key_hash: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          pass_key_hash?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           approved: boolean
