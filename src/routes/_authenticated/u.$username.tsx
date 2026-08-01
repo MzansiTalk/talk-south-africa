@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 
@@ -10,10 +10,13 @@ import {
   fetchFollowCounts,
   fetchProfileByUsername,
   fetchUserContent,
+  isBlocked,
   isFollowing,
   setBlock,
   setFollow,
+  startDirectChat,
 } from "@/lib/api";
+
 
 export const Route = createFileRoute("/_authenticated/u/$username")({
   head: () => ({
