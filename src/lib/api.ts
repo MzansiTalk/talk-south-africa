@@ -793,8 +793,9 @@ export async function createSponsoredOrder(input: {
   reference?: string;
 }) {
   const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("Please log in to place an order");
   const { error } = await supabase.from("sponsored_orders").insert({
-    user_id: auth.user?.id ?? null,
+    user_id: auth.user.id,
     brand_name: input.brandName,
     brand_email: input.brandEmail,
     phone: input.phone ?? null,
