@@ -71,11 +71,9 @@ function Reels() {
         <InterstitialAd
           onClose={interstitial.close}
           placement="reel_interstitial"
-          target={
-            items[0]
-              ? { postId: items[0].id, contentKind: "reel", ownerId: items[0].user_id }
-              : undefined
-          }
+          {...(items[0]
+            ? { target: { postId: items[0].id, contentKind: "reel", ownerId: items[0].user_id } }
+            : {})}
         />
       ) : null}
 
