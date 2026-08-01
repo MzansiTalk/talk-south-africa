@@ -26,11 +26,21 @@ type Inbox = { address: string; token: string };
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function json(url: string, init?: RequestInit) {
-  const response = await fetch(url, init);
-  const text = await response.text();
-  if (!response.ok) throw new Error(`${init?.method ?? "GET"} ${url} -> ${response.status} ${text}`);
-  return text ? JSON.parse(text) : null;
+  // The sandbox mail provider rate limits aggressively; back off on 429.
+  for (let attempt = 0; ; attempt += 1) {
+    const response = await fetch(url, init);
+    const text = await response.text();
+    if (response.status === 429 && attempt < 8) {
+      await sleep(5000 * (attempt + 1));
+      continue;
+    }
+    if (!response.ok) {
+      throw new Error(`${init?.method ?? "GET"} ${url} -> ${response.status} ${text}`);
+    }
+    return text ? JSON.parse(text) : null;
+  }
 }
+
 
 async function createInbox(): Promise<Inbox> {
   const [domain] = (await json(`${MAIL_TM}/domains?page=1`))["hydra:member"];
