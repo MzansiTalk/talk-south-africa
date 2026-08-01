@@ -38,6 +38,8 @@ export function PostCard({ item }: { item: FeedItem }) {
   const [showComments, setShowComments] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [draft, setDraft] = useState("");
+  const [repostCaption, setRepostCaption] = useState("");
+
 
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: ["feed"] });
