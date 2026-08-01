@@ -63,8 +63,7 @@ async function waitForEmail(inbox: Inbox, match: RegExp, timeoutMs = 90_000) {
       const full = await json(`${MAIL_TM}/messages/${hit.id}`, { headers });
       return { subject: full.subject as string, body: `${full.text ?? ""}\n${full.html ?? ""}` };
     }
-    await sleep 
-    ;
+    await sleep(3000);
   }
   throw new Error(`No email matching ${match} arrived within ${timeoutMs}ms`);
 }
