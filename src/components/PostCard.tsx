@@ -211,6 +211,10 @@ export function PostCard({ item }: { item: FeedItem }) {
         >
           <Share2 className="size-5" />
         </button>
+        <span className="btn-base bg-transparent text-sm text-muted-foreground" title="Views">
+          <Eye className="size-5" /> {Number(item.views ?? 0).toLocaleString()}
+        </span>
+
         <button
           type="button"
           onClick={() => save.mutate()}
