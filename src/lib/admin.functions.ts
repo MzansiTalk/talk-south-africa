@@ -212,3 +212,35 @@ export const removeAdmin = createServerFn({ method: "POST" })
 
     return { ok: true as const };
   });
+
+/**
+ * Promote an existing member to admin by email.
+ * Allowed for any approved staff member (Owner or approved admin).
+ * Nobody can promote themselves — role writes only ever happen here, server-side.
+ */
+export const promoteToAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { email: string }) => {
+    const email = String(data.email ?? "").trim().toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new Error("Enter a valid email address");
+    return { email };
+  })
+  .handler(async ({ data, context }) => {
+    const { data: isStaff } = await (context.supabase as any).rpc("is_active_staff", {
+      _user_id: context.userId,
+    });
+    if (!isStaff) throw new Error("Access Denied");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: list } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
+    const target = (list?.users ?? []).find((user) => user.email?.toLowerCase() === data.email);
+    if (!target) throw new Error("No MzansiTalk member uses that email");
+    if (target.id === context.userId) throw new Error("You cannot change your own role");
+
+    const { error } = await supabaseAdmin
+      .from("user_roles")
+      .upsert({ user_id: target.id, role: "admin" as const, approved: true }, { onConflict: "user_id,role" });
+    if (error) throw new Error(error.message);
+
+    return { email: data.email };
+  });

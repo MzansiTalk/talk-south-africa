@@ -112,11 +112,10 @@ function AdminPage() {
           </Link>
         ) : null}
 
-        {isOwner ? (
-          <Link to="/admin/management" className="btn-base bg-secondary text-secondary-foreground">
-            <UserCog className="size-4" /> Admin Management
-          </Link>
-        ) : null}
+        <Link to="/admin/management" className="btn-base bg-secondary text-secondary-foreground">
+          <UserCog className="size-4" /> Admin Management
+        </Link>
+
         {isOwner ? (
           <Link to="/admin/earnings" className="btn-base bg-secondary text-secondary-foreground">
             <BarChart3 className="size-4" /> Earnings

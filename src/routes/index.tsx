@@ -160,11 +160,10 @@ function AuthWall() {
           </span>
         </div>
 
-        <p className="mt-3 text-center text-xs">
-          <Link to="/advertise" className="font-semibold text-gold underline">
-            Advertise With Us
-          </Link>
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          Want to advertise? Sign in first — pricing and checkout live inside the app.
         </p>
+
       </div>
     </div>
   );

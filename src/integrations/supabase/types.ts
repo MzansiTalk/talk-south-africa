@@ -66,9 +66,7 @@ export type Database = {
           meta_rewarded_placement_id: string | null
           paystack_payout_email: string | null
           paystack_public_key: string | null
-          paystack_secret_key: string | null
           paystack_test_mode: boolean
-          paystack_webhook_secret: string | null
           paystack_webhook_url: string | null
           price_boost_7_days: number
           price_boost_post: number
@@ -99,9 +97,7 @@ export type Database = {
           meta_rewarded_placement_id?: string | null
           paystack_payout_email?: string | null
           paystack_public_key?: string | null
-          paystack_secret_key?: string | null
           paystack_test_mode?: boolean
-          paystack_webhook_secret?: string | null
           paystack_webhook_url?: string | null
           price_boost_7_days?: number
           price_boost_post?: number
@@ -132,9 +128,7 @@ export type Database = {
           meta_rewarded_placement_id?: string | null
           paystack_payout_email?: string | null
           paystack_public_key?: string | null
-          paystack_secret_key?: string | null
           paystack_test_mode?: boolean
-          paystack_webhook_secret?: string | null
           paystack_webhook_url?: string | null
           price_boost_7_days?: number
           price_boost_post?: number

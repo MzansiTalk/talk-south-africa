@@ -723,8 +723,6 @@ export type AppSettings = {
   ads_rewarded_enabled: boolean;
   ads_native_enabled: boolean;
   paystack_public_key: string | null;
-  paystack_secret_key: string | null;
-  paystack_webhook_secret: string | null;
   paystack_webhook_url: string | null;
   paystack_payout_email: string | null;
   price_per_1000_impressions: number;
@@ -795,8 +793,9 @@ export async function createSponsoredOrder(input: {
   reference?: string;
 }) {
   const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("Please log in to place an order");
   const { error } = await supabase.from("sponsored_orders").insert({
-    user_id: auth.user?.id ?? null,
+    user_id: auth.user.id,
     brand_name: input.brandName,
     brand_email: input.brandEmail,
     phone: input.phone ?? null,

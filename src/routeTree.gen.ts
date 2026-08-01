@@ -12,9 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
-import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAdvertiseRouteImport } from './routes/_authenticated/advertise'
 import { Route as AuthenticatedAppealRouteImport } from './routes/_authenticated/appeal'
 import { Route as AuthenticatedCreateRouteImport } from './routes/_authenticated/create'
 import { Route as AuthenticatedCreatorProgramRouteImport } from './routes/_authenticated/creator-program'
@@ -62,11 +62,6 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/admin-login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdvertiseRoute = AdvertiseRouteImport.update({
-  id: '/advertise',
-  path: '/advertise',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -76,6 +71,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdvertiseRoute = AuthenticatedAdvertiseRouteImport.update({
+  id: '/advertise',
+  path: '/advertise',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAppealRoute = AuthenticatedAppealRouteImport.update({
   id: '/appeal',
@@ -257,9 +257,9 @@ const AuthenticatedUUsernameRoute = AuthenticatedUUsernameRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin-login': typeof AdminLoginRoute
-  '/advertise': typeof AdvertiseRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/advertise': typeof AuthenticatedAdvertiseRoute
   '/appeal': typeof AuthenticatedAppealRoute
   '/create': typeof AuthenticatedCreateRoute
   '/creator-program': typeof AuthenticatedCreatorProgramRoute
@@ -296,9 +296,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin-login': typeof AdminLoginRoute
-  '/advertise': typeof AdvertiseRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/advertise': typeof AuthenticatedAdvertiseRoute
   '/appeal': typeof AuthenticatedAppealRoute
   '/create': typeof AuthenticatedCreateRoute
   '/creator-program': typeof AuthenticatedCreatorProgramRoute
@@ -337,9 +337,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin-login': typeof AdminLoginRoute
-  '/advertise': typeof AdvertiseRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/advertise': typeof AuthenticatedAdvertiseRoute
   '/_authenticated/appeal': typeof AuthenticatedAppealRoute
   '/_authenticated/create': typeof AuthenticatedCreateRoute
   '/_authenticated/creator-program': typeof AuthenticatedCreatorProgramRoute
@@ -378,9 +378,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin-login'
-    | '/advertise'
     | '/forgot-password'
     | '/reset-password'
+    | '/advertise'
     | '/appeal'
     | '/create'
     | '/creator-program'
@@ -417,9 +417,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin-login'
-    | '/advertise'
     | '/forgot-password'
     | '/reset-password'
+    | '/advertise'
     | '/appeal'
     | '/create'
     | '/creator-program'
@@ -457,9 +457,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/admin-login'
-    | '/advertise'
     | '/forgot-password'
     | '/reset-password'
+    | '/_authenticated/advertise'
     | '/_authenticated/appeal'
     | '/_authenticated/create'
     | '/_authenticated/creator-program'
@@ -498,7 +498,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
-  AdvertiseRoute: typeof AdvertiseRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RUsernameRoute: typeof RUsernameRoute
@@ -527,13 +526,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/advertise': {
-      id: '/advertise'
-      path: '/advertise'
-      fullPath: '/advertise'
-      preLoaderRoute: typeof AdvertiseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/forgot-password': {
       id: '/forgot-password'
       path: '/forgot-password'
@@ -547,6 +539,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/advertise': {
+      id: '/_authenticated/advertise'
+      path: '/advertise'
+      fullPath: '/advertise'
+      preLoaderRoute: typeof AuthenticatedAdvertiseRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/appeal': {
       id: '/_authenticated/appeal'
@@ -776,6 +775,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdvertiseRoute: typeof AuthenticatedAdvertiseRoute
   AuthenticatedAppealRoute: typeof AuthenticatedAppealRoute
   AuthenticatedCreateRoute: typeof AuthenticatedCreateRoute
   AuthenticatedCreatorProgramRoute: typeof AuthenticatedCreatorProgramRoute
@@ -810,6 +810,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdvertiseRoute: AuthenticatedAdvertiseRoute,
   AuthenticatedAppealRoute: AuthenticatedAppealRoute,
   AuthenticatedCreateRoute: AuthenticatedCreateRoute,
   AuthenticatedCreatorProgramRoute: AuthenticatedCreatorProgramRoute,
@@ -851,7 +852,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
-  AdvertiseRoute: AdvertiseRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RUsernameRoute: RUsernameRoute,
