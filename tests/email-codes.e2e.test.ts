@@ -34,8 +34,9 @@ async function json(url: string, init?: RequestInit) {
 
 async function createInbox(): Promise<Inbox> {
   const [domain] = (await json(`${MAIL_TM}/domains?page=1`))["hydra:member"];
-  const address = `mzansitalk.test.${Date.now()}@${domain.domain}`;
-  const password = `Test-${Math.random().toString(36).slice(2)}-9`;
+  // Keep the local part short and dot-free — the sandbox provider rejects long/dotted ones.
+  const address = `mtt${Math.random().toString(36).slice(2, 10)}@${domain.domain}`;
+  const password = `Test-${Math.random().toString(36).slice(2, 8)}-9`;
   await json(`${MAIL_TM}/accounts`, {
     method: "POST",
     headers: { "content-type": "application/json" },
