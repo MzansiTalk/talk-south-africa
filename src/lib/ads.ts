@@ -116,13 +116,17 @@ export async function logAdImpression(
   network: AdNetwork = "admob",
   target: AdTarget = {},
 ) {
-  const { data } = await supabase.rpc("log_ad_impression", {
-    _placement: placement,
-    _network: network,
-    _post_id: target.postId ?? undefined,
-    _content_kind: target.contentKind ?? undefined,
-    _content_owner_id: target.ownerId ?? undefined,
-  });
+  const args: {
+    _placement: string;
+    _network: string;
+    _post_id?: string;
+    _content_kind?: string;
+    _content_owner_id?: string;
+  } = { _placement: placement, _network: network };
+  if (target.postId) args._post_id = target.postId;
+  if (target.contentKind) args._content_kind = target.contentKind;
+  if (target.ownerId) args._content_owner_id = target.ownerId;
+  const { data } = await supabase.rpc("log_ad_impression", args);
   return (data as string | null) ?? null;
 }
 
