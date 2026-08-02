@@ -1,4 +1,4 @@
-name: Build Android APK v1.1
+name: Build Android APK v1.2
 on:
   workflow_dispatch:
   push:
@@ -33,8 +33,8 @@ jobs:
 
       - name: Set Android release version
         run: |
-          sed -i 's/versionCode [0-9]\+/versionCode 2/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "1.1"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9]\+/versionCode 3/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "1.2"/' android/app/build.gradle
 
       - name: Create release signing key
         if: ${{ secrets.ANDROID_KEYSTORE_BASE64 == '' }}
@@ -68,5 +68,5 @@ jobs:
         
       - uses: actions/upload-artifact@v4
         with:
-          name: MzansiTalk-v1.1-release
+          name: MzansiTalk-v1.2-release
           path: android/app/build/outputs/apk/release/app-release.apk
