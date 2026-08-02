@@ -12,7 +12,8 @@ const config: CapacitorConfig = {
   appName: "MzansiTalk",
   webDir: "public",
   server: {
-    url: "https://talk-south-africa.lovable.app",
+    // Welcome screen is the app's first (launcher) screen.
+    url: "https://talk-south-africa.lovable.app/welcome",
     cleartext: false,
     androidScheme: "https",
   },
