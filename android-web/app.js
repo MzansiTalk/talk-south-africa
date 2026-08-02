@@ -4,11 +4,16 @@
  * The APK bundles this welcome screen locally so the app always opens, then
  * hands over to the live MzansiTalk web app as soon as any internet
  * connection (mobile data on any carrier, or WiFi) is reachable.
+ *
+ * IMPORTANT: probes use mode:"no-cors". A normal cross-origin fetch from the
+ * local app origin is blocked by the browser (no CORS headers on the site),
+ * which used to surface as a bogus "Failed to fetch" even when the server was
+ * perfectly reachable. WebView navigation itself is NOT subject to CORS, so we
+ * navigate whenever the device reports a connection.
  */
 const APP_URL = "https://talk-south-africa.lovable.app/";
-// Probed with a plain GET; any HTTP response proves internet works.
 const PROBE_URLS = [APP_URL, "https://clients3.google.com/generate_204"];
-const ATTEMPTS = 4;
+const ATTEMPTS = 3;
 
 const welcome = document.querySelector("#welcome");
 const chat = document.querySelector("#chat");
@@ -35,17 +40,20 @@ function setState(title, text, error) {
   stateError.textContent = error || "";
 }
 
-/** Fetch with an explicit timeout so slow 3G never hangs forever. */
-async function fetchWithTimeout(url, ms) {
+/** Opaque no-cors fetch with an explicit timeout so slow 3G never hangs forever. */
+async function probe(url, ms) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), ms);
   try {
-    return await fetch(url, {
+    // no-cors: an opaque response still proves the request left the device.
+    await fetch(url, {
       method: "GET",
+      mode: "no-cors",
       cache: "no-store",
       redirect: "follow",
       signal: controller.signal,
     });
+    return true;
   } finally {
     clearTimeout(timer);
   }
@@ -55,11 +63,11 @@ async function fetchWithTimeout(url, ms) {
 async function reachable() {
   let lastError = null;
   for (let attempt = 1; attempt <= ATTEMPTS; attempt += 1) {
-    const timeout = 6000 + attempt * 4000; // 10s → 22s for slow mobile data
+    const timeout = 6000 + attempt * 4000; // 10s → 18s for slow mobile data
     for (const url of PROBE_URLS) {
       try {
-        const response = await fetchWithTimeout(url, timeout);
-        log("probe ok", url, response.status, "attempt", attempt);
+        await probe(url, timeout);
+        log("probe ok", url, "attempt", attempt);
         return { ok: true };
       } catch (error) {
         lastError = error;
@@ -69,11 +77,17 @@ async function reachable() {
     setState(
       "Still connecting…",
       `Retrying on your current network (attempt ${attempt} of ${ATTEMPTS}).`,
-      lastError ? String(lastError.message || lastError) : "",
+      "",
     );
-    await new Promise((resolve) => setTimeout(resolve, 1200 * attempt));
+    await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
   }
   return { ok: false, error: lastError };
+}
+
+function openLiveApp() {
+  setState("Connected", "Loading MzansiTalk…", "");
+  log("navigating to", APP_URL);
+  window.location.replace(APP_URL);
 }
 
 async function openApp() {
@@ -86,16 +100,23 @@ async function openApp() {
   retryBtn.disabled = false;
 
   if (result.ok) {
-    setState("Connected", "Loading MzansiTalk…", "");
-    log("navigating to", APP_URL);
-    window.location.replace(APP_URL);
+    openLiveApp();
     return;
   }
 
-  const detail = result.error ? String(result.error.message || result.error) : "Unknown network error";
+  // Probes can fail for reasons that do not stop real navigation (captive
+  // portals, blocked HEAD/GET, proxy quirks). If the device says it is online,
+  // let the WebView try the real thing instead of dead-ending the user.
+  if (navigator.onLine) {
+    log("probes failed but navigator.onLine is true — navigating anyway");
+    openLiveApp();
+    return;
+  }
+
+  const detail = result.error ? String(result.error.message || result.error) : "No network connection";
   setState(
     "Can't reach MzansiTalk",
-    "Your data or WiFi seems to be on, but the server did not answer. Check your signal and tap Try again.",
+    "Turn on mobile data or WiFi, then tap Try again.",
     `Network error: ${detail}`,
   );
   log("giving up:", detail);
