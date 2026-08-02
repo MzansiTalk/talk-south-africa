@@ -34,7 +34,7 @@ jobs:
       - name: Set Android release version
         run: |
           sed -i 's/versionCode [0-9]\+/versionCode 5/' android/app/build.gradle
-          sed -i 's/versionName "1.4"]*"/versionName "1.2"/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "1.4"/' android/app/build.gradle
 
       - name: Create release signing key
         if: ${{ secrets.ANDROID_KEYSTORE_BASE64 == '' }}
