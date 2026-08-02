@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test:email": "RUN_EMAIL_E2E=1 vitest run tests/email-links.e2e.test.ts --testTimeout=300000"
+    "test:email": "RUN_EMAIL_E2E=1 vitest run tests/email-links.e2e.test.ts --testTimeout=300000",
+    "android:web": "node scripts/build-android-web.mjs"
   },
   "dependencies": {
     "@capacitor-community/admob": "^8.0.0",

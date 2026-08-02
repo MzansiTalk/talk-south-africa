@@ -10,8 +10,9 @@ project), or create a new repo and upload the ZIP contents.
 
 ## 2. (Optional but recommended) Add signing secrets
 
-Without these, the workflow still runs and gives you an installable **debug**
-APK. For a Play Store upload you need a signed **release** APK/AAB.
+Without these, the workflow generates a signed **release** APK using a temporary
+key. Add the secrets below before publishing to an app store so future versions
+can be signed with the same permanent key.
 
 Create a keystore once (needs a computer or a terminal app like Termux):
 
@@ -47,8 +48,8 @@ install — allow "install unknown apps" for your browser/file manager first.
 
 ## Notes
 
-- The APK loads the published site (`https://talk-south-africa.lovable.app`), so
-  web changes go live in the app as soon as you publish — no rebuild needed.
+- The APK bundles its launcher and offline app shell locally. Rebuild the APK
+  when these packaged assets change; live social data still requires internet.
 - AdMob ids come from Owner Money Center → Ad Settings, changeable without a rebuild.
 - The `android/` folder isn't committed; the workflow regenerates it with
   `npx cap add android` on every run.
