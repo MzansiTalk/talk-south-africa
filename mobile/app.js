@@ -58,7 +58,7 @@ async function reachable() {
     const timeout = 6000 + attempt * 4000; // 10s → 22s for slow mobile data
     for (const url of PROBE_URLS) {
       try {
-        const response = await fetch2(url, timeout);
+        const response = await fetchWithTimeout(url, timeout);
         log("probe ok", url, response.status, "attempt", attempt);
         return { ok: true };
       } catch (error) {
@@ -74,10 +74,6 @@ async function reachable() {
     await new Promise((resolve) => setTimeout(resolve, 1200 * attempt));
   }
   return { ok: false, error: lastError };
-}
-
-function fetch2(url, timeout) {
-  return fetchWithTimeout(url, timeout);
 }
 
 async function openApp() {
