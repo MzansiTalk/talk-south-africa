@@ -37,28 +37,32 @@ jobs:
           sed -i 's/versionName "[^"]*"/versionName "1.1"/' android/app/build.gradle
 
       - name: Create release signing key
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 == '' }}
         run: |
           keytool -genkeypair -v -keystore "$RUNNER_TEMP/mzansitalk-release.jks" \
-            -storepass "$KEYSTORE_PASSWORD" -keypass "$KEY_PASSWORD" \
+            -storepass android -keypass android \
             -alias mzansitalk -keyalg RSA -keysize 2048 -validity 10000 \
             -dname "CN=MzansiTalk, OU=Mobile, O=MzansiTalk, L=Johannesburg, ST=Gauteng, C=ZA"
+
+      - name: Restore permanent release signing key
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        run: echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/mzansitalk-release.jks"
         env:
-          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
       - name: Configure release signing
         run: |
           cat >> android/gradle.properties <<EOF
           MZANSITALK_STORE_FILE=$RUNNER_TEMP/mzansitalk-release.jks
-          MZANSITALK_STORE_PASSWORD=$KEYSTORE_PASSWORD
-          MZANSITALK_KEY_ALIAS=mzansitalk
-          MZANSITALK_KEY_PASSWORD=$KEY_PASSWORD
+          MZANSITALK_STORE_PASSWORD=${KEYSTORE_PASSWORD:-android}
+          MZANSITALK_KEY_ALIAS=${KEY_ALIAS:-mzansitalk}
+          MZANSITALK_KEY_PASSWORD=${KEY_PASSWORD:-android}
           EOF
           python3 - <<'PY'
           from pathlib import Path
           path = Path('android/app/build.gradle')
           text = path.read_text()
-          text = text.replace('buildTypes {', '''signingConfigs {
+          text = text.replace('    buildTypes {', '''    signingConfigs {
                   release {
                       storeFile file(MZANSITALK_STORE_FILE)
                       storePassword MZANSITALK_STORE_PASSWORD
@@ -66,8 +70,10 @@ jobs:
                       keyPassword MZANSITALK_KEY_PASSWORD
                   }
               }
-              buildTypes {''')
-          text = text.replace('release {', 'release {\n                    signingConfig signingConfigs.release', 1)
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.release''')
+          text = text.replace('        release {\n            minifyEnabled', '            minifyEnabled', 1)
           path.write_text(text)
           PY
         env:

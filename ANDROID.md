@@ -1,11 +1,9 @@
 # Building the MzansiTalk Android APK
 
-The web app stays exactly as it is. Capacitor wraps it in a native Android shell
-so the real Google AdMob SDK can serve ads (banners, interstitials, rewarded).
-
-The APK loads the published site (`https://talk-south-africa.lovable.app`, set in
-`capacitor.config.ts`). Publish the web app and the APK picks up the change — no
-rebuild needed for content updates.
+Capacitor wraps MzansiTalk in a native Android shell with a locally bundled
+WelcomeScreen and app shell. It does not load a website URL, so the launcher and
+offline screen open without a network connection. Live social data still needs
+internet access.
 
 ## One-time setup on your computer
 
@@ -51,9 +49,10 @@ app, so you can change them any time without rebuilding.
 
 ## Updating the shell
 
-After changing `capacitor.config.ts` or adding plugins:
+After changing local Android assets, `capacitor.config.ts`, or plugins:
 
 ```bash
+npm run android:web
 npx cap sync android
 ```
 
