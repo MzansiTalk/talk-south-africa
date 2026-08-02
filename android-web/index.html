@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#8e24aa" />
+    <title>MzansiTalk</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="welcome" class="screen active" aria-labelledby="welcome-title">
+      <img src="./mzansitalk-logo.png" alt="MzansiTalk logo" class="logo" />
+      <div>
+        <h1 id="welcome-title">Welcome to Mzansi<span>Talk</span></h1>
+        <p>Connect with South Africa</p>
+      </div>
+      <button id="start-chat" type="button">Start Chat</button>
+    </main>
+
+    <main id="chat" class="screen" aria-labelledby="chat-title">
+      <header>
+        <img src="./mzansitalk-logo.png" alt="" class="mark" />
+        <div><h1 id="chat-title">MzansiTalk</h1><p>Messages</p></div>
+      </header>
+      <section class="offline-panel">
+        <div class="status-dot"></div>
+        <h2>You're offline</h2>
+        <p>Your app is installed and ready. Connect to the internet to sign in, load conversations, and send messages.</p>
+      </section>
+      <button id="back" class="secondary" type="button">Back to Welcome</button>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
