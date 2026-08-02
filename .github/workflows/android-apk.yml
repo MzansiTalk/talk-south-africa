@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK v1.1
 on:
   workflow_dispatch:
   push:
@@ -22,19 +22,62 @@ jobs:
       - name: Install dependencies
         run: npm install
         
-      - name: Build web app
-        run: npm run build
+      - name: Bundle offline app assets
+        run: npm run android:web
         
       - name: Add Android platform
         run: npx cap add android || npx cap sync android
         
       - name: Sync Capacitor
         run: npx cap sync
+
+      - name: Set Android release version
+        run: |
+          sed -i 's/versionCode [0-9]\+/versionCode 2/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "1.1"/' android/app/build.gradle
+
+      - name: Create release signing key
+        run: |
+          keytool -genkeypair -v -keystore "$RUNNER_TEMP/mzansitalk-release.jks" \
+            -storepass "$KEYSTORE_PASSWORD" -keypass "$KEY_PASSWORD" \
+            -alias mzansitalk -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=MzansiTalk, OU=Mobile, O=MzansiTalk, L=Johannesburg, ST=Gauteng, C=ZA"
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: Configure release signing
+        run: |
+          cat >> android/gradle.properties <<EOF
+          MZANSITALK_STORE_FILE=$RUNNER_TEMP/mzansitalk-release.jks
+          MZANSITALK_STORE_PASSWORD=$KEYSTORE_PASSWORD
+          MZANSITALK_KEY_ALIAS=mzansitalk
+          MZANSITALK_KEY_PASSWORD=$KEY_PASSWORD
+          EOF
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('android/app/build.gradle')
+          text = path.read_text()
+          text = text.replace('buildTypes {', '''signingConfigs {
+                  release {
+                      storeFile file(MZANSITALK_STORE_FILE)
+                      storePassword MZANSITALK_STORE_PASSWORD
+                      keyAlias MZANSITALK_KEY_ALIAS
+                      keyPassword MZANSITALK_KEY_PASSWORD
+                  }
+              }
+              buildTypes {''')
+          text = text.replace('release {', 'release {\n                    signingConfig signingConfigs.release', 1)
+          path.write_text(text)
+          PY
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         
-      - name: Build APK
-        run: cd android && ./gradlew assembleDebug
+      - name: Build production APK
+        run: cd android && ./gradlew assembleRelease
         
       - uses: actions/upload-artifact@v4
         with:
-          name: mzansitalk-debug.apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: MzansiTalk-v1.1-release
+          path: android/app/build/outputs/apk/release/app-release.apk

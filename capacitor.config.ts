@@ -3,20 +3,13 @@ import type { CapacitorConfig } from "@capacitor/cli";
 /**
  * Native Android shell for MzansiTalk.
  *
- * MzansiTalk is a server-rendered app, so the APK loads the published site
- * instead of a static copy of the bundle. That keeps the native build in sync
- * with every deploy — publish the web app and the APK updates itself.
+ * The Android release bundles its launcher and app shell in the APK. No remote
+ * server URL is configured, so Capacitor always starts from local assets.
  */
 const config: CapacitorConfig = {
   appId: "com.mzansitalk.app",
   appName: "MzansiTalk",
-  webDir: "public",
-  server: {
-    // Welcome screen is the app's first (launcher) screen.
-    url: "https://talk-south-africa.lovable.app/welcome",
-    cleartext: false,
-    androidScheme: "https",
-  },
+  webDir: "android-web",
   android: {
     allowMixedContent: false,
   },
