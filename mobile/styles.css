@@ -32,4 +32,7 @@ header p { color: #cbbdce; font-size: 13px; margin-top: 2px; }
 .offline-panel h2 { margin-top: 14px; font-size: 22px; }
 .offline-panel p { margin-top: 10px; color: #cbbdce; line-height: 1.6; }
 .status-dot { width: 12px; height: 12px; margin: 0 auto; border-radius: 50%; background: #ffd700; }
-.secondary { margin: 0 auto; background: #33253a; }
+.secondary { margin: 0 auto; background: #33253a; }.error-detail { margin-top: 12px; font-size: 12px; color: #ffb4a2; word-break: break-word; }
+.hint { color: #cbbdce; font-size: 13px; min-height: 18px; }
+#retry { margin: 0 auto; }
+#chat button { flex: 0 0 auto; }

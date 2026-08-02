@@ -13,6 +13,11 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: false,
   },
+  server: {
+    androidScheme: "https",
+    // The bundled shell hands over to the live app once any network is up.
+    allowNavigation: ["talk-south-africa.lovable.app", "*.lovable.app", "*.supabase.co"],
+  },
   plugins: {
     SplashScreen: {
       backgroundColor: "#8E24AA",

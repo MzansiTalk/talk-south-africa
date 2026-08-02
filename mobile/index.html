@@ -15,18 +15,21 @@
         <p>Connect with South Africa</p>
       </div>
       <button id="start-chat" type="button">Start Chat</button>
+      <p id="welcome-hint" class="hint"></p>
     </main>
 
     <main id="chat" class="screen" aria-labelledby="chat-title">
       <header>
         <img src="./mzansitalk-logo.png" alt="" class="mark" />
-        <div><h1 id="chat-title">MzansiTalk</h1><p>Messages</p></div>
+        <div><h1 id="chat-title">MzansiTalk</h1><p id="chat-sub">Connecting…</p></div>
       </header>
       <section class="offline-panel">
         <div class="status-dot"></div>
-        <h2>You're offline</h2>
-        <p>Your app is installed and ready. Connect to the internet to sign in, load conversations, and send messages.</p>
+        <h2 id="state-title">Connecting to MzansiTalk…</h2>
+        <p id="state-text">Checking your mobile data or WiFi connection.</p>
+        <p id="state-error" class="error-detail"></p>
       </section>
+      <button id="retry" type="button">Try again</button>
       <button id="back" class="secondary" type="button">Back to Welcome</button>
     </main>
     <script src="./app.js"></script>
