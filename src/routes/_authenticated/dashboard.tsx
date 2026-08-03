@@ -92,6 +92,42 @@ function DashboardPage() {
       </div>
 
       <section className="mt-3 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold uppercase tracking-wide">In-App Purchases</h2>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <div className="rounded-xl bg-secondary/60 p-3">
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Rocket className="size-3.5" /> Total boost revenue
+            </p>
+            <p className="mt-1 text-lg font-bold">{money(boostSpend)}</p>
+          </div>
+          <div className="rounded-xl bg-secondary/60 p-3">
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Coins className="size-3.5" /> Coins bought
+            </p>
+            <p className="mt-1 text-lg font-bold">{formatCount(coins)}</p>
+          </div>
+          <div className="col-span-2 rounded-xl bg-secondary/60 p-3">
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Gift className="size-3.5" /> Spent on gifts
+            </p>
+            <p className="mt-1 text-lg font-bold">{money(0)}</p>
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Coin packs and premium are sold through in-app purchases (Boost Live R50, Coins 100, Premium
+          Monthly R29). Ads are served by Meta Audience Network — Google AdMob is no longer used.
+        </p>
+        <MetaRewardedAd
+          onReward={() => {
+            setCoins((current) => current + 5);
+            toast.success("You earned 5 free coins.");
+          }}
+          rewarded={false}
+          label="Watch ad to get 5 free coins"
+        />
+      </section>
+
+      <section className="mt-3 rounded-2xl border border-border bg-card p-4">
         <p className="text-sm">
           Already paid out: <span className="font-bold">{money(data?.paid_out ?? 0)}</span>
         </p>
@@ -99,6 +135,7 @@ function DashboardPage() {
           Request a payout
         </Link>
       </section>
+
     </Screen>
   );
 }
