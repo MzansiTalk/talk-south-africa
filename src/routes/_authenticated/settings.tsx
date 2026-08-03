@@ -207,8 +207,11 @@ function SettingsPage() {
         <Link to="/appeal" className="btn-base mt-2 bg-secondary text-secondary-foreground">
           Account Status &amp; Appeal a Ban
         </Link>
-
+        <Link to="/privacy" className="btn-base mt-2 bg-secondary text-secondary-foreground">
+          <ShieldCheck className="size-4" /> Privacy Policy
+        </Link>
       </section>
+
 
       <button type="button" onClick={signOut} className="btn-base mt-4 w-full bg-destructive text-destructive-foreground">
         <LogOut className="size-4" /> Log Out
