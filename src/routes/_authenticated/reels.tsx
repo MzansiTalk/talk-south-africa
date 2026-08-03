@@ -28,19 +28,27 @@ export const Route = createFileRoute("/_authenticated/reels")({
       { property: "og:description", content: "Short videos from creators across South Africa." },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    post: typeof search['post'] === "string" ? (search['post'] as string) : "",
+  }),
   component: Reels,
 });
 
 function Reels() {
+  const { post } = Route.useSearch();
   const [term, setTerm] = useState("");
   const [watched, setWatched] = useState(0);
   const seen = useRef(new Set<string>());
   const reels = useQuery({ queryKey: ["feed", "reels"], queryFn: () => fetchFeed("reel") });
   const interstitial = useInterstitialAfterEvery(watched, 3);
 
-  const items = (reels.data ?? []).filter((item) =>
+  const filtered = (reels.data ?? []).filter((item) =>
     term.trim() ? (item.caption ?? "").toLowerCase().includes(term.trim().toLowerCase()) : true,
   );
+  // Opening a reel from a profile grid puts that reel at the top of the player.
+  const items = post
+    ? [...filtered].sort((a, b) => Number(b.id === post) - Number(a.id === post))
+    : filtered;
 
   useEffect(() => {
     for (const item of items.slice(0, 5)) void countView(item);
