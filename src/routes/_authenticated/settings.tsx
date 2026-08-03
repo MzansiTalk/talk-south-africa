@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Bell, BellOff, CreditCard, Crown, LifeBuoy, LogOut, Moon, ShieldOff, Sparkles, Sun } from "lucide-react";
+import { Bell, BellOff, CreditCard, Crown, LifeBuoy, LogOut, Moon, ShieldCheck, ShieldOff, Sparkles, Sun } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
