@@ -69,7 +69,7 @@ function HomeFeed() {
   };
 
   return (
-    <Screen showSearch>
+    <Screen>
       {videoInterstitial.open ? (
         <InterstitialAd onClose={videoInterstitial.close} placement="video_interstitial" />
       ) : null}

@@ -1,9 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Plus, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Avatar, useMediaUrl } from "@/components/SignedMedia";
-import type { FeedItem } from "@/lib/api";
+import { fetchMyProfile, type FeedItem } from "@/lib/api";
 
 export type StatusGroup = {
   userId: string;
@@ -191,41 +192,80 @@ export function StatusViewer({
   );
 }
 
-/** Horizontal "Create status" + member status circles rail. */
+/** Facebook-style card: the group's newest status media as the background. */
+function StatusCard({ group, onOpen }: { group: StatusGroup; onOpen: () => void }) {
+  const newest = group.items[group.items.length - 1];
+  const { data: url } = useMediaUrl(newest?.media_url ?? null);
+  const isVideo = (newest?.media_type ?? "").startsWith("video");
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="relative h-40 w-24 shrink-0 overflow-hidden rounded-2xl border border-border bg-brand text-left"
+    >
+      {url ? (
+        isVideo ? (
+          <video src={url} className="absolute inset-0 h-full w-full object-cover" muted playsInline />
+        ) : (
+          <img
+            src={url}
+            alt={`${group.name}'s status`}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )
+      ) : (
+        <span className="absolute inset-0 grid place-items-center p-2 text-center text-[0.6rem] font-semibold text-primary-foreground">
+          {newest?.caption ?? "Status"}
+        </span>
+      )}
+
+      <span className="absolute left-2 top-2 grid size-5 place-items-center rounded-md bg-primary text-[0.62rem] font-bold text-primary-foreground">
+        {group.items.length}
+      </span>
+
+      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-foreground/80 to-transparent px-2 pb-2 pt-6">
+        <span className="block truncate text-[0.66rem] font-semibold text-background">
+          {group.name}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+/** Horizontal "Create status" + member status cards rail. */
 export function StatusRail({ items }: { items: FeedItem[] }) {
   const groups = useMemo(() => groupStatuses(items), [items]);
   const [open, setOpen] = useState<number | null>(null);
   const rail = useRef<HTMLDivElement>(null);
+  const { data: me } = useQuery({ queryKey: ["my-profile"], queryFn: fetchMyProfile });
+  const { data: myAvatar } = useMediaUrl(me?.avatar_url ?? null);
 
   return (
     <>
-      <div ref={rail} className="mb-3 flex gap-3 overflow-x-auto pb-1 no-scrollbar">
-        <Link to="/create" className="flex w-16 shrink-0 flex-col items-center gap-1 text-center">
-          <span className="grid size-14 place-items-center rounded-full bg-brand text-primary-foreground">
-            <Plus className="size-6" />
+      <div ref={rail} className="mb-3 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <Link
+          to="/create"
+          className="relative h-40 w-24 shrink-0 overflow-hidden rounded-2xl border border-border bg-muted"
+        >
+          {myAvatar ? (
+            <img src={myAvatar} alt="Your profile" className="absolute inset-0 h-full w-full object-cover" />
+          ) : (
+            <span className="absolute inset-0 bg-brand" />
+          )}
+          <span className="absolute inset-x-0 bottom-0 bg-card px-1.5 pb-1.5 pt-4">
+            <span className="mb-1 block">
+              <span className="grid size-6 place-items-center rounded-full border-2 border-card bg-primary text-primary-foreground">
+                <Plus className="size-3.5" />
+              </span>
+            </span>
+            <span className="block truncate text-[0.64rem] font-semibold">Create status</span>
           </span>
-          <span className="truncate text-[0.62rem] font-semibold">Create Status</span>
         </Link>
 
         {groups.map((group, index) => (
-          <button
-            key={group.userId}
-            type="button"
-            onClick={() => setOpen(index)}
-            className="flex w-16 shrink-0 flex-col items-center gap-1 text-center"
-          >
-            <span className="rounded-full bg-gold-gradient p-[2px]">
-              <Avatar path={group.avatar} name={group.name} size={52} />
-            </span>
-            <span className="w-full truncate text-[0.62rem] font-medium">{group.name}</span>
-          </button>
+          <StatusCard key={group.userId} group={group} onOpen={() => setOpen(index)} />
         ))}
-
-        {groups.length === 0 ? (
-          <p className="self-center text-xs text-muted-foreground">
-            No status updates yet. They disappear after 24 hours.
-          </p>
-        ) : null}
       </div>
 
       {open !== null ? (
@@ -234,3 +274,4 @@ export function StatusRail({ items }: { items: FeedItem[] }) {
     </>
   );
 }
+
