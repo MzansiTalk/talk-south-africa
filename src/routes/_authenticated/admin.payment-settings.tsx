@@ -441,19 +441,20 @@ function MoneyCenter() {
       <section className="mt-4 space-y-2 rounded-2xl border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
         <h2 className="text-sm font-bold uppercase tracking-wide text-foreground">How Money Flows</h2>
         <p>
-          <strong>AdMob money:</strong> a member watches a reel, status or post → a Google ad shows →
-          Google collects the money → Google pays you directly into your own bank via AdMob on the 21st
-          of the month.
+          <strong>Ad money:</strong> a member watches a reel, status or post → a Meta Audience Network
+          ad shows → the ad network collects the money → the ad network pays you directly into your own
+          bank account. Google AdMob is no longer used anywhere in MzansiTalk.
         </p>
         <p>
           <strong>Sponsored / Boost money:</strong> a brand or member pays at Paystack checkout → money
           goes directly into your Paystack account → your bank in 1–2 days.
         </p>
         <p>
-          Only the Owner ({OWNER_EMAIL}) can edit these keys. There are only 2 payment systems: AdMob
-          and Paystack. Change your AdMob bank inside admob.google.com and your Paystack bank inside
-          paystack.com. MzansiTalk never stores your bank details — only the keys above.
+          Only the Owner ({OWNER_EMAIL}) can edit these keys. There are 2 payment systems: Meta
+          Audience Network for ads and Paystack for Sponsored, Boosts and in-app purchases. MzansiTalk
+          never stores your bank details — only the keys above.
         </p>
+
       </section>
     </Screen>
   );
