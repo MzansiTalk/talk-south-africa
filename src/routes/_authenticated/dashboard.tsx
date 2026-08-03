@@ -1,9 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BadgeCheck, Eye, MousePointerClick, Rocket, Wallet } from "lucide-react";
+import { BadgeCheck, Coins, Eye, Gift, MousePointerClick, Rocket, Wallet } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
+import { MetaRewardedAd } from "@/components/Ads";
 import { Screen } from "@/components/Shell";
 import { formatCount } from "@/components/MediaGrid";
+import { fetchMyBoosts } from "@/lib/api";
 import { fetchMyEarnings } from "@/lib/live";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -13,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       {
         name: "description",
         content:
-          "Your MzansiTalk earnings dashboard: ad views, clicks and your 20% share ready to request as a payout.",
+          "Your MzansiTalk earnings dashboard: ad views, clicks, boost spend, coins and your 20% share ready to request as a payout.",
       },
       { property: "og:title", content: "My Dashboard — MzansiTalk" },
       { property: "og:description", content: "Track your own MzansiTalk earnings share." },
@@ -28,7 +32,14 @@ const money = (value: number) => `R${value.toFixed(2)}`;
 
 function DashboardPage() {
   const earnings = useQuery({ queryKey: ["my-earnings"], queryFn: fetchMyEarnings });
+  const boosts = useQuery({ queryKey: ["my-boosts"], queryFn: fetchMyBoosts });
+  const [coins, setCoins] = useState(0);
   const data = earnings.data;
+
+  const boostSpend = (boosts.data ?? [])
+    .filter((row) => row.status !== "refunded")
+    .reduce((sum, row) => sum + Number(row.amount), 0);
+
 
   return (
     <Screen title="My Dashboard">
