@@ -2,6 +2,7 @@ import { Flag, Gift, Info, Volume2, VolumeX, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { BANNER_SAFE_AREA_CLASS, MAX_BANNERS_PER_SCREEN, REWARDED_COINS } from "@/config/ads";
 import {
   canShowInterstitial,
   logAdClick,
