@@ -1,9 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Bell, Heart, MessageCircle, MessageSquare, Share2, UserPlus } from "lucide-react";
 import { useEffect } from "react";
 
+import { Avatar } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
-import { fetchNotifications, markNotificationsRead } from "@/lib/api";
+import { fetchNotifications, markNotificationsRead, type NotificationRow } from "@/lib/api";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
@@ -20,6 +22,73 @@ export const Route = createFileRoute("/_authenticated/notifications")({
   component: NotificationsPage,
 });
 
+function KindIcon({ kind }: { kind: string }) {
+  const className = "size-4";
+  if (kind.includes("like")) return <Heart className={className} />;
+  if (kind.includes("comment")) return <MessageCircle className={className} />;
+  if (kind.includes("follow")) return <UserPlus className={className} />;
+  if (kind.includes("share")) return <Share2 className={className} />;
+  if (kind.includes("message") || kind.includes("dm")) return <MessageSquare className={className} />;
+  return <Bell className={className} />;
+}
+
+function NotificationRowItem({ item }: { item: NotificationRow }) {
+  const body = (
+    <span className="flex min-w-0 items-center gap-3">
+      <span className="relative shrink-0">
+        <Avatar path={item.actor?.avatar_url} name={item.actor?.name ?? "M"} size={40} />
+        <span className="absolute -bottom-1 -right-1 grid size-5 place-items-center rounded-full bg-primary text-primary-foreground">
+          <KindIcon kind={item.kind} />
+        </span>
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm">
+          {item.actor?.name ? <span className="font-semibold">{item.actor.name} </span> : null}
+          {item.message}
+        </span>
+        <span className="block text-xs text-muted-foreground">
+          {new Date(item.created_at).toLocaleString()}
+        </span>
+      </span>
+      {item.is_read ? null : <span className="ml-auto size-2 shrink-0 rounded-full bg-destructive" />}
+    </span>
+  );
+
+  const className = `block p-3 ${item.is_read ? "" : "bg-secondary/40"}`;
+
+  if (item.kind.includes("message") || item.kind.includes("dm")) {
+    return (
+      <li>
+        <Link to="/chat" className={className}>
+          {body}
+        </Link>
+      </li>
+    );
+  }
+
+  if (item.kind.includes("status")) {
+    return (
+      <li>
+        <Link to="/home" className={className}>
+          {body}
+        </Link>
+      </li>
+    );
+  }
+
+  if (item.actor?.username) {
+    return (
+      <li>
+        <Link to="/u/$username" params={{ username: item.actor.username }} className={className}>
+          {body}
+        </Link>
+      </li>
+    );
+  }
+
+  return <li className={className}>{body}</li>;
+}
+
 function NotificationsPage() {
   const queryClient = useQueryClient();
   const items = useQuery({ queryKey: ["notifications"], queryFn: fetchNotifications });
@@ -30,22 +99,18 @@ function NotificationsPage() {
     );
   }, [queryClient]);
 
+  const list = items.data ?? [];
 
   return (
     <Screen title="Notifications">
-      {(items.data ?? []).length === 0 ? (
+      {list.length === 0 ? (
         <p className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
           No notifications yet.
         </p>
       ) : (
         <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
-          {(items.data ?? []).map((item) => (
-            <li key={item.id} className="p-3 text-sm">
-              <span className="font-semibold capitalize">{item.kind}</span> — {item.message}
-              <span className="block text-xs text-muted-foreground">
-                {new Date(item.created_at).toLocaleString()}
-              </span>
-            </li>
+          {list.map((item) => (
+            <NotificationRowItem key={item.id} item={item} />
           ))}
         </ul>
       )}
