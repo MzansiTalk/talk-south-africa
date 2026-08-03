@@ -6,11 +6,10 @@ import {
   Film,
   Home,
   MessageCircle,
-  PlusCircle,
   Radio,
   Search,
   Shield,
-  User,
+  Users,
 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 
