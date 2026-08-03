@@ -32,6 +32,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 const money = (value: number) => `R${value.toFixed(2)}`;
 
 function DashboardPage() {
+  const queryClient = useQueryClient();
   const earnings = useQuery({ queryKey: ["my-earnings"], queryFn: fetchMyEarnings });
   const boosts = useQuery({ queryKey: ["my-boosts"], queryFn: fetchMyBoosts });
   const wallet = useQuery({ queryKey: ["entitlements"], queryFn: fetchEntitlements });
