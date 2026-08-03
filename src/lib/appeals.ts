@@ -84,7 +84,7 @@ export async function decideAppealDecision(input: {
   const { error } = await supabase.rpc("admin_decide_appeal", {
     _appeal_id: input.appealId,
     _approve: input.approve,
-    _reason: input.reason ?? null,
+    ...(input.reason ? { _reason: input.reason } : {}),
   });
   if (error) throw error;
 }
