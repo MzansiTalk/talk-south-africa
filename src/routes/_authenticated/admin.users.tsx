@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
 import { Screen, useIsAdmin } from "@/components/Shell";
+import { setMonetizationApproved } from "@/lib/live";
 import { fetchMembers, setBanned, setViral } from "@/lib/moderation";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
@@ -48,6 +49,18 @@ function UserManagerPage() {
       );
       refresh();
       void queryClient.invalidateQueries({ queryKey: ["feed"] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const monetize = useMutation({
+    mutationFn: (input: { userId: string; approved: boolean }) =>
+      setMonetizationApproved(input.userId, input.approved),
+    onSuccess: (_result, input) => {
+      toast.success(
+        input.approved ? "Monetization approved — they now earn 20%." : "Monetization removed.",
+      );
+      refresh();
     },
     onError: (error: Error) => toast.error(error.message),
   });
