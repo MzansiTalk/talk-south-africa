@@ -396,15 +396,35 @@ export async function createContent(input: {
   }
   const expiresAt =
     input.kind === "status" ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() : null;
-  const { error } = await supabase.from("posts").insert({
-    user_id: userId,
-    kind: input.kind,
-    caption: input.caption || null,
-    media_url: mediaPath,
-    media_type: mediaType,
-    expires_at: expiresAt,
-  });
+  const { data: created, error } = await supabase
+    .from("posts")
+    .insert({
+      user_id: userId,
+      kind: input.kind,
+      caption: input.caption || null,
+      media_url: mediaPath,
+      media_type: mediaType,
+      expires_at: expiresAt,
+    })
+    .select("id")
+    .single();
   if (error) throw error;
+
+  // AI moderation (Google Cloud Vision / Video Intelligence) on every media upload.
+  if (created?.id && mediaPath && mediaType) {
+    const url = await signedUrl(mediaPath);
+    if (url) {
+      const { moderateUpload } = await import("@/lib/ai-moderation.functions");
+      const verdict = await moderateUpload({
+        data: { postId: created.id, mediaUrl: url, mediaType: mediaType as "image" | "video" },
+      });
+      if (verdict.status === "removed") {
+        throw new Error(
+          `AI moderation flagged this upload (risk ${verdict.aiScore}%). It was removed and an appeal was opened — you have 24 hours for a review.`,
+        );
+      }
+    }
+  }
 }
 
 export async function updateMyProfile(patch: Partial<Profile>) {
