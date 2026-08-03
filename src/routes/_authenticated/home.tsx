@@ -11,6 +11,7 @@ import {
   VideoAd,
 } from "@/components/Ads";
 import { Composer } from "@/components/Composer";
+import { LiveRail } from "@/components/LiveRail";
 import { PostCard } from "@/components/PostCard";
 import { Screen } from "@/components/Shell";
 import { StatusRail } from "@/components/StatusRail";
@@ -73,6 +74,7 @@ function HomeFeed() {
         <InterstitialAd onClose={videoInterstitial.close} placement="video_interstitial" />
       ) : null}
 
+      <LiveRail />
       <StatusRail items={statuses.data ?? []} />
       <Composer />
 
