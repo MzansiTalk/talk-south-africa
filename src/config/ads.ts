@@ -55,7 +55,14 @@ export const INTERSTITIAL_EVERY_N_VIDEOS = 3;
 export const FEED_AD_EVERY_N_POSTS = 5;
 
 /** Ads may only appear on these surfaces. Never during an active live stream. */
-export const AD_ALLOWED_SURFACES = ["home", "reels", "status", "comments", "pre_live", "post_live"] as const;
+export const AD_ALLOWED_SURFACES = [
+  "home",
+  "reels",
+  "status",
+  "comments",
+  "pre_live",
+  "post_live",
+] as const;
 
 export type AdSurface = (typeof AD_ALLOWED_SURFACES)[number];
 

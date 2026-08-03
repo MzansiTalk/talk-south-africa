@@ -9,7 +9,6 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyRoles, getCurrentUserId, getMyEmail, OWNER_EMAIL } from "@/lib/api";
 
-
 export type AdNetwork = "meta";
 
 export type AdPlacementSlot =
@@ -172,7 +171,6 @@ export function useInterstitialCooldown() {
   return ready;
 }
 
-
 // ==================== IMPRESSIONS, CLICKS, FREQUENCY CAP ====================
 
 export async function logAdImpression(
@@ -258,7 +256,6 @@ function readLastAdTime(): number {
   return newest;
 }
 
-
 /** Frequency cap: at most one interstitial every 120 seconds per user. */
 export function canShowInterstitial(): boolean {
   if (typeof window === "undefined") return false;
@@ -275,7 +272,6 @@ export function markInterstitialShown() {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(LAST_AD_TIME_KEY, String(Date.now()));
 }
-
 
 // ==================== OWNER AD EARNINGS ====================
 

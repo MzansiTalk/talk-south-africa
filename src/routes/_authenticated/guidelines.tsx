@@ -64,8 +64,8 @@ function GuidelinesPage() {
   return (
     <Screen title="Community Guidelines">
       <p className="flex items-center gap-2 rounded-2xl border border-gold/50 bg-gold/10 p-4 text-xs font-semibold">
-        <ScrollText className="size-4 text-gold" /> These guidelines apply to every post, reel, status,
-        comment, live stream and message on MzansiTalk.
+        <ScrollText className="size-4 text-gold" /> These guidelines apply to every post, reel,
+        status, comment, live stream and message on MzansiTalk.
       </p>
 
       <section className="mt-4 space-y-3">
@@ -86,17 +86,17 @@ function GuidelinesPage() {
           unlimited — a blocked member cannot message you or see your content.
         </p>
         <p>
-          Content that is flagged is hidden from the feed until a staff member reviews it. Breaking these
-          rules earns a strike, and three strikes bans the account automatically. Bans can be appealed
-          from Settings.
+          Content that is flagged is hidden from the feed until a staff member reviews it. Breaking
+          these rules earns a strike, and three strikes bans the account automatically. Bans can be
+          appealed from Settings.
         </p>
       </Section>
 
       <Section title="Ads and monetisation">
         <p>
           Ads are served by Meta Audience Network and are never placed on flagged content, on banned
-          accounts, or during a live stream. Content that breaks these guidelines is not eligible for
-          monetisation or creator earnings.
+          accounts, or during a live stream. Content that breaks these guidelines is not eligible
+          for monetisation or creator earnings.
         </p>
       </Section>
 

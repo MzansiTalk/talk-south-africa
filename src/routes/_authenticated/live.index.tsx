@@ -16,7 +16,6 @@ import {
   fetchLiveComments,
   fetchLiveLikes,
   fetchMyActiveLive,
-  
   MAX_LIVE_GUESTS,
   MAX_LIVE_HOURS,
   setJoinStatus,
@@ -178,11 +177,15 @@ function GoLivePage() {
       const recorder = recorderRef.current;
       const recording = await new Promise<Blob | null>((resolve) => {
         if (!recorder || recorder.state === "inactive") {
-          resolve(chunksRef.current.length ? new Blob(chunksRef.current, { type: "video/webm" }) : null);
+          resolve(
+            chunksRef.current.length ? new Blob(chunksRef.current, { type: "video/webm" }) : null,
+          );
           return;
         }
         recorder.onstop = () =>
-          resolve(chunksRef.current.length ? new Blob(chunksRef.current, { type: "video/webm" }) : null);
+          resolve(
+            chunksRef.current.length ? new Blob(chunksRef.current, { type: "video/webm" }) : null,
+          );
         recorder.stop();
       });
       await endLive(streamId, recording);
@@ -284,11 +287,10 @@ function GoLivePage() {
           </button>
 
           <p className="mt-3 text-xs text-muted-foreground">
-            Boost Live is a digital item, so it is sold through Google Play Billing — never a card or
-            EFT. The Boosted badge lasts 24 hours; the live itself can run for up to {MAX_LIVE_HOURS}{" "}
-            hours and its recording is saved to your profile for 60 days.
+            Boost Live is a digital item, so it is sold through Google Play Billing — never a card
+            or EFT. The Boosted badge lasts 24 hours; the live itself can run for up to{" "}
+            {MAX_LIVE_HOURS} hours and its recording is saved to your profile for 60 days.
           </p>
-
 
           <button
             type="button"
@@ -325,7 +327,13 @@ function GoLivePage() {
       ) : null}
 
       <div className="relative overflow-hidden rounded-2xl bg-black">
-        <video ref={videoRef} autoPlay muted playsInline className="aspect-[3/4] w-full object-cover" />
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          playsInline
+          className="aspect-[3/4] w-full object-cover"
+        />
         <span className="absolute left-2 top-2 rounded bg-destructive px-2 py-0.5 text-[0.65rem] font-bold uppercase text-destructive-foreground">
           ● Live
         </span>

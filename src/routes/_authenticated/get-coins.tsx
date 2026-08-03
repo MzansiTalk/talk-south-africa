@@ -94,7 +94,9 @@ function GetCoinsPage() {
               onClick={() => buy.mutate(id)}
               className="btn-base btn-primary mt-3 w-full disabled:opacity-60"
             >
-              {buy.isPending && buy.variables === id ? "Opening Google Play…" : `Buy ${product.title}`}
+              {buy.isPending && buy.variables === id
+                ? "Opening Google Play…"
+                : `Buy ${product.title}`}
             </button>
           </section>
         );
@@ -103,7 +105,8 @@ function GetCoinsPage() {
       <section className="mt-3 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold">Free coins</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Watch a full rewarded ad and get {REWARDED_COINS} coins. Closing the ad early gives 0 coins.
+          Watch a full rewarded ad and get {REWARDED_COINS} coins. Closing the ad early gives 0
+          coins.
         </p>
         <MetaRewardedAd
           onReward={() => reward.mutate()}

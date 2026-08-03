@@ -43,25 +43,21 @@ function DashboardPage() {
     .filter((row) => row.status !== "refunded")
     .reduce((sum, row) => sum + Number(row.amount), 0);
 
-
-
   return (
     <Screen title="My Dashboard">
       <section className="rounded-2xl border border-border bg-card p-5">
         <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           <Wallet className="size-4" /> Your earnings (your 20% share)
         </p>
-        <p className="mt-2 font-display text-3xl font-bold text-gold">
-          {money(data?.total ?? 0)}
-        </p>
+        <p className="mt-2 font-display text-3xl font-bold text-gold">{money(data?.total ?? 0)}</p>
         <p className="mt-1 text-xs text-muted-foreground">
           You keep 20% of what your content earns. Only your own share is shown here.
         </p>
 
         {data && !data.approved ? (
           <p className="mt-3 rounded-xl border border-border bg-secondary p-3 text-xs text-muted-foreground">
-            Monetization is not approved yet. You can keep posting — earnings start counting once the
-            Owner approves your account.
+            Monetization is not approved yet. You can keep posting — earnings start counting once
+            the Owner approves your account.
           </p>
         ) : (
           <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-green-600">
@@ -138,7 +134,6 @@ function DashboardPage() {
         />
       </section>
 
-
       <section className="mt-3 rounded-2xl border border-border bg-card p-4">
         <p className="text-sm">
           Already paid out: <span className="font-bold">{money(data?.paid_out ?? 0)}</span>
@@ -147,7 +142,6 @@ function DashboardPage() {
           Request a payout
         </Link>
       </section>
-
     </Screen>
   );
 }

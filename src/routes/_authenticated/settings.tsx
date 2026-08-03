@@ -1,6 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Bell, BellOff, Coins, CreditCard, Crown, LifeBuoy, LogOut, Moon, RotateCcw, ScrollText, ShieldCheck, ShieldOff, Sparkles, Sun } from "lucide-react";
+import {
+  Bell,
+  BellOff,
+  Coins,
+  CreditCard,
+  Crown,
+  LifeBuoy,
+  LogOut,
+  Moon,
+  RotateCcw,
+  ScrollText,
+  ShieldCheck,
+  ShieldOff,
+  Sparkles,
+  Sun,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
@@ -15,7 +30,6 @@ import {
 } from "@/lib/api";
 import { fetchEntitlements, restorePurchases } from "@/lib/billing";
 import { useTheme } from "@/lib/theme";
-
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -79,7 +93,6 @@ function SettingsPage() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
-
 
   const signOut = async () => {
     await queryClient.cancelQueries();
@@ -173,8 +186,6 @@ function SettingsPage() {
         )}
       </section>
 
-
-
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold">Blocked Users</h2>
         {(blocked.data ?? []).length === 0 ? (
@@ -225,8 +236,8 @@ function SettingsPage() {
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold">Advertiser payments</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Cards are only used for advertiser and sponsored-placement invoices, never for in-app digital
-          items.
+          Cards are only used for advertiser and sponsored-placement invoices, never for in-app
+          digital items.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Link to="/payment-methods" className="btn-base bg-secondary text-secondary-foreground">
@@ -237,7 +248,6 @@ function SettingsPage() {
           </Link>
         </div>
       </section>
-
 
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold">Help and Support</h2>
@@ -262,8 +272,11 @@ function SettingsPage() {
         </Link>
       </section>
 
-
-      <button type="button" onClick={signOut} className="btn-base mt-4 w-full bg-destructive text-destructive-foreground">
+      <button
+        type="button"
+        onClick={signOut}
+        className="btn-base mt-4 w-full bg-destructive text-destructive-foreground"
+      >
         <LogOut className="size-4" /> Log Out
       </button>
     </Screen>

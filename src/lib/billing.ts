@@ -30,7 +30,8 @@ export const PRODUCTS: Record<ProductId, Product> = {
   boost_live_r50: {
     id: "boost_live_r50",
     title: "Boost Live",
-    description: "Shows your live to everyone in the Home feed and gives you the Boosted badge for 24 hours.",
+    description:
+      "Shows your live to everyone in the Home feed and gives you the Boosted badge for 24 hours.",
     priceLabel: "R50.00",
     amount: 50,
     type: "inapp",
@@ -80,9 +81,11 @@ type BillingPlugin = {
 
 function nativeBilling(): BillingPlugin | null {
   if (typeof window === "undefined") return null;
-  const capacitor = (window as unknown as {
-    Capacitor?: { isNativePlatform?: () => boolean; Plugins?: Record<string, unknown> };
-  }).Capacitor;
+  const capacitor = (
+    window as unknown as {
+      Capacitor?: { isNativePlatform?: () => boolean; Plugins?: Record<string, unknown> };
+    }
+  ).Capacitor;
   if (!capacitor?.isNativePlatform?.()) return null;
   const plugin = capacitor.Plugins?.["InAppPurchase"] as BillingPlugin | undefined;
   return plugin ?? null;
@@ -134,13 +137,18 @@ export async function requestPurchase(productId: ProductId): Promise<Entitlement
 }
 
 /** Re-applies every purchase Google Play still has on record for this account. */
-export async function restorePurchases(): Promise<{ restored: number; entitlements: Entitlements }> {
+export async function restorePurchases(): Promise<{
+  restored: number;
+  entitlements: Entitlements;
+}> {
   const plugin = nativeBilling();
   if (!plugin) {
     throw new Error("Restore Purchases only works inside the MzansiTalk Android app.");
   }
   await plugin.initialize?.().catch(() => undefined);
-  const result = (await (plugin.restorePurchases?.() ?? plugin.getPurchases?.() ?? Promise.resolve({}))) as {
+  const result = (await (plugin.restorePurchases?.() ??
+    plugin.getPurchases?.() ??
+    Promise.resolve({}))) as {
     purchases?: NativePurchase[];
   };
   const purchases = result.purchases ?? [];
