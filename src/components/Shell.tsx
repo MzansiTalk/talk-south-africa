@@ -81,11 +81,11 @@ export function TopBar({
 
         <div className="ml-auto flex shrink-0 items-center gap-1">
           <Link
-            to="/create"
-            aria-label="Create"
+            to="/friends"
+            aria-label="Find friends"
             className="btn-base bg-transparent px-2 text-muted-foreground"
           >
-            <PlusCircle className="size-5" />
+            <Users className="size-5" />
           </Link>
           <Link
             to="/search"
@@ -106,27 +106,9 @@ export function TopBar({
               </span>
             ) : null}
           </Link>
-          <Link
-            to="/profile"
-            aria-label="Your profile"
-            className="btn-base bg-transparent px-2 text-muted-foreground"
-          >
-            <User className="size-5" />
-          </Link>
         </div>
       </div>
 
-      {showSearch ? (
-        <div className="mx-auto w-full max-w-2xl px-3 pb-3">
-          <Link
-            to="/search"
-            className="field field-focus flex items-center gap-2 text-muted-foreground"
-          >
-            <Search className="size-4" />
-            Search users, posts, reels and photos
-          </Link>
-        </div>
-      ) : null}
     </header>
   );
 }
