@@ -38,6 +38,8 @@ function SettingsPage() {
   const { theme, toggle } = useTheme();
 
   const blocked = useQuery({ queryKey: ["blocked"], queryFn: fetchBlockedUsers });
+  const boosters = useQuery({ queryKey: ["top-boosters"], queryFn: fetchTopBoosters });
+
   const notifications = useQuery({
     queryKey: ["notifications-enabled"],
     queryFn: fetchNotificationsEnabled,
