@@ -80,6 +80,7 @@
 
   --gradient-brand: linear-gradient(135deg, oklch(0.42 0.2 313) 0%, oklch(0.55 0.22 315) 55%, oklch(0.885 0.176 96) 140%);
   --gradient-gold: linear-gradient(120deg, oklch(0.885 0.176 96) 0%, oklch(0.94 0.13 100) 50%, oklch(0.82 0.17 84) 100%);
+  --gradient-reel: linear-gradient(160deg, oklch(0.75 0.18 60) 0%, oklch(0.66 0.22 40) 50%, oklch(0.55 0.24 22) 100%);
   --shadow-brand: 0 18px 45px -20px oklch(0.42 0.2 313 / 0.55);
   --shadow-card: 0 2px 18px -8px oklch(0.3 0.1 315 / 0.18);
 }
@@ -146,6 +147,10 @@
 
 @utility bg-gold-gradient {
   background-image: var(--gradient-gold);
+}
+
+@utility bg-reel-gradient {
+  background-image: var(--gradient-reel);
 }
 
 @utility shadow-brand {

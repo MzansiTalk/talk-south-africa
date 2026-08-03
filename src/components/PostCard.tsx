@@ -160,7 +160,7 @@ export function PostCard({ item }: { item: FeedItem }) {
               ) : null}
               {boostActive ? (
                 <span className="rounded-full bg-secondary px-2 py-0.5 text-[0.62rem] font-bold uppercase text-secondary-foreground">
-                  Sponsored
+                  Boosted
                 </span>
               ) : null}
             </span>

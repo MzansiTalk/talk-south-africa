@@ -1,11 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { MessageSquare } from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { MediaGrid, ProfileTabs } from "@/components/MediaGrid";
 import { PostCard } from "@/components/PostCard";
 import { Avatar, useMediaUrl } from "@/components/SignedMedia";
 import { Screen, useIsAdmin } from "@/components/Shell";
+import { groupStatuses, StatusViewer } from "@/components/StatusRail";
 import {
   fetchFollowCounts,
   fetchProfileByUsername,
@@ -15,6 +18,7 @@ import {
   setBlock,
   setFollow,
   startDirectChat,
+  type FeedItem,
 } from "@/lib/api";
 
 
@@ -30,12 +34,16 @@ export const Route = createFileRoute("/_authenticated/u/$username")({
   component: UserProfile,
 });
 
+const TABS = ["All", "Reels", "Status", "Photos"] as const;
+
 function UserProfile() {
   const { isAdmin } = useIsAdmin();
 
   const { username } = Route.useParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [tab, setTab] = useState<(typeof TABS)[number]>("Reels");
+  const [statusOpen, setStatusOpen] = useState<number | null>(null);
 
 
   const profile = useQuery({
@@ -95,6 +103,28 @@ function UserProfile() {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  const all = content.data ?? [];
+  const items =
+    tab === "Photos"
+      ? all.filter((item) => (item.media_type ?? "").startsWith("image"))
+      : tab === "Reels"
+        ? all.filter((item) => item.kind === "reel")
+        : tab === "Status"
+          ? all.filter((item) => item.kind === "status")
+          : all;
+
+  const statusGroups = useMemo(
+    () => groupStatuses(all.filter((item) => item.kind === "status")),
+    [all],
+  );
+
+  const openItem = (item: FeedItem) => {
+    if (item.kind === "status") {
+      setStatusOpen(0);
+      return;
+    }
+    void navigate({ to: "/reels", search: { post: item.id } });
+  };
 
   if (profile.isLoading) {
     return (
@@ -174,15 +204,33 @@ function UserProfile() {
         </div>
       </div>
 
-      <div className="mt-4 space-y-4">
-        {(content.data ?? []).length === 0 ? (
-          <p className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
-            No content yet.
-          </p>
+      <ProfileTabs tabs={TABS} value={tab} onChange={setTab} />
+
+      <div className="mt-4">
+        {tab === "All" ? (
+          items.length === 0 ? (
+            <p className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+              No content yet.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {items.map((item) => (
+                <PostCard key={item.id} item={item} />
+              ))}
+            </div>
+          )
         ) : (
-          (content.data ?? []).map((item) => <PostCard key={item.id} item={item} />)
+          <MediaGrid items={items} onOpen={openItem} emptyText="Nothing here yet." />
         )}
       </div>
+
+      {statusOpen !== null && statusGroups.length > 0 ? (
+        <StatusViewer
+          groups={statusGroups}
+          startGroup={statusOpen}
+          onClose={() => setStatusOpen(null)}
+        />
+      ) : null}
     </Screen>
   );
 }

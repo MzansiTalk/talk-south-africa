@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Bell, BellOff, CreditCard, LifeBuoy, LogOut, Moon, ShieldOff, Sparkles, Sun } from "lucide-react";
+import { Bell, BellOff, CreditCard, Crown, LifeBuoy, LogOut, Moon, ShieldOff, Sparkles, Sun } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
@@ -9,10 +9,12 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   fetchBlockedUsers,
   fetchNotificationsEnabled,
+  fetchTopBoosters,
   setBlock,
   setNotificationsEnabled,
 } from "@/lib/api";
 import { useTheme } from "@/lib/theme";
+
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -36,6 +38,8 @@ function SettingsPage() {
   const { theme, toggle } = useTheme();
 
   const blocked = useQuery({ queryKey: ["blocked"], queryFn: fetchBlockedUsers });
+  const boosters = useQuery({ queryKey: ["top-boosters"], queryFn: fetchTopBoosters });
+
   const notifications = useQuery({
     queryKey: ["notifications-enabled"],
     queryFn: fetchNotificationsEnabled,
@@ -112,6 +116,33 @@ function SettingsPage() {
           <Sparkles className="size-4" /> Open Creator Program
         </Link>
       </section>
+
+      <section className="mt-4 rounded-2xl border border-border bg-card p-4">
+        <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
+          <Crown className="size-4 text-gold" /> Top Boosters This Week
+        </h2>
+        {(boosters.data ?? []).length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground">
+            No boosts yet this week. Boost any post to appear on this leaderboard.
+          </p>
+        ) : (
+          <ol className="mt-3 flex gap-4 overflow-x-auto no-scrollbar">
+            {(boosters.data ?? []).map((row, index) => (
+              <li
+                key={row.profile?.id ?? index}
+                className="flex w-16 shrink-0 flex-col items-center gap-1 text-center"
+              >
+                <Avatar path={row.profile?.avatar_url} name={row.profile?.name ?? "M"} size={48} />
+                <span className="w-full truncate text-[0.68rem] font-semibold">
+                  #{index + 1} @{row.profile?.username}
+                </span>
+                <span className="text-[0.62rem] text-gold">R{row.total.toFixed(0)}</span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+
 
 
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">

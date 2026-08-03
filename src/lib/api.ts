@@ -471,7 +471,18 @@ export async function setNotificationsEnabled(enabled: boolean) {
   if (enabled) await enablePushNotifications();
 }
 
-export async function fetchNotifications() {
+export type NotificationRow = {
+  id: string;
+  kind: string;
+  message: string;
+  post_id: string | null;
+  actor_id: string | null;
+  is_read: boolean;
+  created_at: string;
+  actor: Profile | null;
+};
+
+export async function fetchNotifications(): Promise<NotificationRow[]> {
   const userId = await getCurrentUserId();
   if (!userId) return [];
   const { data, error } = await supabase
@@ -481,8 +492,19 @@ export async function fetchNotifications() {
     .order("created_at", { ascending: false })
     .limit(50);
   if (error) throw error;
-  return data ?? [];
+  const rows = data ?? [];
+  const actorIds = [...new Set(rows.map((row) => row.actor_id).filter(Boolean))] as string[];
+  const actors = new Map<string, Profile>();
+  if (actorIds.length > 0) {
+    const { data: profiles } = await supabase.from("profiles").select("*").in("id", actorIds);
+    for (const profile of (profiles ?? []) as Profile[]) actors.set(profile.id, profile);
+  }
+  return rows.map((row) => ({
+    ...row,
+    actor: row.actor_id ? (actors.get(row.actor_id) ?? null) : null,
+  })) as NotificationRow[];
 }
+
 
 export async function fetchUnreadNotificationCount(): Promise<number> {
   const userId = await getCurrentUserId();
@@ -1208,4 +1230,17 @@ export async function sharePostToTimeline(postId: string, caption: string) {
     media_type: original.media_type,
   });
   if (error) throw error;
+}
+
+/** Posts the signed-in member has liked, newest first. */
+export async function fetchLiked(): Promise<FeedItem[]> {
+  const userId = await getCurrentUserId();
+  if (!userId) return [];
+  const { data, error } = await supabase.from("likes").select("post_id").eq("user_id", userId);
+  if (error) throw error;
+  const ids = (data ?? []).map((row) => row.post_id);
+  if (ids.length === 0) return [];
+  const posts = await supabase.from("posts").select("*").in("id", ids);
+  if (posts.error) throw posts.error;
+  return hydrate((posts.data ?? []) as Post[]);
 }
