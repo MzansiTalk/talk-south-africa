@@ -118,11 +118,8 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
 
-  // Inside the Android APK this hands the ad slots to the real AdMob SDK.
-  // On the web it does nothing.
-  useEffect(() => {
-    void installNativeAdMob().catch(() => undefined);
-  }, []);
+
+
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
