@@ -729,14 +729,6 @@ export async function fetchAppSettings() {
 }
 
 export type AppSettings = {
-  admob_app_id: string | null;
-  admob_banner_id: string | null;
-  admob_interstitial_id: string | null;
-  admob_rewarded_id: string | null;
-  admob_rewarded_interstitial_id: string | null;
-  admob_native_id: string | null;
-  admob_status_id: string | null;
-  admob_payment_email: string | null;
   meta_app_id: string | null;
   meta_banner_placement_id: string | null;
   meta_interstitial_placement_id: string | null;
@@ -753,8 +745,8 @@ export type AppSettings = {
   price_sponsored_30_days: number;
   price_boost_post: number;
   price_boost_7_days: number;
-  admob_test_mode: boolean;
   paystack_test_mode: boolean;
+
   test_mode: boolean;
   live_mode: boolean;
 };
