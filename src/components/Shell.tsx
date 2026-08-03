@@ -6,11 +6,9 @@ import {
   Film,
   Home,
   MessageCircle,
-  Moon,
   PlusCircle,
   Search,
   Shield,
-  Sun,
   User,
 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
@@ -18,7 +16,6 @@ import { useEffect, type ReactNode } from "react";
 import logo from "@/assets/mzansitalk-logo.png";
 import { fetchMyRoles, fetchUnreadNotificationCount } from "@/lib/api";
 import { touchPresence } from "@/lib/creators";
-import { useTheme } from "@/lib/theme";
 
 export function useIsAdmin() {
   const { data: roles } = useQuery({ queryKey: ["my-roles"], queryFn: fetchMyRoles });
@@ -49,66 +46,65 @@ export function TopBar({
   showSearch?: boolean | undefined;
 }) {
   const router = useRouter();
-  const { theme, toggle } = useTheme();
   const unread = useQuery({
     queryKey: ["notifications-unread"],
     queryFn: fetchUnreadNotificationCount,
     refetchInterval: 45_000,
   });
 
+  const unseen = unread.data ?? 0;
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-14 w-full max-w-2xl items-center gap-2 px-3">
-        <button
-          type="button"
-          onClick={() => router.history.back()}
-          aria-label="Go back"
-          className="btn-base -ml-2 bg-transparent px-2 text-muted-foreground"
-        >
-          <ChevronLeft className="size-5" />
-        </button>
-
         {title ? (
-          <h1 className="truncate text-base font-semibold">{title}</h1>
+          <>
+            <button
+              type="button"
+              onClick={() => router.history.back()}
+              aria-label="Go back"
+              className="btn-base -ml-2 bg-transparent px-2 text-muted-foreground"
+            >
+              <ChevronLeft className="size-5" />
+            </button>
+            <h1 className="truncate text-base font-semibold">{title}</h1>
+          </>
         ) : (
-          <Link to="/home" className="flex items-center gap-2">
-            <img src={logo} alt="MzansiTalk" width={28} height={28} className="rounded-md" />
-            <span className="font-display text-lg font-bold tracking-tight">
+          <Link to="/home" className="flex min-w-0 items-center gap-2">
+            <img src={logo} alt="MzansiTalk" width={30} height={30} className="rounded-md" />
+            <span className="font-display text-xl font-bold tracking-tight">
               Mzansi<span className="text-gold">Talk</span>
             </span>
           </Link>
         )}
 
-        <div className="ml-auto flex items-center gap-1">
-          <button
-            type="button"
-            onClick={toggle}
-            aria-label="Toggle dark mode"
-            className="btn-base bg-transparent px-2 text-muted-foreground"
-          >
-            {theme === "dark" ? <Sun className="size-5" /> : <Moon className="size-5" />}
-          </button>
+        <div className="ml-auto flex shrink-0 items-center gap-1">
           <Link
-            to="/chat"
-            aria-label="Chats"
+            to="/create"
+            aria-label="Create"
             className="btn-base bg-transparent px-2 text-muted-foreground"
           >
-            <MessageCircle className="size-5" />
+            <PlusCircle className="size-5" />
+          </Link>
+          <Link
+            to="/search"
+            aria-label="Search"
+            className="btn-base bg-transparent px-2 text-muted-foreground"
+          >
+            <Search className="size-5" />
           </Link>
           <Link
             to="/notifications"
-            aria-label="Notifications"
+            aria-label={`Notifications${unseen > 0 ? `, ${unseen} unseen` : ""}`}
             className="btn-base relative bg-transparent px-2 text-muted-foreground"
           >
             <Bell className="size-5" />
-            {(unread.data ?? 0) > 0 ? (
-              <span className="absolute right-0.5 top-0.5 min-w-4 rounded-full bg-gold px-1 text-[0.6rem] font-bold leading-4 text-background">
-                {(unread.data ?? 0) > 9 ? "9+" : unread.data}
+            {unseen > 0 ? (
+              <span className="absolute right-0 top-0 min-w-4 rounded-full bg-destructive px-1 text-[0.6rem] font-bold leading-4 text-destructive-foreground">
+                {unseen > 9 ? "9+" : unseen}
               </span>
             ) : null}
           </Link>
-
         </div>
       </div>
 
@@ -134,9 +130,7 @@ export function BottomNav() {
   const items = [
     { to: "/home", label: "Home", icon: Home },
     { to: "/reels", label: "Reels", icon: Film },
-    { to: "/create", label: "Create", icon: PlusCircle },
     { to: "/chat", label: "Messages", icon: MessageCircle },
-    { to: "/status", label: "Status", icon: Search },
     { to: "/profile", label: "Profile", icon: User },
     ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: Shield }] : []),
   ] as const;
@@ -160,6 +154,7 @@ export function BottomNav() {
     </nav>
   );
 }
+
 
 export function Screen({
   children,
