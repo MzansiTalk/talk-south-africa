@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/admin/payment-settings")({
       {
         name: "description",
         content:
-          "Owner-only MzansiTalk money control centre: AdMob ad revenue keys, Paystack sponsored and boost payments, and your own pricing.",
+          "Owner-only MzansiTalk money control centre: Meta Audience Network ad keys, Paystack sponsored and boost payments, and your own pricing.",
       },
       { property: "og:title", content: "Owner Money Center — MzansiTalk" },
       { property: "og:description", content: "One page to control every way MzansiTalk earns money." },
@@ -34,14 +34,6 @@ export const Route = createFileRoute("/_authenticated/admin/payment-settings")({
 });
 
 const EMPTY: AppSettings = {
-  admob_app_id: "",
-  admob_banner_id: "",
-  admob_interstitial_id: "",
-  admob_rewarded_id: "",
-  admob_rewarded_interstitial_id: "",
-  admob_native_id: "",
-  admob_status_id: "",
-  admob_payment_email: OWNER_EMAIL,
   meta_app_id: "",
   meta_banner_placement_id: "",
   meta_interstitial_placement_id: "",
@@ -58,11 +50,11 @@ const EMPTY: AppSettings = {
   price_sponsored_30_days: 1500,
   price_boost_post: 20,
   price_boost_7_days: 100,
-  admob_test_mode: true,
   paystack_test_mode: true,
   test_mode: true,
   live_mode: false,
 };
+
 
 function Field({
   label,
@@ -211,8 +203,8 @@ function MoneyCenter() {
         WARNING: OWNER ONLY. This controls ALL app revenue.
       </div>
       <p className="mt-2 rounded-2xl border border-gold/50 bg-gold/10 p-4 text-xs font-semibold">
-        This controls ALL app revenue. AdMob for ads. Paystack for Sponsored + Boosts. All money goes
-        directly to you.
+        This controls ALL app revenue. Meta Audience Network for ads. Paystack for Sponsored, Boosts
+        and in-app purchases. All money goes directly to you.
       </p>
 
       {/* SECTION A */}
@@ -221,40 +213,31 @@ function MoneyCenter() {
           Ad Revenue from Posts, Reels, Status, Comments
         </h2>
         <p className="text-xs text-muted-foreground">
-          You earn money when users watch reels, view posts, see status, or click ads. Google pays you
-          directly.
+          You earn money when members watch reels, view posts, see status, or tap an ad. The ad network
+          pays you directly. Google AdMob has been fully removed from MzansiTalk.
         </p>
-        <Field label="AdMob App ID" value={form.admob_app_id ?? ""} onChange={(v) => set("admob_app_id", v)} />
         <Field
-          label="AdMob Banner Ad Unit ID"
-          value={form.admob_banner_id ?? ""}
-          onChange={(v) => set("admob_banner_id", v)}
+          label="Meta App ID"
+          value={form.meta_app_id ?? ""}
+          onChange={(v) => set("meta_app_id", v)}
         />
+        {/* TODO: Replace with real Meta Placement ID */}
         <Field
-          label="AdMob Interstitial Ad Unit ID"
-          value={form.admob_interstitial_id ?? ""}
-          onChange={(v) => set("admob_interstitial_id", v)}
+          label="Meta Banner Placement ID"
+          value={form.meta_banner_placement_id ?? ""}
+          onChange={(v) => set("meta_banner_placement_id", v)}
         />
+        {/* TODO: Replace with real Meta Placement ID */}
         <Field
-          label="AdMob Rewarded Ad Unit ID"
-          value={form.admob_rewarded_id ?? ""}
-          onChange={(v) => set("admob_rewarded_id", v)}
+          label="Meta Interstitial Placement ID"
+          value={form.meta_interstitial_placement_id ?? ""}
+          onChange={(v) => set("meta_interstitial_placement_id", v)}
         />
+        {/* TODO: Replace with real Meta Placement ID */}
         <Field
-          label="AdMob Rewarded Interstitial Ad Unit ID"
-          value={form.admob_rewarded_interstitial_id ?? ""}
-          onChange={(v) => set("admob_rewarded_interstitial_id", v)}
-        />
-        <Field
-          label="AdMob Native Ad Unit ID"
-          value={form.admob_native_id ?? ""}
-          onChange={(v) => set("admob_native_id", v)}
-        />
-        <Field
-          label="AdMob Payment Email"
-          type="email"
-          value={form.admob_payment_email ?? ""}
-          onChange={(v) => set("admob_payment_email", v)}
+          label="Meta Rewarded Placement ID"
+          value={form.meta_rewarded_placement_id ?? ""}
+          onChange={(v) => set("meta_rewarded_placement_id", v)}
         />
         <Toggle
           label="Banner Ads"
@@ -271,33 +254,25 @@ function MoneyCenter() {
           checked={form.ads_rewarded_enabled}
           onChange={(v) => set("ads_rewarded_enabled", v)}
         />
-        <Toggle
-          label="AdMob Test Mode"
-          checked={form.admob_test_mode}
-          onChange={(v) => set("admob_test_mode", v)}
-        />
         <button
           type="button"
           onClick={() =>
             save.mutate({
-              admob_app_id: form.admob_app_id,
-              admob_banner_id: form.admob_banner_id,
-              admob_interstitial_id: form.admob_interstitial_id,
-              admob_rewarded_id: form.admob_rewarded_id,
-              admob_rewarded_interstitial_id: form.admob_rewarded_interstitial_id,
-              admob_native_id: form.admob_native_id,
-              admob_payment_email: form.admob_payment_email,
+              meta_app_id: form.meta_app_id,
+              meta_banner_placement_id: form.meta_banner_placement_id,
+              meta_interstitial_placement_id: form.meta_interstitial_placement_id,
+              meta_rewarded_placement_id: form.meta_rewarded_placement_id,
               ads_banner_enabled: form.ads_banner_enabled,
               ads_interstitial_enabled: form.ads_interstitial_enabled,
               ads_rewarded_enabled: form.ads_rewarded_enabled,
-              admob_test_mode: form.admob_test_mode,
             })
           }
           disabled={save.isPending}
           className="btn-base btn-primary w-full disabled:opacity-60"
         >
-          Save AdMob Settings
+          Save Ad Network Settings
         </button>
+
       </section>
 
       {/* SECTION B */}
@@ -441,19 +416,20 @@ function MoneyCenter() {
       <section className="mt-4 space-y-2 rounded-2xl border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
         <h2 className="text-sm font-bold uppercase tracking-wide text-foreground">How Money Flows</h2>
         <p>
-          <strong>AdMob money:</strong> a member watches a reel, status or post → a Google ad shows →
-          Google collects the money → Google pays you directly into your own bank via AdMob on the 21st
-          of the month.
+          <strong>Ad money:</strong> a member watches a reel, status or post → a Meta Audience Network
+          ad shows → the ad network collects the money → the ad network pays you directly into your own
+          bank account. Google AdMob is no longer used anywhere in MzansiTalk.
         </p>
         <p>
           <strong>Sponsored / Boost money:</strong> a brand or member pays at Paystack checkout → money
           goes directly into your Paystack account → your bank in 1–2 days.
         </p>
         <p>
-          Only the Owner ({OWNER_EMAIL}) can edit these keys. There are only 2 payment systems: AdMob
-          and Paystack. Change your AdMob bank inside admob.google.com and your Paystack bank inside
-          paystack.com. MzansiTalk never stores your bank details — only the keys above.
+          Only the Owner ({OWNER_EMAIL}) can edit these keys. There are 2 payment systems: Meta
+          Audience Network for ads and Paystack for Sponsored, Boosts and in-app purchases. MzansiTalk
+          never stores your bank details — only the keys above.
         </p>
+
       </section>
     </Screen>
   );

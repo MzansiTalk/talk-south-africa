@@ -1,9 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BadgeCheck, Eye, MousePointerClick, Rocket, Wallet } from "lucide-react";
+import { BadgeCheck, Coins, Eye, Gift, MousePointerClick, Rocket, Wallet } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
+import { MetaRewardedAd } from "@/components/Ads";
 import { Screen } from "@/components/Shell";
 import { formatCount } from "@/components/MediaGrid";
+import { fetchMyBoosts } from "@/lib/api";
 import { fetchMyEarnings } from "@/lib/live";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -13,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       {
         name: "description",
         content:
-          "Your MzansiTalk earnings dashboard: ad views, clicks and your 20% share ready to request as a payout.",
+          "Your MzansiTalk earnings dashboard: ad views, clicks, boost spend, coins and your 20% share ready to request as a payout.",
       },
       { property: "og:title", content: "My Dashboard — MzansiTalk" },
       { property: "og:description", content: "Track your own MzansiTalk earnings share." },
@@ -28,7 +32,14 @@ const money = (value: number) => `R${value.toFixed(2)}`;
 
 function DashboardPage() {
   const earnings = useQuery({ queryKey: ["my-earnings"], queryFn: fetchMyEarnings });
+  const boosts = useQuery({ queryKey: ["my-boosts"], queryFn: fetchMyBoosts });
+  const [coins, setCoins] = useState(0);
   const data = earnings.data;
+
+  const boostSpend = (boosts.data ?? [])
+    .filter((row) => row.status !== "refunded")
+    .reduce((sum, row) => sum + Number(row.amount), 0);
+
 
   return (
     <Screen title="My Dashboard">
@@ -81,6 +92,42 @@ function DashboardPage() {
       </div>
 
       <section className="mt-3 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold uppercase tracking-wide">In-App Purchases</h2>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <div className="rounded-xl bg-secondary/60 p-3">
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Rocket className="size-3.5" /> Total boost revenue
+            </p>
+            <p className="mt-1 text-lg font-bold">{money(boostSpend)}</p>
+          </div>
+          <div className="rounded-xl bg-secondary/60 p-3">
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Coins className="size-3.5" /> Coins bought
+            </p>
+            <p className="mt-1 text-lg font-bold">{formatCount(coins)}</p>
+          </div>
+          <div className="col-span-2 rounded-xl bg-secondary/60 p-3">
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Gift className="size-3.5" /> Spent on gifts
+            </p>
+            <p className="mt-1 text-lg font-bold">{money(0)}</p>
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Coin packs and premium are sold through in-app purchases (Boost Live R50, Coins 100, Premium
+          Monthly R29). Ads are served by Meta Audience Network — Google AdMob is no longer used.
+        </p>
+        <MetaRewardedAd
+          onReward={() => {
+            setCoins((current) => current + 5);
+            toast.success("You earned 5 free coins.");
+          }}
+          rewarded={false}
+          label="Watch ad to get 5 free coins"
+        />
+      </section>
+
+      <section className="mt-3 rounded-2xl border border-border bg-card p-4">
         <p className="text-sm">
           Already paid out: <span className="font-bold">{money(data?.paid_out ?? 0)}</span>
         </p>
@@ -88,6 +135,7 @@ function DashboardPage() {
           Request a payout
         </Link>
       </section>
+
     </Screen>
   );
 }

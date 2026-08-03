@@ -1,24 +1,30 @@
-import { Gift, Volume2, VolumeX, X } from "lucide-react";
+import { Flag, Gift, Volume2, VolumeX, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import {
   canShowInterstitial,
   logAdClick,
   logAdImpression,
   markInterstitialShown,
+  reportAd,
   useAds,
   type AdConfig,
-  type AdNetwork,
   type AdPlacementSlot,
   type AdTarget,
 } from "@/lib/ads";
 
+/**
+ * Meta Audience Network ad surfaces.
+ *
+ * Google AdMob has been removed from MzansiTalk completely — there is no AdMob
+ * SDK, no AdMob unit id and no AdMob bridge left anywhere in the app. These are
+ * Meta Audience Network placeholders that already log impressions, clicks and
+ * ad reports, so switching them onto real Meta placements later is a drop-in.
+ */
+
 /** Records the impression as soon as the ad renders and returns a click reporter. */
-function useImpression(
-  placement: AdPlacementSlot,
-  network: AdNetwork = "admob",
-  target: AdTarget = {},
-) {
+function useImpression(placement: AdPlacementSlot, target: AdTarget = {}) {
   const idRef = useRef<string | null>(null);
   const postId = target.postId ?? null;
   const contentKind = target.contentKind ?? null;
@@ -26,7 +32,7 @@ function useImpression(
 
   useEffect(() => {
     let cancelled = false;
-    void logAdImpression(placement, network, { postId, contentKind, ownerId })
+    void logAdImpression(placement, "meta", { postId, contentKind, ownerId })
       .then((id) => {
         if (!cancelled) idRef.current = id;
       })
@@ -34,7 +40,7 @@ function useImpression(
     return () => {
       cancelled = true;
     };
-  }, [placement, network, postId, contentKind, ownerId]);
+  }, [placement, postId, contentKind, ownerId]);
 
   return () => {
     if (idRef.current) void logAdClick(idRef.current).catch(() => undefined);
@@ -43,36 +49,33 @@ function useImpression(
 
 type AdSlotKind = "banner" | "interstitial" | "rewarded" | "native";
 
-/** The live AdMob unit id for a slot, when the Owner has saved one in the Money Center. */
-function unitId(config: AdConfig, kind: AdSlotKind) {
-  if (kind === "banner") return config.admob_banner_id;
-  if (kind === "interstitial") return config.admob_interstitial_id;
-  if (kind === "rewarded") return config.admob_rewarded_id;
-  return config.admob_native_id;
+/** The Meta placement id for a slot, when the Owner has saved one in the Money Center. */
+function placementId(config: AdConfig, kind: AdSlotKind) {
+  // TODO: Replace with real Meta Placement ID
+  if (kind === "banner" || kind === "native") return config.meta_banner_placement_id;
+  if (kind === "rewarded") return config.meta_rewarded_placement_id;
+  return config.meta_interstitial_placement_id;
 }
 
-type AdmobBridge = {
-  showAd?: (options: { adUnitId: string; format: string; testMode: boolean }) => unknown;
-};
-
-/**
- * Requests the ad from the real AdMob SDK when the native bridge is present
- * (mobile build). On the web build the branded ad surface renders instead.
- * Ads always start on their own — the member is never asked for permission.
- */
-function useAdmobRequest(config: AdConfig, kind: AdSlotKind, format: string) {
-  const id = unitId(config, kind);
-  useEffect(() => {
-    if (!id) return;
-    const bridge = (globalThis as { admob?: AdmobBridge }).admob;
-    if (!bridge?.showAd) return;
-    try {
-      void bridge.showAd({ adUnitId: id, format, testMode: config.test_mode });
-    } catch {
-      // Native bridge unavailable — the in-app ad surface is shown instead.
-    }
-  }, [id, format, config.test_mode]);
-  return id;
+/** Policy compliance: every Meta ad surface can be reported by the member. */
+export function ReportAdButton({ placement }: { placement: AdPlacementSlot }) {
+  const [sent, setSent] = useState(false);
+  return (
+    <button
+      type="button"
+      disabled={sent}
+      onClick={(event) => {
+        event.stopPropagation();
+        setSent(true);
+        void reportAd(placement, "Reported from ad surface")
+          .then(() => toast.success("Thanks — this ad was reported for review."))
+          .catch(() => undefined);
+      }}
+      className="inline-flex items-center gap-1 text-[0.65rem] font-semibold text-muted-foreground underline"
+    >
+      <Flag className="size-3" /> {sent ? "Ad reported" : "Report ad"}
+    </button>
+  );
 }
 
 /** Autoplaying ad video surface with a mute/unmute control. Never asks permission. */
@@ -110,7 +113,9 @@ function AdVideoSurface({ label, unit }: { label: string; unit: string | null })
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1 px-6 text-center">
         <p className="text-xs font-bold uppercase tracking-widest text-gold">{label}</p>
         <p className="text-sm text-muted-foreground">
-          {unit ? "Playing your AdMob video ad." : "Add your AdMob unit ids in Owner Money Center."}
+          {unit
+            ? "Playing your Meta Audience Network video ad."
+            : "Add your Meta placement ids in Owner Money Center."}
         </p>
       </div>
       <button
@@ -128,70 +133,86 @@ function AdVideoSurface({ label, unit }: { label: string; unit: string | null })
   );
 }
 
-/** Native ad automatically placed every 5 posts in the Home feed. */
-export function NativeAd({ target }: { target?: AdTarget }) {
-  const { canShow, config } = useAds();
-  const click = useImpression("home_native", "admob", target ?? {});
-  const unit = useAdmobRequest(config, "native", "native");
-  if (!canShow("native")) return null;
-  return (
-    <button
-      type="button"
-      onClick={click}
-      className="w-full rounded-2xl border border-dashed border-border bg-muted/50 p-6 text-center"
-    >
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        Sponsored · Advertisement
-      </p>
-      <p className="mt-1 text-sm text-muted-foreground">
-        {unit
-          ? "AdMob native ad. Tap to visit the advertiser."
-          : "AdMob native ad slot. Add your Native Ad Unit ID in Owner Money Center."}
-      </p>
-    </button>
-  );
-}
-
-/** Inline autoplaying video ad placed between reels and long videos. */
-export function VideoAd({ target }: { target?: AdTarget }) {
-  const { canShow, config } = useAds();
-  const click = useImpression("reel_video", "admob", target ?? {});
-  const unit = useAdmobRequest(config, "interstitial", "video");
-  if (!canShow("interstitial")) return null;
-  return (
-    <div role="presentation" onClick={click}>
-      <AdVideoSurface label="Video Advertisement" unit={unit} />
-    </div>
-  );
-}
-
-/** Sticky banner ad. Used at the bottom of the feed, profile, search and above comments. */
-export function BannerAd({
-  placement = "reel_banner",
+/**
+ * Meta Audience Network banner placeholder. Used on the Home feed, Reels,
+ * profile and search. Renders nothing at all when banners are off, so the
+ * content simply expands into the space — never an empty white box.
+ */
+export function MetaBannerAd({
+  placement = "home_banner",
   target,
 }: {
   placement?: AdPlacementSlot;
   target?: AdTarget;
 }) {
   const { canShow, config } = useAds();
-  const click = useImpression(placement, "admob", target ?? {});
-  const unit = useAdmobRequest(config, "banner", "banner");
+  const click = useImpression(placement, target ?? {});
+  const unit = placementId(config, "banner");
   if (!canShow("banner")) return null;
   return (
-    <button
-      type="button"
-      onClick={click}
-      className="flex h-16 w-full items-center justify-center rounded-xl border border-dashed border-border bg-muted/60 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
-    >
-      {unit ? "AdMob Banner Ad" : "AdMob Banner Slot"}
-    </button>
+    <div className="rounded-xl border border-dashed border-border bg-muted/60 p-2 text-center">
+      <button
+        type="button"
+        onClick={click}
+        className="flex h-12 w-full items-center justify-center text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+      >
+        {unit ? "Meta Audience Network banner" : "Meta banner placement"}
+      </button>
+      <ReportAdButton placement={placement} />
+    </div>
+  );
+}
+
+/** Alias kept so every existing screen keeps working without changes. */
+export const BannerAd = MetaBannerAd;
+
+/** Native ad automatically placed every 5 posts in the Home feed. */
+export function NativeAd({ target }: { target?: AdTarget }) {
+  const { canShow, config } = useAds();
+  const click = useImpression("home_native", target ?? {});
+  const unit = placementId(config, "native");
+  if (!canShow("native")) return null;
+  return (
+    <div className="rounded-2xl border border-dashed border-border bg-muted/50 p-6 text-center">
+      <button type="button" onClick={click} className="w-full">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Sponsored · Advertisement
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {unit
+            ? "Meta Audience Network native ad. Tap to visit the advertiser."
+            : "Meta native ad slot. Add your Meta placement id in Owner Money Center."}
+        </p>
+      </button>
+      <div className="mt-2">
+        <ReportAdButton placement="home_native" />
+      </div>
+    </div>
+  );
+}
+
+/** Inline autoplaying video ad placed between reels and long videos. */
+export function VideoAd({ target }: { target?: AdTarget }) {
+  const { canShow, config } = useAds();
+  const click = useImpression("reel_video", target ?? {});
+  const unit = placementId(config, "interstitial");
+  if (!canShow("interstitial")) return null;
+  return (
+    <div>
+      <div role="presentation" onClick={click}>
+        <AdVideoSurface label="Video Advertisement" unit={unit} />
+      </div>
+      <div className="mt-1 text-center">
+        <ReportAdButton placement="reel_video" />
+      </div>
+    </div>
   );
 }
 
 /** Small banner shown automatically above the comments of posts and reels. */
 export function CommentsAd({ target }: { target?: AdTarget }) {
   const { canShow } = useAds();
-  const click = useImpression("comments_banner", "admob", target ?? {});
+  const click = useImpression("comments_banner", target ?? {});
   if (!canShow("banner")) return null;
   return (
     <button
@@ -199,7 +220,7 @@ export function CommentsAd({ target }: { target?: AdTarget }) {
       onClick={click}
       className="mb-3 flex h-12 w-full items-center justify-center rounded-xl border border-dashed border-gold/50 bg-muted/60 text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground"
     >
-      Sponsored · AdMob
+      Sponsored · Meta Audience Network
     </button>
   );
 }
@@ -210,8 +231,8 @@ export function CommentsAd({ target }: { target?: AdTarget }) {
  */
 export function StatusAd({ target, onDone }: { target?: AdTarget; onDone?: () => void }) {
   const { canShow, config } = useAds();
-  const click = useImpression("status_ad", "admob", target ?? {});
-  const unit = useAdmobRequest(config, "native", "status");
+  const click = useImpression("status_ad", target ?? {});
+  const unit = placementId(config, "native");
   const [seconds, setSeconds] = useState(5);
   const [closed, setClosed] = useState(false);
 
@@ -245,17 +266,20 @@ export function StatusAd({ target, onDone }: { target?: AdTarget; onDone?: () =>
       </div>
       <div className="mt-2 flex items-center justify-between text-xs">
         <span className="text-muted-foreground">Sponsored status · {seconds}s</span>
-        <button
-          type="button"
-          disabled={seconds > 2}
-          onClick={() => {
-            setClosed(true);
-            onDone?.();
-          }}
-          className="btn-base btn-primary px-3 py-1 text-[0.7rem] disabled:opacity-60"
-        >
-          {seconds > 2 ? `Skip in ${seconds - 2}s` : "Skip"}
-        </button>
+        <div className="flex items-center gap-3">
+          <ReportAdButton placement="status_ad" />
+          <button
+            type="button"
+            disabled={seconds > 2}
+            onClick={() => {
+              setClosed(true);
+              onDone?.();
+            }}
+            className="btn-base btn-primary px-3 py-1 text-[0.7rem] disabled:opacity-60"
+          >
+            {seconds > 2 ? `Skip in ${seconds - 2}s` : "Skip"}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -276,8 +300,8 @@ export function InterstitialAd({
 }) {
   const [seconds, setSeconds] = useState(3);
   const { config } = useAds();
-  const click = useImpression(placement, "admob", target ?? {});
-  const unit = useAdmobRequest(config, "interstitial", "interstitial");
+  const click = useImpression(placement, target ?? {});
+  const unit = placementId(config, "interstitial");
 
   useEffect(() => {
     markInterstitialShown();
@@ -291,7 +315,7 @@ export function InterstitialAd({
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-6 text-center">
       <p className="text-xs font-bold uppercase tracking-widest text-gold">Advertisement</p>
       <div className="mt-4 w-full max-w-sm" role="presentation" onClick={click}>
-        <AdVideoSurface label="AdMob Interstitial" unit={unit} />
+        <AdVideoSurface label="Meta Interstitial" unit={unit} />
       </div>
       <button
         type="button"
@@ -302,6 +326,9 @@ export function InterstitialAd({
         {seconds > 0 ? `Skip in ${seconds}s` : "Skip Ad"}
         <X className="size-4" />
       </button>
+      <div className="mt-3">
+        <ReportAdButton placement={placement} />
+      </div>
     </div>
   );
 }
@@ -327,13 +354,20 @@ export function useInterstitialAfterEvery(watched: number, every = 3) {
   return { open, close: () => setOpen(false) };
 }
 
-/** Optional rewarded ad: watch a full ad to unlock a 2x boost discount. */
-export function RewardedAdButton({
+/**
+ * Meta Audience Network rewarded placeholder: watch a full ad to unlock a reward.
+ * Used for "Watch ad to get 5 free coins" and for the 2x boost discount.
+ */
+export function MetaRewardedAd({
   onReward,
   rewarded,
+  label = "Watch ad to get 5 free coins",
+  rewardedLabel = "Reward unlocked.",
 }: {
   onReward: () => void;
   rewarded: boolean;
+  label?: string;
+  rewardedLabel?: string;
 }) {
   const { canShow } = useAds();
   const [watching, setWatching] = useState(false);
@@ -346,7 +380,7 @@ export function RewardedAdButton({
         if (current <= 1) {
           window.clearInterval(timer);
           setWatching(false);
-          void logAdImpression("rewarded_boost").catch(() => undefined);
+          void logAdImpression("rewarded_boost", "meta").catch(() => undefined);
           onReward();
           return 0;
         }
@@ -362,7 +396,7 @@ export function RewardedAdButton({
   if (rewarded) {
     return (
       <p className="mt-3 rounded-xl border border-gold/50 bg-gold/10 p-3 text-xs font-semibold text-gold">
-        Reward unlocked: 2x boost discount applied to this boost.
+        {rewardedLabel}
       </p>
     );
   }
@@ -377,7 +411,7 @@ export function RewardedAdButton({
         }}
         className="btn-base mt-3 w-full bg-secondary text-secondary-foreground"
       >
-        <Gift className="size-4 text-gold" /> Watch ad to get 2x boost discount
+        <Gift className="size-4 text-gold" /> {label}
       </button>
       {watching ? (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-6 text-center">
@@ -386,8 +420,29 @@ export function RewardedAdButton({
             <AdVideoSurface label="Rewarded Ad" unit={null} />
           </div>
           <p className="mt-6 text-sm font-semibold">Reward in {seconds}s</p>
+          <div className="mt-3">
+            <ReportAdButton placement="rewarded_boost" />
+          </div>
         </div>
       ) : null}
     </>
+  );
+}
+
+/** Boost checkout keeps its own reward wording. */
+export function RewardedAdButton({
+  onReward,
+  rewarded,
+}: {
+  onReward: () => void;
+  rewarded: boolean;
+}) {
+  return (
+    <MetaRewardedAd
+      onReward={onReward}
+      rewarded={rewarded}
+      label="Watch ad to get 2x boost discount"
+      rewardedLabel="Reward unlocked: 2x boost discount applied to this boost."
+    />
   );
 }

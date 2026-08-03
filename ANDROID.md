@@ -29,24 +29,6 @@ The file lands in `android/app/build/outputs/apk/debug/app-debug.apk`.
 For a Play Store upload use **Build → Generate Signed Bundle / APK**, create a
 keystore, and pick **Android App Bundle (.aab)**.
 
-## AdMob
-
-`capacitor.config.ts` already carries your production AdMob app id
-(`ca-app-pub-1349489304852677~8992145141`). `npx cap sync android` injects it
-into `AndroidManifest.xml`.
-
-The individual ad unit ids come from **Owner Money Center → Ad Settings** in the
-app, so you can change them any time without rebuilding.
-
-`src/lib/native-ads.ts` connects the app's ad slots to the native SDK:
-
-| App slot                    | AdMob format             |
-| --------------------------- | ------------------------ |
-| Feed native / status ads    | Adaptive banner          |
-| Banner slots                | Adaptive banner          |
-| Reel / video interstitials  | Interstitial             |
-| Boost discount reward       | Rewarded video           |
-
 ## Updating the shell
 
 After changing local Android assets, `capacitor.config.ts`, or plugins:
@@ -63,3 +45,9 @@ npx cap sync android
 - Test on a real device: emulators often report no ad fill.
 - Ads never show to the Owner account or banned members — that rule lives in the
   app, so it applies in the APK too.
+
+## Ads
+
+Google AdMob has been fully removed (banned account). Ads now run through Meta
+Audience Network placeholders configured in Owner Money Center → Ad Settings.
+No Google Mobile Ads SDK, manifest entry or ad unit id remains in the project.

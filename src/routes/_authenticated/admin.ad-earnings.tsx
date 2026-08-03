@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/admin/ad-earnings")({
       {
         name: "description",
         content:
-          "Owner-only MzansiTalk ad earnings: estimated ad revenue, impressions, eCPM and clicks from AdMob and Meta Audience Network.",
+          "Owner-only MzansiTalk ad earnings: estimated ad revenue, impressions, eCPM and clicks from Meta Audience Network.",
       },
       { property: "og:title", content: "Ad Earnings — MzansiTalk Admin" },
       { property: "og:description", content: "Estimated ad revenue and impressions for MzansiTalk." },
@@ -110,15 +110,12 @@ function AdEarningsPage() {
       </section>
 
       <p className="mt-4 rounded-2xl border border-gold/50 bg-gold/10 p-4 text-xs font-semibold">
-        Actual payments are sent directly by Google AdMob / Meta to the bank account linked in your
-        AdMob account. MzansiTalk does not handle ad payments — create a free account at
-        admob.google.com and add your own bank details there.
+        Actual payments are sent directly by Meta Audience Network to the bank account linked in your
+        Meta monetization account. MzansiTalk does not handle ad payments. Google AdMob is no longer
+        used by this app.
       </p>
 
       <div className="mt-4 grid gap-2">
-        <a href="https://admob.google.com" target="_blank" rel="noreferrer" className="btn-base btn-primary">
-          <ExternalLink className="size-4" /> Open My AdMob Account
-        </a>
         <a
           href="https://business.facebook.com/monetization"
           target="_blank"

@@ -50,6 +50,6 @@ install — allow "install unknown apps" for your browser/file manager first.
 
 - The APK bundles its launcher and offline app shell locally. Rebuild the APK
   when these packaged assets change; live social data still requires internet.
-- AdMob ids come from Owner Money Center → Ad Settings, changeable without a rebuild.
+- Meta Audience Network placement ids come from Owner Money Center → Ad Settings, changeable without a rebuild.
 - The `android/` folder isn't committed; the workflow regenerates it with
   `npx cap add android` on every run.

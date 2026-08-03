@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/admin/ad-settings")({
       {
         name: "description",
         content:
-          "Owner-only MzansiTalk ad settings for Google AdMob and Meta Audience Network unit ids and ad type switches.",
+          "Owner-only MzansiTalk ad settings for Meta Audience Network placement ids and ad type switches.",
       },
       { property: "og:title", content: "Ad Settings — MzansiTalk Admin" },
       { property: "og:description", content: "Owner-only ad network settings for MzansiTalk." },
@@ -32,13 +32,6 @@ export const Route = createFileRoute("/_authenticated/admin/ad-settings")({
 });
 
 type AdForm = {
-  admob_app_id: string;
-  admob_banner_id: string;
-  admob_interstitial_id: string;
-  admob_rewarded_id: string;
-  admob_rewarded_interstitial_id: string;
-  admob_native_id: string;
-  admob_status_id: string;
   meta_app_id: string;
   meta_banner_placement_id: string;
   meta_interstitial_placement_id: string;
@@ -50,13 +43,6 @@ type AdForm = {
 };
 
 const EMPTY: AdForm = {
-  admob_app_id: "",
-  admob_banner_id: "",
-  admob_interstitial_id: "",
-  admob_rewarded_id: "",
-  admob_rewarded_interstitial_id: "",
-  admob_native_id: "",
-  admob_status_id: "",
   meta_app_id: "",
   meta_banner_placement_id: "",
   meta_interstitial_placement_id: "",
@@ -178,45 +164,6 @@ function AdSettingsPage() {
       <div className="rounded-2xl bg-destructive p-4 text-center text-sm font-bold text-destructive-foreground">
         WARNING: OWNER ONLY. These settings control every ad in MzansiTalk.
       </div>
-
-      <section className="mt-4 space-y-3 rounded-2xl border border-border bg-card p-4">
-        <h2 className="text-sm font-bold uppercase tracking-wide">Google AdMob</h2>
-        <Field
-          label="AdMob App ID"
-          value={form.admob_app_id}
-          onChange={(value) => set("admob_app_id", value)}
-        />
-        <Field
-          label="AdMob Banner ID"
-          value={form.admob_banner_id}
-          onChange={(value) => set("admob_banner_id", value)}
-        />
-        <Field
-          label="AdMob Interstitial ID"
-          value={form.admob_interstitial_id}
-          onChange={(value) => set("admob_interstitial_id", value)}
-        />
-        <Field
-          label="AdMob Rewarded ID"
-          value={form.admob_rewarded_id}
-          onChange={(value) => set("admob_rewarded_id", value)}
-        />
-        <Field
-          label="AdMob Rewarded Interstitial ID"
-          value={form.admob_rewarded_interstitial_id}
-          onChange={(value) => set("admob_rewarded_interstitial_id", value)}
-        />
-        <Field
-          label="AdMob Native ID"
-          value={form.admob_native_id}
-          onChange={(value) => set("admob_native_id", value)}
-        />
-        <Field
-          label="AdMob Status Ad ID"
-          value={form.admob_status_id}
-          onChange={(value) => set("admob_status_id", value)}
-        />
-      </section>
 
       <section className="mt-4 space-y-3 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold uppercase tracking-wide">Meta Audience Network</h2>
