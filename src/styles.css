@@ -149,6 +149,10 @@
   background-image: var(--gradient-gold);
 }
 
+@utility bg-reel-gradient {
+  background-image: var(--gradient-reel);
+}
+
 @utility shadow-brand {
   box-shadow: var(--shadow-brand);
 }
