@@ -1,21 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Pencil, Settings } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { BannerAd } from "@/components/Ads";
+import { CollectionPills, MediaGrid, ProfileTabs } from "@/components/MediaGrid";
 import { PostCard } from "@/components/PostCard";
 
 import { Avatar, useMediaUrl } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
+import { groupStatuses, StatusViewer } from "@/components/StatusRail";
 import {
   fetchFollowCounts,
+  fetchLiked,
   fetchMyProfile,
   fetchSaved,
   fetchUserContent,
   updateMyProfile,
   uploadMedia,
+  type FeedItem,
 } from "@/lib/api";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -24,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
       { title: "My Profile — MzansiTalk" },
       {
         name: "description",
-        content: "Your MzansiTalk profile: timeline, photos, reels, tagged, saved and my boosts.",
+        content: "Your MzansiTalk profile: posts, reels, status, photos, saved and liked content.",
       },
       { property: "og:title", content: "My Profile — MzansiTalk" },
       { property: "og:description", content: "Manage your MzansiTalk profile and content." },
@@ -33,12 +37,14 @@ export const Route = createFileRoute("/_authenticated/profile")({
   component: MyProfile,
 });
 
-const TABS = ["Timeline", "Photos", "Reels", "Tagged", "Saved", "My Boosts"] as const;
+const TABS = ["All", "Reels", "Status", "Photos"] as const;
 
 function MyProfile() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Timeline");
+  const [tab, setTab] = useState<(typeof TABS)[number]>("Reels");
+  const [collection, setCollection] = useState<"none" | "saved" | "liked">("none");
+  const [statusOpen, setStatusOpen] = useState<number | null>(null);
   const [editing, setEditing] = useState(false);
 
   const profile = useQuery({ queryKey: ["my-profile"], queryFn: fetchMyProfile });
@@ -54,7 +60,16 @@ function MyProfile() {
     queryFn: () => fetchUserContent(userId!),
     enabled: Boolean(userId),
   });
-  const saved = useQuery({ queryKey: ["saved"], queryFn: fetchSaved, enabled: tab === "Saved" });
+  const saved = useQuery({
+    queryKey: ["saved"],
+    queryFn: fetchSaved,
+    enabled: collection === "saved",
+  });
+  const liked = useQuery({
+    queryKey: ["liked"],
+    queryFn: fetchLiked,
+    enabled: collection === "liked",
+  });
   const cover = useMediaUrl(profile.data?.cover_url);
 
   const [name, setName] = useState("");
@@ -81,16 +96,34 @@ function MyProfile() {
     }
   };
 
+  const all = content.data ?? [];
   const items =
-    tab === "Saved"
+    collection === "saved"
       ? (saved.data ?? [])
-      : tab === "Photos"
-        ? (content.data ?? []).filter((item) => item.media_type === "image")
-        : tab === "Reels"
-          ? (content.data ?? []).filter((item) => item.kind === "reel")
-          : tab === "Timeline"
-            ? (content.data ?? [])
-            : [];
+      : collection === "liked"
+        ? (liked.data ?? [])
+        : tab === "Photos"
+          ? all.filter((item) => (item.media_type ?? "").startsWith("image"))
+          : tab === "Reels"
+            ? all.filter((item) => item.kind === "reel")
+            : tab === "Status"
+              ? all.filter((item) => item.kind === "status")
+              : all;
+
+  const statusGroups = useMemo(
+    () => groupStatuses(all.filter((item) => item.kind === "status")),
+    [all],
+  );
+
+  const openItem = (item: FeedItem) => {
+    if (item.kind === "status") {
+      setStatusOpen(0);
+      return;
+    }
+    void navigate({ to: "/reels", search: { post: item.id } });
+  };
+
+  const gridMode = collection === "none" && (tab === "Reels" || tab === "Status" || tab === "Photos");
 
   return (
     <Screen title="Profile">
@@ -162,11 +195,11 @@ function MyProfile() {
           ) : (
             <>
               <div className="mt-2 flex items-start justify-between gap-2">
-                <div>
-                  <h1 className="font-display text-xl font-bold">{profile.data?.name}</h1>
-                  <p className="text-sm text-muted-foreground">@{profile.data?.username}</p>
+                <div className="min-w-0">
+                  <h1 className="truncate font-display text-xl font-bold">{profile.data?.name}</h1>
+                  <p className="truncate text-sm text-muted-foreground">@{profile.data?.username}</p>
                 </div>
-                <div className="flex gap-1">
+                <div className="flex shrink-0 gap-1">
                   <button
                     type="button"
                     onClick={() => setEditing(true)}
@@ -201,51 +234,42 @@ function MyProfile() {
         </div>
       </div>
 
-      <div className="mt-4 flex gap-2 overflow-x-auto no-scrollbar">
-        {TABS.map((value) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => setTab(value)}
-            className={`btn-base whitespace-nowrap py-1.5 text-xs ${
-              tab === value ? "btn-primary" : "bg-secondary text-secondary-foreground"
-            }`}
-          >
-            {value}
-          </button>
-        ))}
-      </div>
+      <ProfileTabs tabs={TABS} value={tab} onChange={setTab} />
+      <CollectionPills value={collection} onChange={setCollection} />
 
-      <div className="mt-4 space-y-4">
-        {tab === "My Boosts" ? (
-          <div className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
-            Boosting with Paystack arrives in the next release. Your boost history will show here.
-          </div>
-        ) : tab === "Tagged" ? (
-          <div className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
-            No tagged content yet.
-          </div>
+      <div className="mt-4">
+        {gridMode ? (
+          <MediaGrid
+            items={items}
+            onOpen={openItem}
+            {...(tab === "Reels" ? { createLabel: "Create reel" } : {})}
+            {...(tab === "Status" ? { createLabel: "Create status" } : {})}
+            emptyText="Nothing here yet."
+          />
         ) : items.length === 0 ? (
           <div className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
             Nothing here yet.
           </div>
         ) : (
-          items.map((item) => <PostCard key={item.id} item={item} />)
+          <div className="space-y-4">
+            {items.map((item) => (
+              <PostCard key={item.id} item={item} />
+            ))}
+          </div>
         )}
       </div>
+
+      {statusOpen !== null && statusGroups.length > 0 ? (
+        <StatusViewer
+          groups={statusGroups}
+          startGroup={statusOpen}
+          onClose={() => setStatusOpen(null)}
+        />
+      ) : null}
 
       <div className="mt-6">
         <BannerAd placement="profile_banner" />
       </div>
-
-
-
-      <button
-        type="button"
-        className="mt-6 hidden"
-        onClick={() => void navigate({ to: "/home" })}
-        aria-hidden
-      />
     </Screen>
   );
 }
