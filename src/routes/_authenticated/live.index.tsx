@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Avatar } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdsPausedForLive } from "@/lib/ads";
 import {
   addLiveComment,
   endLive,
@@ -63,6 +64,8 @@ function GoLivePage() {
 
   const live = useQuery({ queryKey: ["my-live"], queryFn: fetchMyActiveLive });
   const streamId = live.data?.id ?? null;
+  // Meta policy: no ads anywhere in the app while a live stream is running.
+  useAdsPausedForLive(Boolean(streamId));
 
   const comments = useQuery({
     queryKey: ["live-comments", streamId],

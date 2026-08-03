@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Bell, BellOff, CreditCard, Crown, LifeBuoy, LogOut, Moon, ShieldCheck, ShieldOff, Sparkles, Sun } from "lucide-react";
+import { Bell, BellOff, CreditCard, Crown, LifeBuoy, LogOut, Moon, ScrollText, ShieldCheck, ShieldOff, Sparkles, Sun } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
@@ -209,6 +209,12 @@ function SettingsPage() {
         </Link>
         <Link to="/privacy" className="btn-base mt-2 bg-secondary text-secondary-foreground">
           <ShieldCheck className="size-4" /> Privacy Policy
+        </Link>
+        <Link
+          to="/community-guidelines"
+          className="btn-base mt-2 bg-secondary text-secondary-foreground"
+        >
+          <ScrollText className="size-4" /> Community Guidelines
         </Link>
       </section>
 

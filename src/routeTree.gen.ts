@@ -17,6 +17,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as AuthenticatedAdvertiseRouteImport } from './routes/_authenticated/advertise'
 import { Route as AuthenticatedAppealRouteImport } from './routes/_authenticated/appeal'
+import { Route as AuthenticatedCommunityGuidelinesRouteImport } from './routes/_authenticated/community-guidelines'
 import { Route as AuthenticatedCreateRouteImport } from './routes/_authenticated/create'
 import { Route as AuthenticatedCreatorProgramRouteImport } from './routes/_authenticated/creator-program'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -93,6 +94,12 @@ const AuthenticatedAppealRoute = AuthenticatedAppealRouteImport.update({
   path: '/appeal',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCommunityGuidelinesRoute =
+  AuthenticatedCommunityGuidelinesRouteImport.update({
+    id: '/community-guidelines',
+    path: '/community-guidelines',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCreateRoute = AuthenticatedCreateRouteImport.update({
   id: '/create',
   path: '/create',
@@ -298,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/welcome': typeof WelcomeRoute
   '/advertise': typeof AuthenticatedAdvertiseRoute
   '/appeal': typeof AuthenticatedAppealRoute
+  '/community-guidelines': typeof AuthenticatedCommunityGuidelinesRoute
   '/create': typeof AuthenticatedCreateRoute
   '/creator-program': typeof AuthenticatedCreatorProgramRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -343,6 +351,7 @@ export interface FileRoutesByTo {
   '/welcome': typeof WelcomeRoute
   '/advertise': typeof AuthenticatedAdvertiseRoute
   '/appeal': typeof AuthenticatedAppealRoute
+  '/community-guidelines': typeof AuthenticatedCommunityGuidelinesRoute
   '/create': typeof AuthenticatedCreateRoute
   '/creator-program': typeof AuthenticatedCreatorProgramRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -390,6 +399,7 @@ export interface FileRoutesById {
   '/welcome': typeof WelcomeRoute
   '/_authenticated/advertise': typeof AuthenticatedAdvertiseRoute
   '/_authenticated/appeal': typeof AuthenticatedAppealRoute
+  '/_authenticated/community-guidelines': typeof AuthenticatedCommunityGuidelinesRoute
   '/_authenticated/create': typeof AuthenticatedCreateRoute
   '/_authenticated/creator-program': typeof AuthenticatedCreatorProgramRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -437,6 +447,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/advertise'
     | '/appeal'
+    | '/community-guidelines'
     | '/create'
     | '/creator-program'
     | '/dashboard'
@@ -482,6 +493,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/advertise'
     | '/appeal'
+    | '/community-guidelines'
     | '/create'
     | '/creator-program'
     | '/dashboard'
@@ -528,6 +540,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/_authenticated/advertise'
     | '/_authenticated/appeal'
+    | '/_authenticated/community-guidelines'
     | '/_authenticated/create'
     | '/_authenticated/creator-program'
     | '/_authenticated/dashboard'
@@ -632,6 +645,13 @@ declare module '@tanstack/react-router' {
       path: '/appeal'
       fullPath: '/appeal'
       preLoaderRoute: typeof AuthenticatedAppealRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/community-guidelines': {
+      id: '/_authenticated/community-guidelines'
+      path: '/community-guidelines'
+      fullPath: '/community-guidelines'
+      preLoaderRoute: typeof AuthenticatedCommunityGuidelinesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/create': {
@@ -892,6 +912,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdvertiseRoute: typeof AuthenticatedAdvertiseRoute
   AuthenticatedAppealRoute: typeof AuthenticatedAppealRoute
+  AuthenticatedCommunityGuidelinesRoute: typeof AuthenticatedCommunityGuidelinesRoute
   AuthenticatedCreateRoute: typeof AuthenticatedCreateRoute
   AuthenticatedCreatorProgramRoute: typeof AuthenticatedCreatorProgramRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -932,6 +953,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdvertiseRoute: AuthenticatedAdvertiseRoute,
   AuthenticatedAppealRoute: AuthenticatedAppealRoute,
+  AuthenticatedCommunityGuidelinesRoute: AuthenticatedCommunityGuidelinesRoute,
   AuthenticatedCreateRoute: AuthenticatedCreateRoute,
   AuthenticatedCreatorProgramRoute: AuthenticatedCreatorProgramRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
