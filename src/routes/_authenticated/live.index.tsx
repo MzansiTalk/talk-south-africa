@@ -122,7 +122,7 @@ function GoLivePage() {
   }, [streamId]);
 
   const stopCamera = () => {
-    recorderRef.current?.state === "recording" && recorderRef.current.stop();
+    if (recorderRef.current?.state === "recording") recorderRef.current.stop();
     recorderRef.current = null;
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
