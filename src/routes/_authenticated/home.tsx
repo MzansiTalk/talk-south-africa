@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Crown, Flame } from "lucide-react";
+import { Flame } from "lucide-react";
 import { useRef, useState } from "react";
 
 import {
@@ -10,10 +10,11 @@ import {
   useInterstitialAfterEvery,
   VideoAd,
 } from "@/components/Ads";
+import { Composer } from "@/components/Composer";
 import { PostCard } from "@/components/PostCard";
-import { Avatar } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
-import { fetchFeed, fetchTopBoosters } from "@/lib/api";
+import { StatusRail } from "@/components/StatusRail";
+import { fetchFeed } from "@/lib/api";
 
 /** 1-based position of a post among the long videos in the feed. */
 function videoIndex(items: { media_type: string | null }[], index: number) {
@@ -42,8 +43,7 @@ export const Route = createFileRoute("/_authenticated/home")({
 function HomeFeed() {
   const feed = useQuery({ queryKey: ["feed", "home"], queryFn: () => fetchFeed() });
   const items = (feed.data ?? []).filter((item) => item.kind !== "status");
-  const boosters = useQuery({ queryKey: ["top-boosters"], queryFn: fetchTopBoosters });
-  const topBoosters = boosters.data ?? [];
+  const statuses = useQuery({ queryKey: ["feed", "status"], queryFn: () => fetchFeed("status") });
 
   const [videosWatched, setVideosWatched] = useState(0);
   const seenVideos = useRef(new Set<string>());
@@ -73,31 +73,8 @@ function HomeFeed() {
         <InterstitialAd onClose={videoInterstitial.close} placement="video_interstitial" />
       ) : null}
 
-      <section className="mb-4 overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-card">
-        <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
-          <Crown className="size-4 text-gold" /> Top Boosters This Week
-        </h2>
-        {topBoosters.length === 0 ? (
-          <p className="mt-2 text-sm text-muted-foreground">
-            No boosts yet this week. Boost any post to appear on this leaderboard.
-          </p>
-        ) : (
-          <ol className="mt-3 flex gap-4 overflow-x-auto no-scrollbar">
-            {topBoosters.map((row, index) => (
-              <li
-                key={row.profile?.id ?? index}
-                className="flex w-16 flex-col items-center gap-1 text-center"
-              >
-                <Avatar path={row.profile?.avatar_url} name={row.profile?.name ?? "M"} size={48} />
-                <span className="truncate text-[0.68rem] font-semibold">
-                  #{index + 1} @{row.profile?.username}
-                </span>
-                <span className="text-[0.62rem] text-gold">R{row.total.toFixed(0)}</span>
-              </li>
-            ))}
-          </ol>
-        )}
-      </section>
+      <StatusRail items={statuses.data ?? []} />
+      <Composer />
 
       {feed.isLoading ? (
         <div className="space-y-4">
@@ -144,4 +121,3 @@ function HomeFeed() {
     </Screen>
   );
 }
-
