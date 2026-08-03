@@ -203,8 +203,8 @@ function MoneyCenter() {
         WARNING: OWNER ONLY. This controls ALL app revenue.
       </div>
       <p className="mt-2 rounded-2xl border border-gold/50 bg-gold/10 p-4 text-xs font-semibold">
-        This controls ALL app revenue. AdMob for ads. Paystack for Sponsored + Boosts. All money goes
-        directly to you.
+        This controls ALL app revenue. Meta Audience Network for ads. Paystack for Sponsored, Boosts
+        and in-app purchases. All money goes directly to you.
       </p>
 
       {/* SECTION A */}
