@@ -106,6 +106,13 @@ export function TopBar({
               </span>
             ) : null}
           </Link>
+          <Link
+            to="/profile"
+            aria-label="Your profile"
+            className="btn-base bg-transparent px-2 text-muted-foreground"
+          >
+            <User className="size-5" />
+          </Link>
         </div>
       </div>
 
