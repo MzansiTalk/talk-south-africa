@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserId, getMyEmail, OWNER_EMAIL } from "@/lib/api";
 
-export type AdNetwork = "admob" | "meta";
+export type AdNetwork = "meta";
 
 export type AdPlacementSlot =
   | "home_native"
@@ -26,13 +26,6 @@ export type AdTarget = {
 };
 
 export type AdConfig = {
-  admob_app_id: string | null;
-  admob_banner_id: string | null;
-  admob_interstitial_id: string | null;
-  admob_rewarded_id: string | null;
-  admob_rewarded_interstitial_id: string | null;
-  admob_native_id: string | null;
-  admob_status_id: string | null;
   meta_app_id: string | null;
   meta_banner_placement_id: string | null;
   meta_interstitial_placement_id: string | null;
@@ -46,13 +39,6 @@ export type AdConfig = {
 };
 
 const DEFAULT_CONFIG: AdConfig = {
-  admob_app_id: null,
-  admob_banner_id: null,
-  admob_interstitial_id: null,
-  admob_rewarded_id: null,
-  admob_rewarded_interstitial_id: null,
-  admob_native_id: null,
-  admob_status_id: null,
   meta_app_id: null,
   meta_banner_placement_id: null,
   meta_interstitial_placement_id: null,
@@ -115,7 +101,7 @@ export function useAds() {
 
 export async function logAdImpression(
   placement: AdPlacementSlot,
-  network: AdNetwork = "admob",
+  network: AdNetwork = "meta",
   target: AdTarget = {},
 ) {
   const args: {
@@ -130,6 +116,15 @@ export async function logAdImpression(
   if (target.ownerId) args._content_owner_id = target.ownerId;
   const { data } = await supabase.rpc("log_ad_impression", args);
   return (data as string | null) ?? null;
+}
+
+/** Files a policy report against an ad the member just saw. */
+export async function reportAd(placement: AdPlacementSlot, reason: string) {
+  const userId = await getCurrentUserId();
+  if (!userId) return;
+  await supabase
+    .from("ad_reports")
+    .insert({ reporter_id: userId, placement, network: "meta", reason });
 }
 
 export async function logAdClick(impressionId: string) {
