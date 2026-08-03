@@ -221,40 +221,31 @@ function MoneyCenter() {
           Ad Revenue from Posts, Reels, Status, Comments
         </h2>
         <p className="text-xs text-muted-foreground">
-          You earn money when users watch reels, view posts, see status, or click ads. Google pays you
-          directly.
+          You earn money when members watch reels, view posts, see status, or tap an ad. The ad network
+          pays you directly. Google AdMob has been fully removed from MzansiTalk.
         </p>
-        <Field label="AdMob App ID" value={form.admob_app_id ?? ""} onChange={(v) => set("admob_app_id", v)} />
         <Field
-          label="AdMob Banner Ad Unit ID"
-          value={form.admob_banner_id ?? ""}
-          onChange={(v) => set("admob_banner_id", v)}
+          label="Meta App ID"
+          value={form.meta_app_id ?? ""}
+          onChange={(v) => set("meta_app_id", v)}
         />
+        {/* TODO: Replace with real Meta Placement ID */}
         <Field
-          label="AdMob Interstitial Ad Unit ID"
-          value={form.admob_interstitial_id ?? ""}
-          onChange={(v) => set("admob_interstitial_id", v)}
+          label="Meta Banner Placement ID"
+          value={form.meta_banner_placement_id ?? ""}
+          onChange={(v) => set("meta_banner_placement_id", v)}
         />
+        {/* TODO: Replace with real Meta Placement ID */}
         <Field
-          label="AdMob Rewarded Ad Unit ID"
-          value={form.admob_rewarded_id ?? ""}
-          onChange={(v) => set("admob_rewarded_id", v)}
+          label="Meta Interstitial Placement ID"
+          value={form.meta_interstitial_placement_id ?? ""}
+          onChange={(v) => set("meta_interstitial_placement_id", v)}
         />
+        {/* TODO: Replace with real Meta Placement ID */}
         <Field
-          label="AdMob Rewarded Interstitial Ad Unit ID"
-          value={form.admob_rewarded_interstitial_id ?? ""}
-          onChange={(v) => set("admob_rewarded_interstitial_id", v)}
-        />
-        <Field
-          label="AdMob Native Ad Unit ID"
-          value={form.admob_native_id ?? ""}
-          onChange={(v) => set("admob_native_id", v)}
-        />
-        <Field
-          label="AdMob Payment Email"
-          type="email"
-          value={form.admob_payment_email ?? ""}
-          onChange={(v) => set("admob_payment_email", v)}
+          label="Meta Rewarded Placement ID"
+          value={form.meta_rewarded_placement_id ?? ""}
+          onChange={(v) => set("meta_rewarded_placement_id", v)}
         />
         <Toggle
           label="Banner Ads"
@@ -271,33 +262,25 @@ function MoneyCenter() {
           checked={form.ads_rewarded_enabled}
           onChange={(v) => set("ads_rewarded_enabled", v)}
         />
-        <Toggle
-          label="AdMob Test Mode"
-          checked={form.admob_test_mode}
-          onChange={(v) => set("admob_test_mode", v)}
-        />
         <button
           type="button"
           onClick={() =>
             save.mutate({
-              admob_app_id: form.admob_app_id,
-              admob_banner_id: form.admob_banner_id,
-              admob_interstitial_id: form.admob_interstitial_id,
-              admob_rewarded_id: form.admob_rewarded_id,
-              admob_rewarded_interstitial_id: form.admob_rewarded_interstitial_id,
-              admob_native_id: form.admob_native_id,
-              admob_payment_email: form.admob_payment_email,
+              meta_app_id: form.meta_app_id,
+              meta_banner_placement_id: form.meta_banner_placement_id,
+              meta_interstitial_placement_id: form.meta_interstitial_placement_id,
+              meta_rewarded_placement_id: form.meta_rewarded_placement_id,
               ads_banner_enabled: form.ads_banner_enabled,
               ads_interstitial_enabled: form.ads_interstitial_enabled,
               ads_rewarded_enabled: form.ads_rewarded_enabled,
-              admob_test_mode: form.admob_test_mode,
             })
           }
           disabled={save.isPending}
           className="btn-base btn-primary w-full disabled:opacity-60"
         >
-          Save AdMob Settings
+          Save Ad Network Settings
         </button>
+
       </section>
 
       {/* SECTION B */}
