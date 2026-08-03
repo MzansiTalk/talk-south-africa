@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Bell, BellOff, CreditCard, LifeBuoy, LogOut, Moon, ShieldOff, Sparkles, Sun } from "lucide-react";
+import { Bell, BellOff, CreditCard, Crown, LifeBuoy, LogOut, Moon, ShieldOff, Sparkles, Sun } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
@@ -9,10 +9,12 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   fetchBlockedUsers,
   fetchNotificationsEnabled,
+  fetchTopBoosters,
   setBlock,
   setNotificationsEnabled,
 } from "@/lib/api";
 import { useTheme } from "@/lib/theme";
+
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
