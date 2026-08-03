@@ -1,13 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BadgeCheck, Coins, Eye, Gift, MousePointerClick, Rocket, Wallet } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
 
 import { MetaRewardedAd } from "@/components/Ads";
 import { Screen } from "@/components/Shell";
 import { formatCount } from "@/components/MediaGrid";
+import { REWARDED_COINS } from "@/config/ads";
 import { fetchMyBoosts } from "@/lib/api";
+import { addRewardCoins, fetchEntitlements } from "@/lib/billing";
 import { fetchMyEarnings } from "@/lib/live";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
