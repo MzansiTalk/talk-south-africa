@@ -1,9 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Plus, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Avatar, useMediaUrl } from "@/components/SignedMedia";
-import type { FeedItem } from "@/lib/api";
+import { fetchMyProfile, type FeedItem } from "@/lib/api";
 
 export type StatusGroup = {
   userId: string;
