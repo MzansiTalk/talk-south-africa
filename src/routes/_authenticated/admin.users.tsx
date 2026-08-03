@@ -136,6 +136,7 @@ function UserManagerPage() {
                   <BadgeCheck className="size-3.5" /> Monetization {approved ? "ON" : "OFF"}
                 </button>
               ) : null}
+              {isOwner ? (
                 <button
                   type="button"
                   onClick={() => ban.mutate({ userId: member.id, banned: !member.is_banned })}
@@ -154,7 +155,8 @@ function UserManagerPage() {
               )}
             </div>
           </li>
-        ))}
+          );
+        })}
         {(members.data ?? []).length === 0 ? (
           <li className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
             No members found.
