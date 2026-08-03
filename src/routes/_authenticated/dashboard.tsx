@@ -33,12 +33,14 @@ const money = (value: number) => `R${value.toFixed(2)}`;
 function DashboardPage() {
   const earnings = useQuery({ queryKey: ["my-earnings"], queryFn: fetchMyEarnings });
   const boosts = useQuery({ queryKey: ["my-boosts"], queryFn: fetchMyBoosts });
-  const [coins, setCoins] = useState(0);
+  const wallet = useQuery({ queryKey: ["entitlements"], queryFn: fetchEntitlements });
+  const coins = wallet.data?.coins ?? 0;
   const data = earnings.data;
 
   const boostSpend = (boosts.data ?? [])
     .filter((row) => row.status !== "refunded")
     .reduce((sum, row) => sum + Number(row.amount), 0);
+
 
 
   return (
