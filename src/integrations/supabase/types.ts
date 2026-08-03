@@ -462,6 +462,48 @@ export type Database = {
         }
         Relationships: []
       }
+      iap_purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          order_id: string | null
+          platform: string
+          product_id: string
+          purchase_token: string | null
+          state: string
+          user_id: string
+          validated: boolean
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          order_id?: string | null
+          platform?: string
+          product_id: string
+          purchase_token?: string | null
+          state?: string
+          user_id: string
+          validated?: boolean
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          order_id?: string | null
+          platform?: string
+          product_id?: string
+          purchase_token?: string | null
+          state?: string
+          user_id?: string
+          validated?: boolean
+        }
+        Relationships: []
+      }
       likes: {
         Row: {
           created_at: string
@@ -1128,6 +1170,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_entitlements: {
+        Row: {
+          boost_active: boolean
+          boost_expires_at: string | null
+          coins: number
+          premium_until: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          boost_active?: boolean
+          boost_expires_at?: string | null
+          coins?: number
+          premium_until?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          boost_active?: boolean
+          boost_expires_at?: string | null
+          coins?: number
+          premium_until?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_pass_keys: {
         Row: {
           created_at: string
@@ -1179,6 +1248,7 @@ export type Database = {
     }
     Functions: {
       ad_config: { Args: never; Returns: Json }
+      add_reward_coins: { Args: { _coins: number }; Returns: number }
       add_strike: {
         Args: { _post_id?: string; _reason: string; _user_id: string }
         Returns: number
@@ -1188,6 +1258,14 @@ export type Database = {
         Returns: undefined
       }
       creator_ad_stats: { Args: never; Returns: Json }
+      grant_iap_entitlement: {
+        Args: {
+          _order_id: string
+          _product_id: string
+          _purchase_token: string
+        }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1233,6 +1311,7 @@ export type Database = {
         Returns: undefined
       }
       my_earnings: { Args: never; Returns: Json }
+      my_entitlements: { Args: never; Returns: Json }
       owner_set_ban: {
         Args: { _banned: boolean; _reason?: string; _user_id: string }
         Returns: undefined

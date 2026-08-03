@@ -1,13 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BadgeCheck, Coins, Eye, Gift, MousePointerClick, Rocket, Wallet } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
 
 import { MetaRewardedAd } from "@/components/Ads";
 import { Screen } from "@/components/Shell";
 import { formatCount } from "@/components/MediaGrid";
+import { REWARDED_COINS } from "@/config/ads";
 import { fetchMyBoosts } from "@/lib/api";
+import { addRewardCoins, fetchEntitlements } from "@/lib/billing";
 import { fetchMyEarnings } from "@/lib/live";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -31,15 +32,16 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 const money = (value: number) => `R${value.toFixed(2)}`;
 
 function DashboardPage() {
+  const queryClient = useQueryClient();
   const earnings = useQuery({ queryKey: ["my-earnings"], queryFn: fetchMyEarnings });
   const boosts = useQuery({ queryKey: ["my-boosts"], queryFn: fetchMyBoosts });
-  const [coins, setCoins] = useState(0);
+  const wallet = useQuery({ queryKey: ["entitlements"], queryFn: fetchEntitlements });
+  const coins = wallet.data?.coins ?? 0;
   const data = earnings.data;
 
   const boostSpend = (boosts.data ?? [])
     .filter((row) => row.status !== "refunded")
     .reduce((sum, row) => sum + Number(row.amount), 0);
-
 
   return (
     <Screen title="My Dashboard">
@@ -47,17 +49,15 @@ function DashboardPage() {
         <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           <Wallet className="size-4" /> Your earnings (your 20% share)
         </p>
-        <p className="mt-2 font-display text-3xl font-bold text-gold">
-          {money(data?.total ?? 0)}
-        </p>
+        <p className="mt-2 font-display text-3xl font-bold text-gold">{money(data?.total ?? 0)}</p>
         <p className="mt-1 text-xs text-muted-foreground">
           You keep 20% of what your content earns. Only your own share is shown here.
         </p>
 
         {data && !data.approved ? (
           <p className="mt-3 rounded-xl border border-border bg-secondary p-3 text-xs text-muted-foreground">
-            Monetization is not approved yet. You can keep posting — earnings start counting once the
-            Owner approves your account.
+            Monetization is not approved yet. You can keep posting — earnings start counting once
+            the Owner approves your account.
           </p>
         ) : (
           <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-green-600">
@@ -114,16 +114,23 @@ function DashboardPage() {
           </div>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          Coin packs and premium are sold through in-app purchases (Boost Live R50, Coins 100, Premium
-          Monthly R29). Ads are served by Meta Audience Network — Google AdMob is no longer used.
+          Boost Live (R50), 100 Coins (R29) and Premium Monthly (R29) are sold through Google Play
+          Billing only. Ads are served by Meta Audience Network — Google AdMob is not used.
         </p>
+        <Link to="/get-coins" className="btn-base btn-primary mt-3 w-full">
+          <Coins className="size-4" /> Get Coins &amp; Premium
+        </Link>
         <MetaRewardedAd
           onReward={() => {
-            setCoins((current) => current + 5);
-            toast.success("You earned 5 free coins.");
+            addRewardCoins(REWARDED_COINS)
+              .then(() => {
+                void queryClient.invalidateQueries({ queryKey: ["entitlements"] });
+                toast.success(`You earned ${REWARDED_COINS} free coins.`);
+              })
+              .catch((error: Error) => toast.error(error.message));
           }}
           rewarded={false}
-          label="Watch ad to get 5 free coins"
+          label={`Watch ad for ${REWARDED_COINS} Coins`}
         />
       </section>
 
@@ -135,7 +142,6 @@ function DashboardPage() {
           Request a payout
         </Link>
       </section>
-
     </Screen>
   );
 }

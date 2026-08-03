@@ -1,9 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
+import {
+  INTERSTITIAL_COOLDOWN_MS,
+  LAST_INTERSTITIAL_KEY,
+  LEGACY_INTERSTITIAL_KEYS,
+} from "@/config/ads";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyRoles, getCurrentUserId, getMyEmail, OWNER_EMAIL } from "@/lib/api";
-
 
 export type AdNetwork = "meta";
 
@@ -167,7 +171,6 @@ export function useInterstitialCooldown() {
   return ready;
 }
 
-
 // ==================== IMPRESSIONS, CLICKS, FREQUENCY CAP ====================
 
 export async function logAdImpression(
@@ -238,18 +241,19 @@ export async function fetchCreatorAdStats(): Promise<CreatorAdStats> {
 }
 
 /** Persisted so the 120 second cap survives reloads and app restarts. */
-const LAST_AD_TIME_KEY = "lastAdTime";
-const LEGACY_CAP_KEY = "mzansitalk:last-interstitial";
-export const INTERSTITIAL_COOLDOWN_MS = 120_000;
+const LAST_AD_TIME_KEY = LAST_INTERSTITIAL_KEY;
+export { INTERSTITIAL_COOLDOWN_MS };
 
 function readLastAdTime(): number {
   if (typeof window === "undefined") return Date.now();
-  const raw =
-    window.localStorage.getItem(LAST_AD_TIME_KEY) ??
-    window.localStorage.getItem(LEGACY_CAP_KEY) ??
-    "0";
-  const value = Number(raw);
-  return Number.isFinite(value) ? value : 0;
+  const keys = [LAST_AD_TIME_KEY, ...LEGACY_INTERSTITIAL_KEYS];
+  // The newest timestamp across current and legacy keys wins, so an app upgrade
+  // can never accidentally reset the cooldown and show back-to-back ads.
+  const newest = keys.reduce((max, key) => {
+    const value = Number(window.localStorage.getItem(key) ?? "0");
+    return Number.isFinite(value) && value > max ? value : max;
+  }, 0);
+  return newest;
 }
 
 /** Frequency cap: at most one interstitial every 120 seconds per user. */
@@ -268,7 +272,6 @@ export function markInterstitialShown() {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(LAST_AD_TIME_KEY, String(Date.now()));
 }
-
 
 // ==================== OWNER AD EARNINGS ====================
 

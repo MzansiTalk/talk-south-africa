@@ -2,6 +2,7 @@ import { Flag, Gift, Info, Volume2, VolumeX, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { BANNER_SAFE_AREA_CLASS, MAX_BANNERS_PER_SCREEN } from "@/config/ads";
 import {
   canShowInterstitial,
   logAdClick,
@@ -13,7 +14,6 @@ import {
   type AdPlacementSlot,
   type AdTarget,
 } from "@/lib/ads";
-
 
 /**
  * Meta Audience Network ad surfaces.
@@ -109,13 +109,13 @@ export function WhyThisAdButton() {
             <h3 className="text-sm font-bold">Why am I seeing this ad?</h3>
             <p className="mt-2 text-xs text-muted-foreground">
               MzansiTalk is free to use and is paid for by ads served through Meta Audience Network.
-              Meta chooses which ad to show using limited device and ad-interaction signals — such as
-              your general location, device type and how you interact with ads — not your private
+              Meta chooses which ad to show using limited device and ad-interaction signals — such
+              as your general location, device type and how you interact with ads — not your private
               messages or your personal MzansiTalk content.
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
-              You can report any ad that breaks policy, and you can read more in our Privacy Policy and
-              Community Guidelines in Settings.
+              You can report any ad that breaks policy, and you can read more in our Privacy Policy
+              and Community Guidelines in Settings.
             </p>
             <button
               type="button"
@@ -140,7 +140,6 @@ export function AdControls({ placement }: { placement: AdPlacementSlot }) {
     </div>
   );
 }
-
 
 /** Autoplaying ad video surface with a mute/unmute control. Never asks permission. */
 function AdVideoSurface({ label, unit }: { label: string; unit: string | null }) {
@@ -198,9 +197,32 @@ function AdVideoSurface({ label, unit }: { label: string; unit: string | null })
 }
 
 /**
+ * Tracks how many banners are mounted so Meta's "max one banner per screen"
+ * rule is enforced structurally: the second banner on a screen renders nothing.
+ */
+let mountedBanners = 0;
+
+function useBannerSlot(): boolean {
+  const [allowed, setAllowed] = useState(false);
+  useEffect(() => {
+    if (mountedBanners >= MAX_BANNERS_PER_SCREEN) return;
+    mountedBanners += 1;
+    setAllowed(true);
+    return () => {
+      mountedBanners -= 1;
+    };
+  }, []);
+  return allowed;
+}
+
+/**
  * Meta Audience Network banner placeholder. Used on the Home feed, Reels,
  * profile and search. Renders nothing at all when banners are off, so the
  * content simply expands into the space — never an empty white box.
+ *
+ * Placement rules enforced here: at most one banner per screen, and at least
+ * 16px of clear space on every side so it can never sit against a Like, Buy or
+ * any other tappable app control.
  */
 export function MetaBannerAd({
   placement = "home_banner",
@@ -212,9 +234,12 @@ export function MetaBannerAd({
   const { canShow, config, isTestDevice } = useAds();
   const click = useImpression(placement, target ?? {});
   const unit = placementId(config, "banner");
-  if (!canShow("banner")) return null;
+  const hasSlot = useBannerSlot();
+  if (!canShow("banner") || !hasSlot) return null;
   return (
-    <div className="rounded-xl border border-dashed border-border bg-muted/60 p-2 text-center">
+    <div
+      className={`${BANNER_SAFE_AREA_CLASS} rounded-xl border border-dashed border-border bg-muted/60 text-center`}
+    >
       <button
         type="button"
         onClick={click}
@@ -297,7 +322,6 @@ export function CommentsAd({ target }: { target?: AdTarget }) {
     </div>
   );
 }
-
 
 /**
  * 5 second autoplaying ad inserted between status stories.
@@ -422,8 +446,6 @@ export function InterstitialAd({
   );
 }
 
-
-
 /**
  * Shows an interstitial after every 3rd reel or video the member watches,
  * capped at one interstitial per 2 minutes.
@@ -477,7 +499,6 @@ export function MetaRewardedAd({
     void logAdImpression("rewarded_boost", "meta").catch(() => undefined);
     setGranted(true);
     onReward();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onReward]);
 
   useEffect(() => {
@@ -559,7 +580,6 @@ export function MetaRewardedAd({
     </>
   );
 }
-
 
 /** Boost checkout keeps its own reward wording. */
 export function RewardedAdButton({

@@ -44,27 +44,52 @@ function PrivacyPage() {
       <Section title="What we collect">
         <p>
           Your name, username, email address, profile photo and the posts, reels, status updates,
-          comments and messages you choose to create. We also keep basic activity counts such as views,
-          likes and ad impressions so creator earnings can be calculated.
+          comments and messages you choose to create. We also keep basic activity counts such as
+          views, likes and ad impressions so creator earnings can be calculated.
         </p>
       </Section>
 
       <Section title="In-App Purchases">
         <p>
-          MzansiTalk offers in-app purchases — for example Boost Live, coin packs and a monthly premium
-          plan. Payments are processed by our payment provider (Paystack on the web, and Google Play
-          Billing inside the Android app). We never see or store your card or bank details; we only
-          store the purchase record, the amount and whether it succeeded.
+          MzansiTalk sells digital items — Boost Live (R50), 100 Coins (R29) and Premium Monthly
+          (R29 per month) — exclusively through <strong>Google Play Billing</strong>. Google Play
+          processes the payment; we never see or store your card or bank details, only the purchase
+          record, the amount and whether it succeeded. Cards through our payment provider are used
+          only for advertiser and sponsored-placement invoices, never for in-app digital items.
         </p>
+      </Section>
+
+      <Section title="Advertising Partners">
+        <p>
+          We use <strong>Meta Audience Network</strong>. Meta may collect data to show personalized
+          ads. See Meta&apos;s Data Policy:{" "}
+          <a
+            href="https://www.facebook.com/about/privacy"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="font-semibold text-gold underline"
+          >
+            https://www.facebook.com/about/privacy
+          </a>
+          .
+        </p>
+        {/*
+          Play Console Data Safety declaration for this app:
+          - Device or other IDs: "Device ID, Advertising ID collected by Meta" (Meta Audience Network),
+            used for Advertising or marketing and Analytics; collected, not shared for sale; not optional.
+          - Purchase history: collected via Google Play Billing to grant coins, Boost Live and Premium.
+          - Photos/videos, messages and profile info: collected as app functionality (user-generated content).
+          - Data is encrypted in transit; users can request account deletion from Settings → Support.
+        */}
       </Section>
 
       <Section title="Advertising — Meta Audience Network">
         <p>
-          Ads in MzansiTalk are served by <strong>Meta Audience Network</strong> (Meta Platforms, Inc.),
-          which acts as an advertising partner and data processor for ad delivery and measurement. Meta
-          Audience Network may collect limited device and ad-interaction data — such as device type,
-          operating system, coarse location, IP address, advertising identifier and whether you viewed or
-          tapped an ad — to select, deliver, cap and measure ads.
+          Ads in MzansiTalk are served by <strong>Meta Audience Network</strong> (Meta Platforms,
+          Inc.), which acts as an advertising partner and data processor for ad delivery and
+          measurement. Meta Audience Network may collect limited device and ad-interaction data —
+          such as device type, operating system, coarse location, IP address, advertising identifier
+          and whether you viewed or tapped an ad — to select, deliver, cap and measure ads.
         </p>
         <p>
           Meta&apos;s handling of that data is governed by Meta&apos;s own policies:{" "}
@@ -97,33 +122,33 @@ function PrivacyPage() {
           . Google AdMob is not used anywhere in this app.
         </p>
         <p>
-          We do not share your private messages, your contacts or your MzansiTalk account content with
-          Meta for advertising. Ads are not shown to banned accounts, are never placed on flagged content,
-          and are paused completely while a live stream is running.
+          We do not share your private messages, your contacts or your MzansiTalk account content
+          with Meta for advertising. Ads are not shown to banned accounts, are never placed on
+          flagged content, and are paused completely while a live stream is running.
         </p>
         <p>
-          Every ad surface has a &quot;Why am I seeing this ad?&quot; explanation and a
-          &quot;Report ad&quot; button. Reports are stored so the owner can review and remove ads that
-          break policy. Rewards for rewarded ads are only granted after an ad has been watched in full.
+          Every ad surface has a &quot;Why am I seeing this ad?&quot; explanation and a &quot;Report
+          ad&quot; button. Reports are stored so the owner can review and remove ads that break
+          policy. Rewards for rewarded ads are only granted after an ad has been watched in full.
         </p>
       </Section>
 
       <Section title="Community Guidelines">
         <p>
           Content on MzansiTalk must follow our{" "}
-          <Link to="/community-guidelines" className="font-semibold text-gold underline">
+          <Link to="/guidelines" className="font-semibold text-gold underline">
             Community Guidelines
           </Link>
-          . Content that breaks them is removed, is not monetised, and earns strikes that can lead to a
-          ban.
+          . Content that breaks them is removed, is not monetised, and earns strikes that can lead
+          to a ban.
         </p>
       </Section>
 
       <Section title="Who can see your data">
         <p>
           Other members see what you post publicly. Only you can see your private messages and your
-          own earnings. Only the owner and approved admins can see moderation reports, payout requests
-          and platform totals.
+          own earnings. Only the owner and approved admins can see moderation reports, payout
+          requests and platform totals.
         </p>
       </Section>
 

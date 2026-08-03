@@ -1,6 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Bell, BellOff, CreditCard, Crown, LifeBuoy, LogOut, Moon, ScrollText, ShieldCheck, ShieldOff, Sparkles, Sun } from "lucide-react";
+import {
+  Bell,
+  BellOff,
+  Coins,
+  CreditCard,
+  Crown,
+  LifeBuoy,
+  LogOut,
+  Moon,
+  RotateCcw,
+  ScrollText,
+  ShieldCheck,
+  ShieldOff,
+  Sparkles,
+  Sun,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
@@ -13,8 +28,8 @@ import {
   setBlock,
   setNotificationsEnabled,
 } from "@/lib/api";
+import { fetchEntitlements, restorePurchases } from "@/lib/billing";
 import { useTheme } from "@/lib/theme";
-
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -63,6 +78,21 @@ function SettingsPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  const wallet = useQuery({ queryKey: ["entitlements"], queryFn: fetchEntitlements });
+
+  /** Re-applies Google Play purchases (coins, Premium, Boost Live) on this device. */
+  const restore = useMutation({
+    mutationFn: restorePurchases,
+    onSuccess: ({ restored, entitlements }) => {
+      queryClient.setQueryData(["entitlements"], entitlements);
+      toast.success(
+        restored > 0
+          ? `Restored ${restored} purchase${restored === 1 ? "" : "s"} from Google Play.`
+          : "No purchases found on this Google Play account.",
+      );
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
 
   const signOut = async () => {
     await queryClient.cancelQueries();
@@ -156,8 +186,6 @@ function SettingsPage() {
         )}
       </section>
 
-
-
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold">Blocked Users</h2>
         {(blocked.data ?? []).length === 0 ? (
@@ -182,9 +210,34 @@ function SettingsPage() {
       </section>
 
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
-        <h2 className="text-sm font-bold">Payments</h2>
+        <h2 className="text-sm font-bold">Purchases</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Manage the cards you use to pay for boosts.
+          Boost Live, coin packs and Premium are digital items sold through Google Play Billing.
+          {wallet.data?.premium_active
+            ? " Premium is active — ads are off and your verified badge is on."
+            : ` You have ${wallet.data?.coins ?? 0} coins.`}
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link to="/get-coins" className="btn-base btn-primary">
+            <Coins className="size-4" /> Get Coins &amp; Premium
+          </Link>
+          <button
+            type="button"
+            disabled={restore.isPending}
+            onClick={() => restore.mutate()}
+            className="btn-base bg-secondary text-secondary-foreground disabled:opacity-60"
+          >
+            <RotateCcw className="size-4" />
+            {restore.isPending ? "Restoring…" : "Restore Purchases"}
+          </button>
+        </div>
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold">Advertiser payments</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Cards are only used for advertiser and sponsored-placement invoices, never for in-app
+          digital items.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Link to="/payment-methods" className="btn-base bg-secondary text-secondary-foreground">
@@ -211,15 +264,19 @@ function SettingsPage() {
           <ShieldCheck className="size-4" /> Privacy Policy
         </Link>
         <Link
-          to="/community-guidelines"
+          to="/guidelines"
+
           className="btn-base mt-2 bg-secondary text-secondary-foreground"
         >
           <ScrollText className="size-4" /> Community Guidelines
         </Link>
       </section>
 
-
-      <button type="button" onClick={signOut} className="btn-base mt-4 w-full bg-destructive text-destructive-foreground">
+      <button
+        type="button"
+        onClick={signOut}
+        className="btn-base mt-4 w-full bg-destructive text-destructive-foreground"
+      >
         <LogOut className="size-4" /> Log Out
       </button>
     </Screen>
