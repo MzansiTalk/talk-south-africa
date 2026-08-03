@@ -24,6 +24,8 @@ const config: CapacitorConfig = {
       showSpinner: false,
       launchAutoHide: true,
     },
+  },
 };
+
 
 export default config;
