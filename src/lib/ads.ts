@@ -1,6 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
+import {
+  INTERSTITIAL_COOLDOWN_MS,
+  LAST_INTERSTITIAL_KEY,
+  LEGACY_INTERSTITIAL_KEYS,
+} from "@/config/ads";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyRoles, getCurrentUserId, getMyEmail, OWNER_EMAIL } from "@/lib/api";
 
