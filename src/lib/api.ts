@@ -144,7 +144,12 @@ async function hydrate(rows: Post[]): Promise<FeedItem[]> {
 }
 
 export async function fetchFeed(kind?: ContentKind): Promise<FeedItem[]> {
-  let query = supabase.from("posts").select("*").order("created_at", { ascending: false }).limit(60);
+  let query = supabase
+    .from("posts")
+    .select("*")
+    .eq("moderation_status", "approved")
+    .order("created_at", { ascending: false })
+    .limit(60);
   if (kind) query = query.eq("kind", kind);
   const { data, error } = await query;
   if (error) throw error;
