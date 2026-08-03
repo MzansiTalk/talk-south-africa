@@ -1231,3 +1231,16 @@ export async function sharePostToTimeline(postId: string, caption: string) {
   });
   if (error) throw error;
 }
+
+/** Posts the signed-in member has liked, newest first. */
+export async function fetchLiked(): Promise<FeedItem[]> {
+  const userId = await getCurrentUserId();
+  if (!userId) return [];
+  const { data, error } = await supabase.from("likes").select("post_id").eq("user_id", userId);
+  if (error) throw error;
+  const ids = (data ?? []).map((row) => row.post_id);
+  if (ids.length === 0) return [];
+  const posts = await supabase.from("posts").select("*").in("id", ids);
+  if (posts.error) throw posts.error;
+  return hydrate((posts.data ?? []) as Post[]);
+}
