@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/admin/payment-settings")({
       {
         name: "description",
         content:
-          "Owner-only MzansiTalk money control centre: AdMob ad revenue keys, Paystack sponsored and boost payments, and your own pricing.",
+          "Owner-only MzansiTalk money control centre: Meta Audience Network ad keys, Paystack sponsored and boost payments, and your own pricing.",
       },
       { property: "og:title", content: "Owner Money Center — MzansiTalk" },
       { property: "og:description", content: "One page to control every way MzansiTalk earns money." },
