@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Flame, ShieldAlert } from "lucide-react";
+import { BadgeCheck, Flame, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
 import { Screen, useIsAdmin } from "@/components/Shell";
+import { setMonetizationApproved } from "@/lib/live";
 import { fetchMembers, setBanned, setViral } from "@/lib/moderation";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
@@ -52,6 +53,18 @@ function UserManagerPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  const monetize = useMutation({
+    mutationFn: (input: { userId: string; approved: boolean }) =>
+      setMonetizationApproved(input.userId, input.approved),
+    onSuccess: (_result, input) => {
+      toast.success(
+        input.approved ? "Monetization approved — they now earn 20%." : "Monetization removed.",
+      );
+      refresh();
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
   const ban = useMutation({
     mutationFn: (input: { userId: string; banned: boolean }) =>
       setBanned(input.userId, input.banned, input.banned ? "Banned by Owner" : undefined),
@@ -83,7 +96,9 @@ function UserManagerPage() {
       />
 
       <ul className="mt-3 space-y-2">
-        {(members.data ?? []).map((member) => (
+        {(members.data ?? []).map((member) => {
+          const approved = Boolean((member as { monetization_approved?: boolean }).monetization_approved);
+          return (
           <li key={member.id} className="rounded-2xl border border-border bg-card p-3">
             <div className="flex items-center gap-3">
               <Avatar path={member.avatar_url} name={member.name} size={36} />
@@ -96,6 +111,7 @@ function UserManagerPage() {
                   Strikes: {member.strikes ?? 0}/3
                   {member.is_banned ? " · BANNED" : ""}
                   {member.is_viral ? " · Viral ON" : ""}
+                  {approved ? " · Monetized" : ""}
                 </p>
               </div>
             </div>
@@ -109,6 +125,17 @@ function UserManagerPage() {
               >
                 <Flame className="size-3.5" /> Viral {member.is_viral ? "ON" : "OFF"}
               </button>
+              {isOwner ? (
+                <button
+                  type="button"
+                  onClick={() => monetize.mutate({ userId: member.id, approved: !approved })}
+                  className={`btn-base px-3 py-1.5 text-xs ${
+                    approved ? "btn-primary" : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  <BadgeCheck className="size-3.5" /> Monetization {approved ? "ON" : "OFF"}
+                </button>
+              ) : null}
               {isOwner ? (
                 <button
                   type="button"
@@ -128,7 +155,8 @@ function UserManagerPage() {
               )}
             </div>
           </li>
-        ))}
+          );
+        })}
         {(members.data ?? []).length === 0 ? (
           <li className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
             No members found.

@@ -19,6 +19,7 @@ import { Route as AuthenticatedAdvertiseRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAppealRouteImport } from './routes/_authenticated/appeal'
 import { Route as AuthenticatedCreateRouteImport } from './routes/_authenticated/create'
 import { Route as AuthenticatedCreatorProgramRouteImport } from './routes/_authenticated/creator-program'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedMyBoostsRouteImport } from './routes/_authenticated/my-boosts'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
@@ -47,6 +48,8 @@ import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedBoostPostIdRouteImport } from './routes/_authenticated/boost.$postId'
 import { Route as AuthenticatedChatIndexRouteImport } from './routes/_authenticated/chat.index'
 import { Route as AuthenticatedChatIdRouteImport } from './routes/_authenticated/chat.$id'
+import { Route as AuthenticatedLiveIndexRouteImport } from './routes/_authenticated/live.index'
+import { Route as AuthenticatedLiveIdRouteImport } from './routes/_authenticated/live.$id'
 import { Route as AuthenticatedUUsernameRouteImport } from './routes/_authenticated/u.$username'
 
 const IndexRoute = IndexRouteImport.update({
@@ -99,6 +102,11 @@ const AuthenticatedCreatorProgramRoute =
     path: '/creator-program',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -254,6 +262,16 @@ const AuthenticatedChatIdRoute = AuthenticatedChatIdRouteImport.update({
   path: '/chat/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLiveIndexRoute = AuthenticatedLiveIndexRouteImport.update({
+  id: '/live/',
+  path: '/live/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLiveIdRoute = AuthenticatedLiveIdRouteImport.update({
+  id: '/live/$id',
+  path: '/live/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedUUsernameRoute = AuthenticatedUUsernameRouteImport.update({
   id: '/u/$username',
   path: '/u/$username',
@@ -270,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/appeal': typeof AuthenticatedAppealRoute
   '/create': typeof AuthenticatedCreateRoute
   '/creator-program': typeof AuthenticatedCreatorProgramRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/home': typeof AuthenticatedHomeRoute
   '/my-boosts': typeof AuthenticatedMyBoostsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -296,9 +315,11 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/boost/$postId': typeof AuthenticatedBoostPostIdRoute
   '/chat/$id': typeof AuthenticatedChatIdRoute
+  '/live/$id': typeof AuthenticatedLiveIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/chat/': typeof AuthenticatedChatIndexRoute
+  '/live/': typeof AuthenticatedLiveIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -310,6 +331,7 @@ export interface FileRoutesByTo {
   '/appeal': typeof AuthenticatedAppealRoute
   '/create': typeof AuthenticatedCreateRoute
   '/creator-program': typeof AuthenticatedCreatorProgramRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/home': typeof AuthenticatedHomeRoute
   '/my-boosts': typeof AuthenticatedMyBoostsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -336,9 +358,11 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/boost/$postId': typeof AuthenticatedBoostPostIdRoute
   '/chat/$id': typeof AuthenticatedChatIdRoute
+  '/live/$id': typeof AuthenticatedLiveIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/chat': typeof AuthenticatedChatIndexRoute
+  '/live': typeof AuthenticatedLiveIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -352,6 +376,7 @@ export interface FileRoutesById {
   '/_authenticated/appeal': typeof AuthenticatedAppealRoute
   '/_authenticated/create': typeof AuthenticatedCreateRoute
   '/_authenticated/creator-program': typeof AuthenticatedCreatorProgramRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/my-boosts': typeof AuthenticatedMyBoostsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
@@ -378,9 +403,11 @@ export interface FileRoutesById {
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/boost/$postId': typeof AuthenticatedBoostPostIdRoute
   '/_authenticated/chat/$id': typeof AuthenticatedChatIdRoute
+  '/_authenticated/live/$id': typeof AuthenticatedLiveIdRoute
   '/_authenticated/u/$username': typeof AuthenticatedUUsernameRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/chat/': typeof AuthenticatedChatIndexRoute
+  '/_authenticated/live/': typeof AuthenticatedLiveIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -394,6 +421,7 @@ export interface FileRouteTypes {
     | '/appeal'
     | '/create'
     | '/creator-program'
+    | '/dashboard'
     | '/home'
     | '/my-boosts'
     | '/notifications'
@@ -420,9 +448,11 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/boost/$postId'
     | '/chat/$id'
+    | '/live/$id'
     | '/u/$username'
     | '/admin/'
     | '/chat/'
+    | '/live/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -434,6 +464,7 @@ export interface FileRouteTypes {
     | '/appeal'
     | '/create'
     | '/creator-program'
+    | '/dashboard'
     | '/home'
     | '/my-boosts'
     | '/notifications'
@@ -460,9 +491,11 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/boost/$postId'
     | '/chat/$id'
+    | '/live/$id'
     | '/u/$username'
     | '/admin'
     | '/chat'
+    | '/live'
   id:
     | '__root__'
     | '/'
@@ -475,6 +508,7 @@ export interface FileRouteTypes {
     | '/_authenticated/appeal'
     | '/_authenticated/create'
     | '/_authenticated/creator-program'
+    | '/_authenticated/dashboard'
     | '/_authenticated/home'
     | '/_authenticated/my-boosts'
     | '/_authenticated/notifications'
@@ -501,9 +535,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users'
     | '/_authenticated/boost/$postId'
     | '/_authenticated/chat/$id'
+    | '/_authenticated/live/$id'
     | '/_authenticated/u/$username'
     | '/_authenticated/admin/'
     | '/_authenticated/chat/'
+    | '/_authenticated/live/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -586,6 +622,13 @@ declare module '@tanstack/react-router' {
       path: '/creator-program'
       fullPath: '/creator-program'
       preLoaderRoute: typeof AuthenticatedCreatorProgramRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/home': {
@@ -784,6 +827,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChatIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/live/': {
+      id: '/_authenticated/live/'
+      path: '/live'
+      fullPath: '/live/'
+      preLoaderRoute: typeof AuthenticatedLiveIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/live/$id': {
+      id: '/_authenticated/live/$id'
+      path: '/live/$id'
+      fullPath: '/live/$id'
+      preLoaderRoute: typeof AuthenticatedLiveIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/u/$username': {
       id: '/_authenticated/u/$username'
       path: '/u/$username'
@@ -799,6 +856,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppealRoute: typeof AuthenticatedAppealRoute
   AuthenticatedCreateRoute: typeof AuthenticatedCreateRoute
   AuthenticatedCreatorProgramRoute: typeof AuthenticatedCreatorProgramRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedMyBoostsRoute: typeof AuthenticatedMyBoostsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
@@ -824,9 +882,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedBoostPostIdRoute: typeof AuthenticatedBoostPostIdRoute
   AuthenticatedChatIdRoute: typeof AuthenticatedChatIdRoute
+  AuthenticatedLiveIdRoute: typeof AuthenticatedLiveIdRoute
   AuthenticatedUUsernameRoute: typeof AuthenticatedUUsernameRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedChatIndexRoute: typeof AuthenticatedChatIndexRoute
+  AuthenticatedLiveIndexRoute: typeof AuthenticatedLiveIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -834,6 +894,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppealRoute: AuthenticatedAppealRoute,
   AuthenticatedCreateRoute: AuthenticatedCreateRoute,
   AuthenticatedCreatorProgramRoute: AuthenticatedCreatorProgramRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedMyBoostsRoute: AuthenticatedMyBoostsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
@@ -860,9 +921,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedBoostPostIdRoute: AuthenticatedBoostPostIdRoute,
   AuthenticatedChatIdRoute: AuthenticatedChatIdRoute,
+  AuthenticatedLiveIdRoute: AuthenticatedLiveIdRoute,
   AuthenticatedUUsernameRoute: AuthenticatedUUsernameRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedChatIndexRoute: AuthenticatedChatIndexRoute,
+  AuthenticatedLiveIndexRoute: AuthenticatedLiveIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

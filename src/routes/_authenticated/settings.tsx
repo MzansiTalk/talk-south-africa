@@ -108,6 +108,19 @@ function SettingsPage() {
       </section>
 
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold">My Dashboard</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          See your ad views, clicks and your own 20% earnings share.
+        </p>
+        <Link to="/dashboard" className="btn-base btn-primary mt-3">
+          Open Dashboard
+        </Link>
+        <Link to="/profile" className="btn-base mt-2 bg-secondary text-secondary-foreground">
+          Open My Profile
+        </Link>
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold">Creator Program</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Track your views and invites, apply, and request payouts (20% you / 80% MzansiTalk).
