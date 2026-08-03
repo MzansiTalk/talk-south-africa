@@ -1,4 +1,4 @@
-import { Flag, Gift, Volume2, VolumeX, X } from "lucide-react";
+import { Flag, Gift, Info, Volume2, VolumeX, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -13,6 +13,7 @@ import {
   type AdPlacementSlot,
   type AdTarget,
 } from "@/lib/ads";
+
 
 /**
  * Meta Audience Network ad surfaces.
@@ -77,6 +78,69 @@ export function ReportAdButton({ placement }: { placement: AdPlacementSlot }) {
     </button>
   );
 }
+
+/** Meta transparency requirement: members can always ask why an ad was shown. */
+export function WhyThisAdButton() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          setOpen(true);
+        }}
+        className="inline-flex items-center gap-1 text-[0.65rem] font-semibold text-muted-foreground underline"
+      >
+        <Info className="size-3" /> Why am I seeing this ad?
+      </button>
+      {open ? (
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 p-4"
+          role="presentation"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl border border-border bg-card p-4 text-left"
+            role="dialog"
+            aria-label="Why am I seeing this ad?"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h3 className="text-sm font-bold">Why am I seeing this ad?</h3>
+            <p className="mt-2 text-xs text-muted-foreground">
+              MzansiTalk is free to use and is paid for by ads served through Meta Audience Network.
+              Meta chooses which ad to show using limited device and ad-interaction signals — such as
+              your general location, device type and how you interact with ads — not your private
+              messages or your personal MzansiTalk content.
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              You can report any ad that breaks policy, and you can read more in our Privacy Policy and
+              Community Guidelines in Settings.
+            </p>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="btn-base btn-primary mt-3 w-full"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+/** Standard control row shown under every Meta ad surface. */
+export function AdControls({ placement }: { placement: AdPlacementSlot }) {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-3">
+      <WhyThisAdButton />
+      <ReportAdButton placement={placement} />
+    </div>
+  );
+}
+
 
 /** Autoplaying ad video surface with a mute/unmute control. Never asks permission. */
 function AdVideoSurface({ label, unit }: { label: string; unit: string | null }) {
@@ -145,7 +209,7 @@ export function MetaBannerAd({
   placement?: AdPlacementSlot;
   target?: AdTarget;
 }) {
-  const { canShow, config } = useAds();
+  const { canShow, config, isTestDevice } = useAds();
   const click = useImpression(placement, target ?? {});
   const unit = placementId(config, "banner");
   if (!canShow("banner")) return null;
@@ -156,9 +220,13 @@ export function MetaBannerAd({
         onClick={click}
         className="flex h-12 w-full items-center justify-center text-xs font-semibold uppercase tracking-wide text-muted-foreground"
       >
-        {unit ? "Meta Audience Network banner" : "Meta banner placement"}
+        {isTestDevice
+          ? "Meta test banner (admin test device)"
+          : unit
+            ? "Meta Audience Network banner"
+            : "Meta banner placement"}
       </button>
-      <ReportAdButton placement={placement} />
+      <AdControls placement={placement} />
     </div>
   );
 }
@@ -168,7 +236,7 @@ export const BannerAd = MetaBannerAd;
 
 /** Native ad automatically placed every 5 posts in the Home feed. */
 export function NativeAd({ target }: { target?: AdTarget }) {
-  const { canShow, config } = useAds();
+  const { canShow, config, isTestDevice } = useAds();
   const click = useImpression("home_native", target ?? {});
   const unit = placementId(config, "native");
   if (!canShow("native")) return null;
@@ -179,13 +247,15 @@ export function NativeAd({ target }: { target?: AdTarget }) {
           Sponsored · Advertisement
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          {unit
-            ? "Meta Audience Network native ad. Tap to visit the advertiser."
-            : "Meta native ad slot. Add your Meta placement id in Owner Money Center."}
+          {isTestDevice
+            ? "Meta test native ad (admin test device)."
+            : unit
+              ? "Meta Audience Network native ad. Tap to visit the advertiser."
+              : "Meta native ad slot. Add your Meta placement id in Owner Money Center."}
         </p>
       </button>
       <div className="mt-2">
-        <ReportAdButton placement="home_native" />
+        <AdControls placement="home_native" />
       </div>
     </div>
   );
@@ -203,7 +273,7 @@ export function VideoAd({ target }: { target?: AdTarget }) {
         <AdVideoSurface label="Video Advertisement" unit={unit} />
       </div>
       <div className="mt-1 text-center">
-        <ReportAdButton placement="reel_video" />
+        <AdControls placement="reel_video" />
       </div>
     </div>
   );
@@ -215,15 +285,19 @@ export function CommentsAd({ target }: { target?: AdTarget }) {
   const click = useImpression("comments_banner", target ?? {});
   if (!canShow("banner")) return null;
   return (
-    <button
-      type="button"
-      onClick={click}
-      className="mb-3 flex h-12 w-full items-center justify-center rounded-xl border border-dashed border-gold/50 bg-muted/60 text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground"
-    >
-      Sponsored · Meta Audience Network
-    </button>
+    <div className="mb-3 rounded-xl border border-dashed border-gold/50 bg-muted/60 p-2 text-center">
+      <button
+        type="button"
+        onClick={click}
+        className="flex h-10 w-full items-center justify-center text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground"
+      >
+        Sponsored · Meta Audience Network
+      </button>
+      <AdControls placement="comments_banner" />
+    </div>
   );
 }
+
 
 /**
  * 5 second autoplaying ad inserted between status stories.
@@ -267,7 +341,9 @@ export function StatusAd({ target, onDone }: { target?: AdTarget; onDone?: () =>
       <div className="mt-2 flex items-center justify-between text-xs">
         <span className="text-muted-foreground">Sponsored status · {seconds}s</span>
         <div className="flex items-center gap-3">
+          <WhyThisAdButton />
           <ReportAdButton placement="status_ad" />
+
           <button
             type="button"
             disabled={seconds > 2}
@@ -287,7 +363,7 @@ export function StatusAd({ target, onDone }: { target?: AdTarget; onDone?: () =>
 
 /**
  * Full screen autoplaying interstitial. The skip button unlocks after 3 seconds.
- * Respects the 1-per-2-minutes frequency cap.
+ * Hard-enforces the 120 second frequency cap and never runs during a live stream.
  */
 export function InterstitialAd({
   onClose,
@@ -299,21 +375,34 @@ export function InterstitialAd({
   placement?: AdPlacementSlot;
 }) {
   const [seconds, setSeconds] = useState(3);
-  const { config } = useAds();
+  const { config, canShow, isTestDevice } = useAds();
   const click = useImpression(placement, target ?? {});
   const unit = placementId(config, "interstitial");
+  // Checked once on mount: markInterstitialShown() below would otherwise close the gate itself.
+  const allowedRef = useRef<boolean | null>(null);
+  if (allowedRef.current === null) allowedRef.current = canShowInterstitial();
+  const allowed = allowedRef.current === true;
 
   useEffect(() => {
+    if (!allowed) {
+      onClose();
+      return;
+    }
     markInterstitialShown();
     const timer = window.setInterval(() => {
       setSeconds((current) => (current <= 1 ? 0 : current - 1));
     }, 1000);
     return () => window.clearInterval(timer);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allowed]);
+
+  if (!allowed || !canShow("interstitial")) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-6 text-center">
-      <p className="text-xs font-bold uppercase tracking-widest text-gold">Advertisement</p>
+      <p className="text-xs font-bold uppercase tracking-widest text-gold">
+        {isTestDevice ? "Test Advertisement" : "Advertisement"}
+      </p>
       <div className="mt-4 w-full max-w-sm" role="presentation" onClick={click}>
         <AdVideoSurface label="Meta Interstitial" unit={unit} />
       </div>
@@ -327,11 +416,13 @@ export function InterstitialAd({
         <X className="size-4" />
       </button>
       <div className="mt-3">
-        <ReportAdButton placement={placement} />
+        <AdControls placement={placement} />
       </div>
     </div>
   );
 }
+
+
 
 /**
  * Shows an interstitial after every 3rd reel or video the member watches,
@@ -354,9 +445,12 @@ export function useInterstitialAfterEvery(watched: number, every = 3) {
   return { open, close: () => setOpen(false) };
 }
 
+const REWARDED_LENGTH_SECONDS = 5;
+
 /**
- * Meta Audience Network rewarded placeholder: watch a full ad to unlock a reward.
- * Used for "Watch ad to get 5 free coins" and for the 2x boost discount.
+ * Meta Audience Network rewarded placeholder: the reward is granted ONLY through the
+ * onRewarded callback, which fires after the ad has been watched 100% to the end.
+ * Closing the ad early aborts it and grants nothing.
  */
 export function MetaRewardedAd({
   onReward,
@@ -369,9 +463,22 @@ export function MetaRewardedAd({
   label?: string;
   rewardedLabel?: string;
 }) {
-  const { canShow } = useAds();
+  const { canShow, isTestDevice } = useAds();
   const [watching, setWatching] = useState(false);
-  const [seconds, setSeconds] = useState(5);
+  const [seconds, setSeconds] = useState(REWARDED_LENGTH_SECONDS);
+  const [granted, setGranted] = useState(false);
+  /** Guards against double-granting from a re-run timer. */
+  const grantedRef = useRef(false);
+
+  /** Fired only when the ad reached 100% of its length. */
+  const onRewarded = useCallback(() => {
+    if (grantedRef.current) return;
+    grantedRef.current = true;
+    void logAdImpression("rewarded_boost", "meta").catch(() => undefined);
+    setGranted(true);
+    onReward();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onReward]);
 
   useEffect(() => {
     if (!watching) return;
@@ -380,8 +487,7 @@ export function MetaRewardedAd({
         if (current <= 1) {
           window.clearInterval(timer);
           setWatching(false);
-          void logAdImpression("rewarded_boost", "meta").catch(() => undefined);
-          onReward();
+          onRewarded();
           return 0;
         }
         return current - 1;
@@ -393,7 +499,7 @@ export function MetaRewardedAd({
 
   if (!canShow("rewarded")) return null;
 
-  if (rewarded) {
+  if (rewarded || granted) {
     return (
       <p className="mt-3 rounded-xl border border-gold/50 bg-gold/10 p-3 text-xs font-semibold text-gold">
         {rewardedLabel}
@@ -401,33 +507,59 @@ export function MetaRewardedAd({
     );
   }
 
+  const watchedPercent = Math.round(
+    ((REWARDED_LENGTH_SECONDS - seconds) / REWARDED_LENGTH_SECONDS) * 100,
+  );
+
   return (
     <>
       <button
         type="button"
         onClick={() => {
-          setSeconds(5);
+          grantedRef.current = false;
+          setSeconds(REWARDED_LENGTH_SECONDS);
           setWatching(true);
         }}
         className="btn-base mt-3 w-full bg-secondary text-secondary-foreground"
       >
         <Gift className="size-4 text-gold" /> {label}
       </button>
+      <p className="mt-1 text-center text-[0.65rem] text-muted-foreground">
+        You must watch the full ad to receive the reward.
+      </p>
       {watching ? (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-6 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-gold">Rewarded Ad</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-gold">
+            {isTestDevice ? "Test Rewarded Ad" : "Rewarded Ad"}
+          </p>
           <div className="mt-4 w-full max-w-sm">
             <AdVideoSurface label="Rewarded Ad" unit={null} />
           </div>
-          <p className="mt-6 text-sm font-semibold">Reward in {seconds}s</p>
+          <div className="mt-4 h-1.5 w-full max-w-sm overflow-hidden rounded-full bg-white/20">
+            <div className="h-full bg-gold" style={{ width: `${watchedPercent}%` }} />
+          </div>
+          <p className="mt-3 text-sm font-semibold">Reward in {seconds}s</p>
+          <button
+            type="button"
+            onClick={() => {
+              // Abandoned early: no reward is granted.
+              setWatching(false);
+              setSeconds(REWARDED_LENGTH_SECONDS);
+              toast.info("Ad closed early — no reward was given.");
+            }}
+            className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground underline"
+          >
+            <X className="size-3" /> Close without reward
+          </button>
           <div className="mt-3">
-            <ReportAdButton placement="rewarded_boost" />
+            <AdControls placement="rewarded_boost" />
           </div>
         </div>
       ) : null}
     </>
   );
 }
+
 
 /** Boost checkout keeps its own reward wording. */
 export function RewardedAdButton({

@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { getCurrentUserId, getMyEmail, OWNER_EMAIL } from "@/lib/api";
+import { fetchMyRoles, getCurrentUserId, getMyEmail, OWNER_EMAIL } from "@/lib/api";
+
 
 export type AdNetwork = "meta";
 
@@ -72,6 +74,48 @@ export async function fetchAdEligibility(): Promise<boolean> {
   return !data?.is_banned;
 }
 
+/** Admins (test devices) must only ever be served Meta test ads. */
+export async function fetchIsTestDevice(): Promise<boolean> {
+  const roles = await fetchMyRoles();
+  return roles.includes("admin") || roles.includes("owner");
+}
+
+// ==================== LIVE STREAM AD PAUSE ====================
+
+let liveActiveCount = 0;
+const liveListeners = new Set<() => void>();
+
+function emitLive() {
+  for (const listener of liveListeners) listener();
+}
+
+/**
+ * Meta policy: no ads may be served on top of an active live stream.
+ * Live screens call this on mount/unmount so every ad surface goes quiet.
+ */
+export function useAdsPausedForLive(isLive: boolean) {
+  useEffect(() => {
+    if (!isLive) return;
+    liveActiveCount += 1;
+    emitLive();
+    return () => {
+      liveActiveCount = Math.max(0, liveActiveCount - 1);
+      emitLive();
+    };
+  }, [isLive]);
+}
+
+export function useIsLiveActive() {
+  return useSyncExternalStore(
+    (listener) => {
+      liveListeners.add(listener);
+      return () => liveListeners.delete(listener);
+    },
+    () => liveActiveCount > 0,
+    () => false,
+  );
+}
+
 type AdType = "banner" | "interstitial" | "rewarded" | "native";
 
 /** Central switchboard for every ad slot in the app. */
@@ -82,20 +126,47 @@ export function useAds() {
     queryFn: fetchAdEligibility,
     staleTime: 300_000,
   });
+  const testDevice = useQuery({
+    queryKey: ["ad-test-device"],
+    queryFn: fetchIsTestDevice,
+    staleTime: 300_000,
+  });
+  const liveActive = useIsLiveActive();
 
   const cfg = config.data ?? DEFAULT_CONFIG;
   const allowed = eligible.data === true;
+  /** Admins always get Meta test ads; everyone else gets live/real ads. */
+  const isTestDevice = testDevice.data === true || cfg.test_mode;
 
   const canShow = (type: AdType) => {
     if (!allowed) return false;
+    if (liveActive) return false;
     if (type === "banner") return cfg.ads_banner_enabled;
     if (type === "interstitial") return cfg.ads_interstitial_enabled;
     if (type === "rewarded") return cfg.ads_rewarded_enabled;
     return cfg.ads_native_enabled;
   };
 
-  return { config: cfg, allowed, canShow, isLoading: config.isLoading || eligible.isLoading };
+  return {
+    config: cfg,
+    allowed,
+    canShow,
+    isTestDevice,
+    liveActive,
+    isLoading: config.isLoading || eligible.isLoading,
+  };
 }
+
+/** Small helper for surfaces that need to react to the local cooldown clock. */
+export function useInterstitialCooldown() {
+  const [ready, setReady] = useState(() => canShowInterstitial());
+  useEffect(() => {
+    const timer = window.setInterval(() => setReady(canShowInterstitial()), 5_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  return ready;
+}
+
 
 // ==================== IMPRESSIONS, CLICKS, FREQUENCY CAP ====================
 
@@ -166,20 +237,38 @@ export async function fetchCreatorAdStats(): Promise<CreatorAdStats> {
   };
 }
 
-const CAP_KEY = "mzansitalk:last-interstitial";
-export const INTERSTITIAL_COOLDOWN_MS = 2 * 60 * 1000;
+/** Persisted so the 120 second cap survives reloads and app restarts. */
+const LAST_AD_TIME_KEY = "lastAdTime";
+const LEGACY_CAP_KEY = "mzansitalk:last-interstitial";
+export const INTERSTITIAL_COOLDOWN_MS = 120_000;
 
-/** Frequency cap: at most one interstitial every 2 minutes per user. */
+function readLastAdTime(): number {
+  if (typeof window === "undefined") return Date.now();
+  const raw =
+    window.localStorage.getItem(LAST_AD_TIME_KEY) ??
+    window.localStorage.getItem(LEGACY_CAP_KEY) ??
+    "0";
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : 0;
+}
+
+/** Frequency cap: at most one interstitial every 120 seconds per user. */
 export function canShowInterstitial(): boolean {
   if (typeof window === "undefined") return false;
-  const last = Number(window.localStorage.getItem(CAP_KEY) ?? 0);
-  return Date.now() - last >= INTERSTITIAL_COOLDOWN_MS;
+  return Date.now() - readLastAdTime() >= INTERSTITIAL_COOLDOWN_MS;
+}
+
+/** Seconds left before another interstitial is allowed. */
+export function interstitialCooldownRemainingMs(): number {
+  if (typeof window === "undefined") return INTERSTITIAL_COOLDOWN_MS;
+  return Math.max(0, INTERSTITIAL_COOLDOWN_MS - (Date.now() - readLastAdTime()));
 }
 
 export function markInterstitialShown() {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(CAP_KEY, String(Date.now()));
+  window.localStorage.setItem(LAST_AD_TIME_KEY, String(Date.now()));
 }
+
 
 // ==================== OWNER AD EARNINGS ====================
 

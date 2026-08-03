@@ -58,15 +58,64 @@ function PrivacyPage() {
         </p>
       </Section>
 
-      <Section title="Meta Ads">
+      <Section title="Advertising — Meta Audience Network">
         <p>
-          Ads in MzansiTalk are served by Meta Audience Network. Meta may collect limited device and
-          ad-interaction data to choose and measure ads, subject to Meta&apos;s own privacy policy.
-          Google AdMob is not used anywhere in this app.
+          Ads in MzansiTalk are served by <strong>Meta Audience Network</strong> (Meta Platforms, Inc.),
+          which acts as an advertising partner and data processor for ad delivery and measurement. Meta
+          Audience Network may collect limited device and ad-interaction data — such as device type,
+          operating system, coarse location, IP address, advertising identifier and whether you viewed or
+          tapped an ad — to select, deliver, cap and measure ads.
         </p>
         <p>
-          Every ad has a &quot;Report ad&quot; button. Reports are stored so the owner can review and
-          remove ads that break policy.
+          Meta&apos;s handling of that data is governed by Meta&apos;s own policies:{" "}
+          <a
+            href="https://www.facebook.com/about/privacy"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="font-semibold text-gold underline"
+          >
+            Meta Privacy Policy
+          </a>
+          ,{" "}
+          <a
+            href="https://www.facebook.com/legal/technology_terms"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="font-semibold text-gold underline"
+          >
+            Meta Audience Network Terms
+          </a>{" "}
+          and{" "}
+          <a
+            href="https://transparency.meta.com/policies/ad-standards/"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="font-semibold text-gold underline"
+          >
+            Meta Advertising Standards
+          </a>
+          . Google AdMob is not used anywhere in this app.
+        </p>
+        <p>
+          We do not share your private messages, your contacts or your MzansiTalk account content with
+          Meta for advertising. Ads are not shown to banned accounts, are never placed on flagged content,
+          and are paused completely while a live stream is running.
+        </p>
+        <p>
+          Every ad surface has a &quot;Why am I seeing this ad?&quot; explanation and a
+          &quot;Report ad&quot; button. Reports are stored so the owner can review and remove ads that
+          break policy. Rewards for rewarded ads are only granted after an ad has been watched in full.
+        </p>
+      </Section>
+
+      <Section title="Community Guidelines">
+        <p>
+          Content on MzansiTalk must follow our{" "}
+          <Link to="/community-guidelines" className="font-semibold text-gold underline">
+            Community Guidelines
+          </Link>
+          . Content that breaks them is removed, is not monetised, and earns strikes that can lead to a
+          ban.
         </p>
       </Section>
 
