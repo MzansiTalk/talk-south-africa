@@ -7,6 +7,7 @@ import {
   Home,
   MessageCircle,
   PlusCircle,
+  Radio,
   Search,
   Shield,
   User,
@@ -128,23 +129,25 @@ export function BottomNav() {
   usePresenceHeartbeat();
 
   const items = [
-    { to: "/home", label: "Home", icon: Home },
-    { to: "/reels", label: "Reels", icon: Film },
-    { to: "/chat", label: "Messages", icon: MessageCircle },
-    { to: "/profile", label: "Profile", icon: User },
-    ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: Shield }] : []),
+    { to: "/home", label: "Home", icon: Home, live: false },
+    { to: "/reels", label: "Reels", icon: Film, live: false },
+    { to: "/chat", label: "Messages", icon: MessageCircle, live: false },
+    { to: "/live", label: "Go Live", icon: Radio, live: true },
+    ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: Shield, live: false }] : []),
   ] as const;
 
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur">
       <div className="mx-auto flex w-full max-w-2xl items-stretch justify-between px-2 py-1.5">
-        {items.map(({ to, label, icon: Icon }) => (
+        {items.map(({ to, label, icon: Icon, live }) => (
           <Link
             key={to}
             to={to}
-            className="flex flex-1 flex-col items-center gap-0.5 rounded-lg py-1.5 text-[0.68rem] font-medium text-muted-foreground"
-            activeProps={{ className: "text-primary" }}
+            className={`flex flex-1 flex-col items-center gap-0.5 rounded-lg py-1.5 text-[0.68rem] font-medium ${
+              live ? "text-destructive" : "text-muted-foreground"
+            }`}
+            activeProps={{ className: live ? "text-destructive" : "text-primary" }}
           >
             <Icon className="size-5" />
             {label}
