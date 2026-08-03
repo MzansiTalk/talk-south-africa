@@ -162,36 +162,110 @@ export type Database = {
       }
       appeals: {
         Row: {
+          admin_id: string | null
+          ai_score_at_appeal: number
+          auto_resolve_at: string
           created_at: string
           decided_at: string | null
           decided_by: string | null
           decision_note: string | null
           id: string
           message: string
+          post_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
           status: string
           user_id: string
         }
         Insert: {
+          admin_id?: string | null
+          ai_score_at_appeal?: number
+          auto_resolve_at?: string
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
           decision_note?: string | null
           id?: string
           message: string
+          post_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
           status?: string
           user_id: string
         }
         Update: {
+          admin_id?: string | null
+          ai_score_at_appeal?: number
+          auto_resolve_at?: string
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
           decision_note?: string | null
           id?: string
           message?: string
+          post_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
           status?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "appeals_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          admin_id: string | null
+          ai_score: number
+          appeal_id: string | null
+          created_at: string
+          id: string
+          post_id: string | null
+          reason: string | null
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          ai_score?: number
+          appeal_id?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          reason?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          ai_score?: number
+          appeal_id?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_appeal_id_fkey"
+            columns: ["appeal_id"]
+            isOneToOne: false
+            referencedRelation: "appeals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_logs_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       blocks: {
         Row: {
@@ -880,6 +954,8 @@ export type Database = {
       }
       posts: {
         Row: {
+          ai_flags: string[]
+          ai_score: number
           boost_amount: number
           boost_expires_at: string | null
           caption: string | null
@@ -891,11 +967,15 @@ export type Database = {
           kind: Database["public"]["Enums"]["content_kind"]
           media_type: string | null
           media_url: string | null
+          moderation_status: string
+          monetization: string
           updated_at: string
           user_id: string
           views: number
         }
         Insert: {
+          ai_flags?: string[]
+          ai_score?: number
           boost_amount?: number
           boost_expires_at?: string | null
           caption?: string | null
@@ -907,11 +987,15 @@ export type Database = {
           kind?: Database["public"]["Enums"]["content_kind"]
           media_type?: string | null
           media_url?: string | null
+          moderation_status?: string
+          monetization?: string
           updated_at?: string
           user_id: string
           views?: number
         }
         Update: {
+          ai_flags?: string[]
+          ai_score?: number
           boost_amount?: number
           boost_expires_at?: string | null
           caption?: string | null
@@ -923,6 +1007,8 @@ export type Database = {
           kind?: Database["public"]["Enums"]["content_kind"]
           media_type?: string | null
           media_url?: string | null
+          moderation_status?: string
+          monetization?: string
           updated_at?: string
           user_id?: string
           views?: number
@@ -1253,10 +1339,19 @@ export type Database = {
         Args: { _post_id?: string; _reason: string; _user_id: string }
         Returns: number
       }
+      admin_decide_appeal: {
+        Args: { _appeal_id: string; _approve: boolean; _reason?: string }
+        Returns: undefined
+      }
       admin_set_viral: {
         Args: { _on: boolean; _user_id: string }
         Returns: undefined
       }
+      apply_ai_moderation: {
+        Args: { _flags: string[]; _post_id: string; _score: number }
+        Returns: Json
+      }
+      auto_resolve_appeals: { Args: never; Returns: number }
       creator_ad_stats: { Args: never; Returns: Json }
       grant_iap_entitlement: {
         Args: {

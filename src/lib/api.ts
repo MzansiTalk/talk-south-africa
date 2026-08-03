@@ -31,6 +31,10 @@ export type Post = {
   boost_expires_at: string | null;
   expires_at: string | null;
   deleted_by_admin?: boolean;
+  ai_score?: number;
+  ai_flags?: string[];
+  moderation_status?: "pending" | "approved" | "removed";
+  monetization?: "eligible" | "blocked";
   views?: number;
 
   created_at: string;
@@ -144,7 +148,12 @@ async function hydrate(rows: Post[]): Promise<FeedItem[]> {
 }
 
 export async function fetchFeed(kind?: ContentKind): Promise<FeedItem[]> {
-  let query = supabase.from("posts").select("*").order("created_at", { ascending: false }).limit(60);
+  let query = supabase
+    .from("posts")
+    .select("*")
+    .eq("moderation_status", "approved")
+    .order("created_at", { ascending: false })
+    .limit(60);
   if (kind) query = query.eq("kind", kind);
   const { data, error } = await query;
   if (error) throw error;
@@ -396,15 +405,35 @@ export async function createContent(input: {
   }
   const expiresAt =
     input.kind === "status" ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() : null;
-  const { error } = await supabase.from("posts").insert({
-    user_id: userId,
-    kind: input.kind,
-    caption: input.caption || null,
-    media_url: mediaPath,
-    media_type: mediaType,
-    expires_at: expiresAt,
-  });
+  const { data: created, error } = await supabase
+    .from("posts")
+    .insert({
+      user_id: userId,
+      kind: input.kind,
+      caption: input.caption || null,
+      media_url: mediaPath,
+      media_type: mediaType,
+      expires_at: expiresAt,
+    })
+    .select("id")
+    .single();
   if (error) throw error;
+
+  // AI moderation (Google Cloud Vision / Video Intelligence) on every media upload.
+  if (created?.id && mediaPath && mediaType) {
+    const url = await signedUrl(mediaPath);
+    if (url) {
+      const { moderateUpload } = await import("@/lib/ai-moderation.functions");
+      const verdict = await moderateUpload({
+        data: { postId: created.id, mediaUrl: url, mediaType: mediaType as "image" | "video" },
+      });
+      if (verdict.status === "removed") {
+        throw new Error(
+          `AI moderation flagged this upload (risk ${verdict.aiScore}%). It was removed and an appeal was opened — you have 24 hours for a review.`,
+        );
+      }
+    }
+  }
 }
 
 export async function updateMyProfile(patch: Partial<Profile>) {
