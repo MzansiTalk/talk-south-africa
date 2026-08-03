@@ -491,6 +491,150 @@ export type Database = {
           },
         ]
       }
+      live_comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          stream_id: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          stream_id: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          stream_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_comments_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "live_streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      live_join_requests: {
+        Row: {
+          created_at: string
+          id: string
+          status: string
+          stream_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: string
+          stream_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: string
+          stream_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_join_requests_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "live_streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      live_likes: {
+        Row: {
+          created_at: string
+          id: string
+          stream_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          stream_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          stream_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_likes_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "live_streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      live_streams: {
+        Row: {
+          boost_amount: number
+          created_at: string
+          ended_at: string | null
+          host_id: string
+          id: string
+          is_boosted: boolean
+          recording_url: string | null
+          scheduled_end_at: string
+          started_at: string
+          status: string
+          title: string | null
+          updated_at: string
+          viewers: number
+        }
+        Insert: {
+          boost_amount?: number
+          created_at?: string
+          ended_at?: string | null
+          host_id: string
+          id?: string
+          is_boosted?: boolean
+          recording_url?: string | null
+          scheduled_end_at?: string
+          started_at?: string
+          status?: string
+          title?: string | null
+          updated_at?: string
+          viewers?: number
+        }
+        Update: {
+          boost_amount?: number
+          created_at?: string
+          ended_at?: string | null
+          host_id?: string
+          id?: string
+          is_boosted?: boolean
+          recording_url?: string | null
+          scheduled_end_at?: string
+          started_at?: string
+          status?: string
+          title?: string | null
+          updated_at?: string
+          viewers?: number
+        }
+        Relationships: []
+      }
       message_reads: {
         Row: {
           conversation_id: string
@@ -756,6 +900,8 @@ export type Database = {
           is_hidden: boolean
           is_viral: boolean
           last_seen_at: string
+          monetization_approved: boolean
+          monetization_approved_at: string | null
           name: string
           notifications_enabled: boolean
           strikes: number
@@ -775,6 +921,8 @@ export type Database = {
           is_hidden?: boolean
           is_viral?: boolean
           last_seen_at?: string
+          monetization_approved?: boolean
+          monetization_approved_at?: string | null
           name?: string
           notifications_enabled?: boolean
           strikes?: number
@@ -794,6 +942,8 @@ export type Database = {
           is_hidden?: boolean
           is_viral?: boolean
           last_seen_at?: string
+          monetization_approved?: boolean
+          monetization_approved_at?: string | null
           name?: string
           notifications_enabled?: boolean
           strikes?: number
@@ -1082,12 +1232,17 @@ export type Database = {
         }
         Returns: undefined
       }
+      my_earnings: { Args: never; Returns: Json }
       owner_set_ban: {
         Args: { _banned: boolean; _reason?: string; _user_id: string }
         Returns: undefined
       }
       owner_set_creator_status: {
         Args: { _application_id: string; _status: string }
+        Returns: undefined
+      }
+      owner_set_monetization: {
+        Args: { _approved: boolean; _user_id: string }
         Returns: undefined
       }
       owner_set_payout_status: {
