@@ -31,6 +31,10 @@ export type Post = {
   boost_expires_at: string | null;
   expires_at: string | null;
   deleted_by_admin?: boolean;
+  ai_score?: number;
+  ai_flags?: string[];
+  moderation_status?: "pending" | "approved" | "removed";
+  monetization?: "eligible" | "blocked";
   views?: number;
 
   created_at: string;
