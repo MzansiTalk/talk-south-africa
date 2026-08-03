@@ -198,9 +198,32 @@ function AdVideoSurface({ label, unit }: { label: string; unit: string | null })
 }
 
 /**
+ * Tracks how many banners are mounted so Meta's "max one banner per screen"
+ * rule is enforced structurally: the second banner on a screen renders nothing.
+ */
+let mountedBanners = 0;
+
+function useBannerSlot(): boolean {
+  const [allowed, setAllowed] = useState(false);
+  useEffect(() => {
+    if (mountedBanners >= MAX_BANNERS_PER_SCREEN) return;
+    mountedBanners += 1;
+    setAllowed(true);
+    return () => {
+      mountedBanners -= 1;
+    };
+  }, []);
+  return allowed;
+}
+
+/**
  * Meta Audience Network banner placeholder. Used on the Home feed, Reels,
  * profile and search. Renders nothing at all when banners are off, so the
  * content simply expands into the space — never an empty white box.
+ *
+ * Placement rules enforced here: at most one banner per screen, and at least
+ * 16px of clear space on every side so it can never sit against a Like, Buy or
+ * any other tappable app control.
  */
 export function MetaBannerAd({
   placement = "home_banner",
@@ -212,9 +235,12 @@ export function MetaBannerAd({
   const { canShow, config, isTestDevice } = useAds();
   const click = useImpression(placement, target ?? {});
   const unit = placementId(config, "banner");
-  if (!canShow("banner")) return null;
+  const hasSlot = useBannerSlot();
+  if (!canShow("banner") || !hasSlot) return null;
   return (
-    <div className="rounded-xl border border-dashed border-border bg-muted/60 p-2 text-center">
+    <div
+      className={`${BANNER_SAFE_AREA_CLASS} rounded-xl border border-dashed border-border bg-muted/60 text-center`}
+    >
       <button
         type="button"
         onClick={click}
@@ -230,6 +256,7 @@ export function MetaBannerAd({
     </div>
   );
 }
+
 
 /** Alias kept so every existing screen keeps working without changes. */
 export const BannerAd = MetaBannerAd;
