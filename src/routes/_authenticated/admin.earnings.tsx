@@ -155,12 +155,12 @@ function EarningsPage() {
 
       <div className="mt-4 grid gap-2">
         <a
-          href="https://apps.admob.com"
+          href="https://business.facebook.com/monetization"
           target="_blank"
           rel="noreferrer"
           className="btn-base btn-primary"
         >
-          <ExternalLink className="size-4" /> Open My AdMob Account
+          <ExternalLink className="size-4" /> Open Meta Audience Network
         </a>
         <a
           href="https://dashboard.paystack.com"
