@@ -96,7 +96,9 @@ function UserManagerPage() {
       />
 
       <ul className="mt-3 space-y-2">
-        {(members.data ?? []).map((member) => (
+        {(members.data ?? []).map((member) => {
+          const approved = Boolean((member as { monetization_approved?: boolean }).monetization_approved);
+          return (
           <li key={member.id} className="rounded-2xl border border-border bg-card p-3">
             <div className="flex items-center gap-3">
               <Avatar path={member.avatar_url} name={member.name} size={36} />
@@ -109,6 +111,7 @@ function UserManagerPage() {
                   Strikes: {member.strikes ?? 0}/3
                   {member.is_banned ? " · BANNED" : ""}
                   {member.is_viral ? " · Viral ON" : ""}
+                  {approved ? " · Monetized" : ""}
                 </p>
               </div>
             </div>
@@ -123,6 +126,16 @@ function UserManagerPage() {
                 <Flame className="size-3.5" /> Viral {member.is_viral ? "ON" : "OFF"}
               </button>
               {isOwner ? (
+                <button
+                  type="button"
+                  onClick={() => monetize.mutate({ userId: member.id, approved: !approved })}
+                  className={`btn-base px-3 py-1.5 text-xs ${
+                    approved ? "btn-primary" : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  <BadgeCheck className="size-3.5" /> Monetization {approved ? "ON" : "OFF"}
+                </button>
+              ) : null}
                 <button
                   type="button"
                   onClick={() => ban.mutate({ userId: member.id, banned: !member.is_banned })}
