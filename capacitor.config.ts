@@ -24,12 +24,6 @@ const config: CapacitorConfig = {
       showSpinner: false,
       launchAutoHide: true,
     },
-    AdMob: {
-      // Production AdMob app id for MzansiTalk.
-      appId: "ca-app-pub-1349489304852677~8992145141",
-      initializeForTesting: false,
-    },
-  },
 };
 
 export default config;
