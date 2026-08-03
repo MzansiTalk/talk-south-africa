@@ -12,7 +12,6 @@ import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { installNativeAdMob } from "../lib/native-ads";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
