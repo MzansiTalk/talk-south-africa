@@ -117,18 +117,26 @@ function DashboardPage() {
           </div>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          Coin packs and premium are sold through in-app purchases (Boost Live R50, Coins 100, Premium
-          Monthly R29). Ads are served by Meta Audience Network — Google AdMob is no longer used.
+          Boost Live (R50), 100 Coins (R29) and Premium Monthly (R29) are sold through Google Play
+          Billing only. Ads are served by Meta Audience Network — Google AdMob is not used.
         </p>
+        <Link to="/get-coins" className="btn-base btn-primary mt-3 w-full">
+          <Coins className="size-4" /> Get Coins &amp; Premium
+        </Link>
         <MetaRewardedAd
           onReward={() => {
-            setCoins((current) => current + 5);
-            toast.success("You earned 5 free coins.");
+            addRewardCoins(REWARDED_COINS)
+              .then(() => {
+                void queryClient.invalidateQueries({ queryKey: ["entitlements"] });
+                toast.success(`You earned ${REWARDED_COINS} free coins.`);
+              })
+              .catch((error: Error) => toast.error(error.message));
           }}
           rewarded={false}
-          label="Watch ad to get 5 free coins"
+          label={`Watch ad for ${REWARDED_COINS} Coins`}
         />
       </section>
+
 
       <section className="mt-3 rounded-2xl border border-border bg-card p-4">
         <p className="text-sm">
