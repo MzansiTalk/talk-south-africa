@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Flame, ShieldAlert } from "lucide-react";
+import { BadgeCheck, Flame, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
