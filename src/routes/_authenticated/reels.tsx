@@ -30,7 +30,6 @@ export const Route = createFileRoute("/_authenticated/reels")({
 function Reels() {
   const { post } = Route.useSearch();
   const [term, setTerm] = useState("");
-  const [watched, setWatched] = useState(0);
   const seen = useRef(new Set<string>());
   const reels = useQuery({ queryKey: ["feed", "reels"], queryFn: () => fetchFeed("reel") });
 
@@ -55,7 +54,6 @@ function Reels() {
         for (const entry of entries) {
           if (entry.isIntersecting && !seen.current.has(id)) {
             seen.current.add(id);
-            setWatched((current) => current + 1);
             observer.disconnect();
           }
         }
@@ -90,15 +88,6 @@ function Reels() {
           ))}
         </div>
       )}
-
-      <div className="fixed inset-x-0 bottom-[3.6rem] z-20 mx-auto w-full max-w-2xl px-3">
-        <BannerAd
-          placement="reel_banner"
-          {...(items[0]
-            ? { target: { postId: items[0].id, contentKind: "reel", ownerId: items[0].user_id } }
-            : {})}
-        />
-      </div>
     </Screen>
   );
 }
