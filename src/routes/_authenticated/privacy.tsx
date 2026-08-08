@@ -10,12 +10,12 @@ export const Route = createFileRoute("/_authenticated/privacy")({
       {
         name: "description",
         content:
-          "How MzansiTalk handles your data, in-app purchases through Paystack and Google Play, and ads served by Meta Audience Network.",
+          "How MzansiTalk handles your data, in-app purchases through Paystack and Google Play, and ads served by ExoClick.",
       },
       { property: "og:title", content: "Privacy Policy — MzansiTalk" },
       {
         property: "og:description",
-        content: "MzansiTalk privacy policy covering in-app purchases and Meta ads.",
+        content: "MzansiTalk privacy policy covering in-app purchases and ExoClick ads.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

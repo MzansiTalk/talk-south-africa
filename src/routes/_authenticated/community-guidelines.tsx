@@ -56,7 +56,7 @@ function GuidelinesPage() {
 
       <Section title="Content next to ads">
         <p>
-          MzansiTalk is monetised with ads served by Meta Audience Network. Ads are never placed on
+          MzansiTalk is monetised with skippable ExoClick pre-roll video ads. Ads are never placed on
           content that breaks these guidelines, on flagged or hidden posts, on banned accounts, or during
           a live stream. Content that breaks these rules is not eligible for monetisation or creator
           earnings.

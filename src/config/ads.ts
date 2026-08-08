@@ -2,7 +2,7 @@
  * Central ad configuration for MzansiTalk.
  *
  * ExoClick VAST 3.0 in-stream video is the ONLY ad network used by this app.
- * There is no Meta Audience Network code, no Google AdMob code, no banners,
+ * No other ad network code exists in this app: no banners,
  * no interstitials, no native units and no rewarded units anywhere.
  */
 
