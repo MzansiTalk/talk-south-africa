@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { BadgeCheck, Coins, Rocket } from "lucide-react";
 import { toast } from "sonner";
 
-import { MetaRewardedAd } from "@/components/Ads";
 import { Screen } from "@/components/Shell";
 import { REWARDED_COINS } from "@/config/ads";
 import {
@@ -101,19 +100,6 @@ function GetCoinsPage() {
           </section>
         );
       })}
-
-      <section className="mt-3 rounded-2xl border border-border bg-card p-4">
-        <h2 className="text-sm font-bold">Free coins</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Watch a full rewarded ad and get {REWARDED_COINS} coins. Closing the ad early gives 0
-          coins.
-        </p>
-        <MetaRewardedAd
-          onReward={() => reward.mutate()}
-          rewarded={false}
-          label={`Watch ad for ${REWARDED_COINS} Coins`}
-        />
-      </section>
 
       <Link to="/live" className="btn-base mt-3 w-full bg-secondary text-secondary-foreground">
         <Rocket className="size-4" /> Go Live and boost your stream

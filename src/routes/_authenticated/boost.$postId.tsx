@@ -4,7 +4,6 @@ import { Rocket, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { RewardedAdButton } from "@/components/Ads";
 import { Screen } from "@/components/Shell";
 import {
   BOOST_PACKAGES,
@@ -152,7 +151,6 @@ function BoostScreen() {
         <p className="mt-3 text-xs text-muted-foreground">
           Higher payment means your content shows more often in the feed.
         </p>
-        <RewardedAdButton rewarded={rewarded} onReward={() => setRewarded(true)} />
         {rewarded ? (
           <p className="mt-2 text-xs text-muted-foreground">
             You pay R{charge} instead of R{amount} and still get the full R{amount} boost.
