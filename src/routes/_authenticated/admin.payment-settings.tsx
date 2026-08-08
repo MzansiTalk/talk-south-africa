@@ -203,75 +203,26 @@ function MoneyCenter() {
         WARNING: OWNER ONLY. This controls ALL app revenue.
       </div>
       <p className="mt-2 rounded-2xl border border-gold/50 bg-gold/10 p-4 text-xs font-semibold">
-        This controls ALL app revenue. Meta Audience Network for ads. Paystack for Sponsored, Boosts
-        and in-app purchases. All money goes directly to you.
+        This controls ALL app revenue. ExoClick for ads. Paystack for Sponsored, Boosts and in-app
+        purchases. All money goes directly to you.
       </p>
 
       {/* SECTION A */}
       <section className="mt-4 space-y-3 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold uppercase tracking-wide">
-          Ad Revenue from Posts, Reels, Status, Comments
+          Ad Revenue from Reels, Videos, Status and Live
         </h2>
         <p className="text-xs text-muted-foreground">
-          You earn money when members watch reels, view posts, see status, or tap an ad. The ad network
-          pays you directly. Google AdMob has been fully removed from MzansiTalk.
+          ExoClick is the only ad network in MzansiTalk. A 5 second skippable pre-roll video plays
+          before a reel, video, status or live stream — at most one ad every 3 pieces of content, and
+          never on a member&apos;s own upload. ExoClick pays you directly. There are no banner,
+          interstitial, native or rewarded ads, and no Meta or Google AdMob code anywhere.
         </p>
-        <Field
-          label="Meta App ID"
-          value={form.meta_app_id ?? ""}
-          onChange={(v) => set("meta_app_id", v)}
-        />
-        {/* TODO: Replace with real Meta Placement ID */}
-        <Field
-          label="Meta Banner Placement ID"
-          value={form.meta_banner_placement_id ?? ""}
-          onChange={(v) => set("meta_banner_placement_id", v)}
-        />
-        {/* TODO: Replace with real Meta Placement ID */}
-        <Field
-          label="Meta Interstitial Placement ID"
-          value={form.meta_interstitial_placement_id ?? ""}
-          onChange={(v) => set("meta_interstitial_placement_id", v)}
-        />
-        {/* TODO: Replace with real Meta Placement ID */}
-        <Field
-          label="Meta Rewarded Placement ID"
-          value={form.meta_rewarded_placement_id ?? ""}
-          onChange={(v) => set("meta_rewarded_placement_id", v)}
-        />
-        <Toggle
-          label="Banner Ads"
-          checked={form.ads_banner_enabled}
-          onChange={(v) => set("ads_banner_enabled", v)}
-        />
-        <Toggle
-          label="Interstitial Ads"
-          checked={form.ads_interstitial_enabled}
-          onChange={(v) => set("ads_interstitial_enabled", v)}
-        />
-        <Toggle
-          label="Rewarded Ads"
-          checked={form.ads_rewarded_enabled}
-          onChange={(v) => set("ads_rewarded_enabled", v)}
-        />
-        <button
-          type="button"
-          onClick={() =>
-            save.mutate({
-              meta_app_id: form.meta_app_id,
-              meta_banner_placement_id: form.meta_banner_placement_id,
-              meta_interstitial_placement_id: form.meta_interstitial_placement_id,
-              meta_rewarded_placement_id: form.meta_rewarded_placement_id,
-              ads_banner_enabled: form.ads_banner_enabled,
-              ads_interstitial_enabled: form.ads_interstitial_enabled,
-              ads_rewarded_enabled: form.ads_rewarded_enabled,
-            })
-          }
-          disabled={save.isPending}
-          className="btn-base btn-primary w-full disabled:opacity-60"
-        >
-          Save Ad Network Settings
-        </button>
+        <p className="rounded-xl bg-secondary/60 p-3 text-[0.68rem] font-semibold">
+          VAST tag in use: https://s.magsrv.com/v1/vast.php?idz=5998094
+        </p>
+
+
 
       </section>
 
