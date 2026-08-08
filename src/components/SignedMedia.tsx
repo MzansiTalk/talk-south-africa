@@ -211,6 +211,16 @@ export function SignedMedia({
             </span>
           ) : null}
         </button>
+        {gate === "ad" ? (
+          <PreRollAd
+            target={{
+              ...(postId ? { postId } : {}),
+              ...(contentKind ? { contentKind } : {}),
+              ...(ownerId ? { ownerId } : {}),
+            }}
+            onDone={finishAd}
+          />
+        ) : null}
         {isVideo && gate === "clear" ? (
           <button
             type="button"
