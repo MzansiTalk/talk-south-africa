@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Play, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { PreRollAd } from "@/components/PreRollAd";
 import { signedUrl } from "@/lib/api";
+import { shouldShowPreRoll } from "@/lib/preroll";
 
 
 export function useMediaUrl(path: string | null | undefined) {
@@ -20,6 +22,10 @@ type Props = {
   className?: string;
   autoPlay?: boolean;
   loop?: boolean;
+  /** Uploader of the content: members never get a pre-roll on their own upload. */
+  ownerId?: string | null;
+  postId?: string | null;
+  contentKind?: string | null;
 };
 
 /**
@@ -194,7 +200,7 @@ export function SignedMedia({
       <div className="relative">
         <button
           type="button"
-          onClick={() => setFullscreen(true)}
+          onClick={openFullscreen}
           className="relative block w-full cursor-zoom-in"
           aria-label="Open in full screen"
         >
@@ -205,7 +211,7 @@ export function SignedMedia({
             </span>
           ) : null}
         </button>
-        {isVideo ? (
+        {isVideo && gate === "clear" ? (
           <button
             type="button"
             onClick={() => setMuted((value) => !value)}
