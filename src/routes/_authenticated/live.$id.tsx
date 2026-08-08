@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/SignedMedia";
+import { PreRollAd } from "@/components/PreRollAd";
 import { Screen } from "@/components/Shell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdsPausedForLive } from "@/lib/ads";
+import { shouldShowPreRoll } from "@/lib/preroll";
 import { fetchMyProfile } from "@/lib/api";
 import {
   addLiveComment,
@@ -45,6 +47,8 @@ function LiveViewer() {
   const queryClient = useQueryClient();
   const [comment, setComment] = useState("");
   const [limited, setLimited] = useState(false);
+  // ExoClick pre-roll runs once before the stream is revealed.
+  const [adState, setAdState] = useState<"idle" | "playing" | "done">("idle");
   // Meta policy: no ads anywhere in the app while watching a live stream.
   useAdsPausedForLive(true);
 
@@ -74,6 +78,14 @@ function LiveViewer() {
       void supabase.removeChannel(channel);
     };
   }, [id, queryClient]);
+
+  // A 5 second skippable ExoClick pre-roll plays before any live stream starts.
+  useEffect(() => {
+    if (!live.data || adState !== "idle") return;
+    void shouldShowPreRoll(live.data.host_id).then((show) =>
+      setAdState(show ? "playing" : "done"),
+    );
+  }, [live.data, adState]);
 
   // "Timeline Limited" popup for every viewer once the 4 hour cap is hit.
   useEffect(() => {
@@ -159,6 +171,12 @@ function LiveViewer() {
       ) : null}
 
       <div className="relative grid aspect-[3/4] w-full place-items-center overflow-hidden rounded-2xl bg-black text-center">
+        {adState === "playing" ? (
+          <PreRollAd
+            target={{ contentKind: "live", ownerId: stream.host_id }}
+            onDone={() => setAdState("done")}
+          />
+        ) : null}
         <div>
           <Avatar path={stream.host?.avatar_url} name={stream.host?.name ?? "M"} size={72} />
           <p className="mt-3 text-sm font-bold text-primary-foreground">{stream.host?.name}</p>
