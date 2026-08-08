@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Play, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { PreRollAd } from "@/components/PreRollAd";
 import { signedUrl } from "@/lib/api";
+import { shouldShowPreRoll } from "@/lib/preroll";
 
 
 export function useMediaUrl(path: string | null | undefined) {
@@ -20,6 +22,10 @@ type Props = {
   className?: string;
   autoPlay?: boolean;
   loop?: boolean;
+  /** Uploader of the content: members never get a pre-roll on their own upload. */
+  ownerId?: string | null;
+  postId?: string | null;
+  contentKind?: string | null;
 };
 
 /**
@@ -97,18 +103,71 @@ function useViewportPlayback(
   return ref;
 }
 
-export function SignedMedia({ path, type, className, autoPlay = true, loop = false }: Props) {
+export function SignedMedia({
+  path,
+  type,
+  className,
+  autoPlay = true,
+  loop = false,
+  ownerId,
+  postId,
+  contentKind,
+}: Props) {
   const { data: url } = useMediaUrl(path);
   const [fullscreen, setFullscreen] = useState(false);
   const [muted, setMuted] = useState(false);
   const isVideo = type === "video";
   const onAutoplayBlocked = useCallback(() => setMuted(true), []);
+
+  // ExoClick pre-roll gate: "idle" = not checked yet, "ad" = ad on screen,
+  // "clear" = content may play (also the state after any ad failure).
+  const [gate, setGate] = useState<"idle" | "ad" | "clear">("idle");
+  const pendingFullscreen = useRef(false);
+
+  useEffect(() => {
+    if (!isVideo || !url || gate !== "idle") return;
+    let cancelled = false;
+    void shouldShowPreRoll(ownerId).then((show) => {
+      if (!cancelled) setGate(show ? "ad" : "clear");
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVideo, url]);
+
   const videoRef = useViewportPlayback(
     Boolean(url) && isVideo && !fullscreen,
-    autoPlay,
+    autoPlay && gate === "clear",
     muted,
     onAutoplayBlocked,
   );
+
+  const openFullscreen = () => {
+    if (gate === "clear") {
+      setFullscreen(true);
+      return;
+    }
+    if (gate === "ad") return;
+    pendingFullscreen.current = true;
+    void shouldShowPreRoll(ownerId).then((show) => {
+      if (show) {
+        setGate("ad");
+        return;
+      }
+      setGate("clear");
+      pendingFullscreen.current = false;
+      setFullscreen(true);
+    });
+  };
+
+  const finishAd = useCallback(() => {
+    setGate("clear");
+    if (pendingFullscreen.current) {
+      pendingFullscreen.current = false;
+      setFullscreen(true);
+    }
+  }, []);
 
   if (!path) return null;
 
@@ -141,7 +200,7 @@ export function SignedMedia({ path, type, className, autoPlay = true, loop = fal
       <div className="relative">
         <button
           type="button"
-          onClick={() => setFullscreen(true)}
+          onClick={openFullscreen}
           className="relative block w-full cursor-zoom-in"
           aria-label="Open in full screen"
         >
@@ -152,7 +211,17 @@ export function SignedMedia({ path, type, className, autoPlay = true, loop = fal
             </span>
           ) : null}
         </button>
-        {isVideo ? (
+        {gate === "ad" ? (
+          <PreRollAd
+            target={{
+              ...(postId ? { postId } : {}),
+              ...(contentKind ? { contentKind } : {}),
+              ...(ownerId ? { ownerId } : {}),
+            }}
+            onDone={finishAd}
+          />
+        ) : null}
+        {isVideo && gate === "clear" ? (
           <button
             type="button"
             onClick={() => setMuted((value) => !value)}
