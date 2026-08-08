@@ -3,13 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import {
-  BannerAd,
-  InterstitialAd,
-  useInterstitialAfterEvery,
-  VideoAd,
-} from "@/components/Ads";
-
 import { PostCard } from "@/components/PostCard";
 import { Screen } from "@/components/Shell";
 import { fetchFeed } from "@/lib/api";
@@ -40,7 +33,6 @@ function Reels() {
   const [watched, setWatched] = useState(0);
   const seen = useRef(new Set<string>());
   const reels = useQuery({ queryKey: ["feed", "reels"], queryFn: () => fetchFeed("reel") });
-  const interstitial = useInterstitialAfterEvery(watched, 3);
 
   const filtered = (reels.data ?? []).filter((item) =>
     term.trim() ? (item.caption ?? "").toLowerCase().includes(term.trim().toLowerCase()) : true,
@@ -75,16 +67,6 @@ function Reels() {
 
   return (
     <Screen title="Reels">
-      {interstitial.open ? (
-        <InterstitialAd
-          onClose={interstitial.close}
-          placement="reel_interstitial"
-          {...(items[0]
-            ? { target: { postId: items[0].id, contentKind: "reel", ownerId: items[0].user_id } }
-            : {})}
-        />
-      ) : null}
-
       <div className="field field-focus mb-4 flex items-center gap-2">
         <Search className="size-4 text-muted-foreground" />
         <input
@@ -101,12 +83,9 @@ function Reels() {
         </p>
       ) : (
         <div className="space-y-4">
-          {items.map((item, index) => (
+          {items.map((item) => (
             <div key={item.id} ref={observe(item.id)} className="space-y-4">
               <PostCard item={item} />
-              {(index + 1) % 3 === 0 && !item.deleted_by_admin ? (
-                <VideoAd target={{ postId: item.id, contentKind: "reel", ownerId: item.user_id }} />
-              ) : null}
             </div>
           ))}
         </div>
