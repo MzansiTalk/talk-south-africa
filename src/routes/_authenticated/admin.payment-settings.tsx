@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/admin/payment-settings")({
       {
         name: "description",
         content:
-          "Owner-only MzansiTalk money control centre: Meta Audience Network ad keys, Paystack sponsored and boost payments, and your own pricing.",
+          "Owner-only MzansiTalk money control centre: ExoClick ad revenue, Paystack sponsored and boost payments, and your own pricing.",
       },
       { property: "og:title", content: "Owner Money Center — MzansiTalk" },
       { property: "og:description", content: "One page to control every way MzansiTalk earns money." },
@@ -34,10 +34,6 @@ export const Route = createFileRoute("/_authenticated/admin/payment-settings")({
 });
 
 const EMPTY: AppSettings = {
-  meta_app_id: "",
-  meta_banner_placement_id: "",
-  meta_interstitial_placement_id: "",
-  meta_rewarded_placement_id: "",
   ads_banner_enabled: true,
   ads_interstitial_enabled: true,
   ads_rewarded_enabled: true,
@@ -367,18 +363,18 @@ function MoneyCenter() {
       <section className="mt-4 space-y-2 rounded-2xl border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
         <h2 className="text-sm font-bold uppercase tracking-wide text-foreground">How Money Flows</h2>
         <p>
-          <strong>Ad money:</strong> a member watches a reel, status or post → a Meta Audience Network
-          ad shows → the ad network collects the money → the ad network pays you directly into your own
-          bank account. Google AdMob is no longer used anywhere in MzansiTalk.
+          <strong>Ad money:</strong> a member opens a reel, video, status or live → a 5 second
+          skippable ExoClick pre-roll plays → ExoClick collects the money → ExoClick pays you directly
+          into your own bank account. No other ad network is used anywhere in MzansiTalk.
         </p>
         <p>
           <strong>Sponsored / Boost money:</strong> a brand or member pays at Paystack checkout → money
           goes directly into your Paystack account → your bank in 1–2 days.
         </p>
         <p>
-          Only the Owner ({OWNER_EMAIL}) can edit these keys. There are 2 payment systems: Meta
-          Audience Network for ads and Paystack for Sponsored, Boosts and in-app purchases. MzansiTalk
-          never stores your bank details — only the keys above.
+          Only the Owner ({OWNER_EMAIL}) can edit these keys. There are 2 payment systems: ExoClick
+          for ads and Paystack for Sponsored, Boosts and in-app purchases. MzansiTalk never stores
+          your bank details — only the keys above.
         </p>
 
       </section>
