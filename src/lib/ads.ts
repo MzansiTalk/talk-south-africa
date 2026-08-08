@@ -9,7 +9,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyRoles, getCurrentUserId, getMyEmail, OWNER_EMAIL } from "@/lib/api";
 
-export type AdNetwork = "meta";
+export type AdNetwork = "meta" | "exoclick";
 
 export type AdPlacementSlot =
   | "home_native"
@@ -22,7 +22,8 @@ export type AdPlacementSlot =
   | "video_interstitial"
   | "comments_banner"
   | "rewarded_boost"
-  | "status_ad";
+  | "status_ad"
+  | "preroll_video";
 
 /** Which piece of content the ad was shown on, so 20% of the revenue is attributed to its creator. */
 export type AdTarget = {
