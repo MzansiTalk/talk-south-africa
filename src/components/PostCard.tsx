@@ -17,7 +17,6 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { CommentsAd } from "@/components/Ads";
 import { Avatar, SignedMedia } from "@/components/SignedMedia";
 import {
   addComment,
@@ -360,7 +359,6 @@ export function PostCard({ item }: { item: FeedItem }) {
 
       {showComments ? (
         <div className="border-t border-border p-3">
-          <CommentsAd target={{ postId: item.id, contentKind: item.kind, ownerId: item.user_id }} />
           <div className="space-y-3">
             {(comments.data ?? []).map((comment) => (
               <div key={comment.id} className="flex items-start gap-2">

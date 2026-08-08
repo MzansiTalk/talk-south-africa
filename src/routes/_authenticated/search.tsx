@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search as SearchIcon } from "lucide-react";
 import { useState } from "react";
 
-import { BannerAd } from "@/components/Ads";
 import { PostCard } from "@/components/PostCard";
 
 import { Avatar } from "@/components/SignedMedia";
@@ -86,9 +85,6 @@ function SearchPage() {
         <p className="mt-6 text-center text-sm text-muted-foreground">No results for “{term}”.</p>
       ) : null}
 
-      <div className="mt-6">
-        <BannerAd placement="search_banner" />
-      </div>
     </Screen>
   );
 }
