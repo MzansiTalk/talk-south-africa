@@ -3,13 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import {
-  BannerAd,
-  InterstitialAd,
-  useInterstitialAfterEvery,
-  VideoAd,
-} from "@/components/Ads";
-
 import { PostCard } from "@/components/PostCard";
 import { Screen } from "@/components/Shell";
 import { fetchFeed } from "@/lib/api";
@@ -37,10 +30,8 @@ export const Route = createFileRoute("/_authenticated/reels")({
 function Reels() {
   const { post } = Route.useSearch();
   const [term, setTerm] = useState("");
-  const [watched, setWatched] = useState(0);
   const seen = useRef(new Set<string>());
   const reels = useQuery({ queryKey: ["feed", "reels"], queryFn: () => fetchFeed("reel") });
-  const interstitial = useInterstitialAfterEvery(watched, 3);
 
   const filtered = (reels.data ?? []).filter((item) =>
     term.trim() ? (item.caption ?? "").toLowerCase().includes(term.trim().toLowerCase()) : true,
@@ -63,7 +54,6 @@ function Reels() {
         for (const entry of entries) {
           if (entry.isIntersecting && !seen.current.has(id)) {
             seen.current.add(id);
-            setWatched((current) => current + 1);
             observer.disconnect();
           }
         }
@@ -75,16 +65,6 @@ function Reels() {
 
   return (
     <Screen title="Reels">
-      {interstitial.open ? (
-        <InterstitialAd
-          onClose={interstitial.close}
-          placement="reel_interstitial"
-          {...(items[0]
-            ? { target: { postId: items[0].id, contentKind: "reel", ownerId: items[0].user_id } }
-            : {})}
-        />
-      ) : null}
-
       <div className="field field-focus mb-4 flex items-center gap-2">
         <Search className="size-4 text-muted-foreground" />
         <input
@@ -101,25 +81,13 @@ function Reels() {
         </p>
       ) : (
         <div className="space-y-4">
-          {items.map((item, index) => (
+          {items.map((item) => (
             <div key={item.id} ref={observe(item.id)} className="space-y-4">
               <PostCard item={item} />
-              {(index + 1) % 3 === 0 && !item.deleted_by_admin ? (
-                <VideoAd target={{ postId: item.id, contentKind: "reel", ownerId: item.user_id }} />
-              ) : null}
             </div>
           ))}
         </div>
       )}
-
-      <div className="fixed inset-x-0 bottom-[3.6rem] z-20 mx-auto w-full max-w-2xl px-3">
-        <BannerAd
-          placement="reel_banner"
-          {...(items[0]
-            ? { target: { postId: items[0].id, contentKind: "reel", ownerId: items[0].user_id } }
-            : {})}
-        />
-      </div>
     </Screen>
   );
 }

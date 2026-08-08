@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { BadgeCheck, Coins, Eye, Gift, MousePointerClick, Rocket, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
-import { MetaRewardedAd } from "@/components/Ads";
 import { Screen } from "@/components/Shell";
 import { formatCount } from "@/components/MediaGrid";
 import { REWARDED_COINS } from "@/config/ads";
@@ -115,23 +114,11 @@ function DashboardPage() {
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
           Boost Live (R50), 100 Coins (R29) and Premium Monthly (R29) are sold through Google Play
-          Billing only. Ads are served by Meta Audience Network — Google AdMob is not used.
+          Billing only. Ads are served by ExoClick as a 5 second skippable pre-roll video only.
         </p>
         <Link to="/get-coins" className="btn-base btn-primary mt-3 w-full">
           <Coins className="size-4" /> Get Coins &amp; Premium
         </Link>
-        <MetaRewardedAd
-          onReward={() => {
-            addRewardCoins(REWARDED_COINS)
-              .then(() => {
-                void queryClient.invalidateQueries({ queryKey: ["entitlements"] });
-                toast.success(`You earned ${REWARDED_COINS} free coins.`);
-              })
-              .catch((error: Error) => toast.error(error.message));
-          }}
-          rewarded={false}
-          label={`Watch ad for ${REWARDED_COINS} Coins`}
-        />
       </section>
 
       <section className="mt-3 rounded-2xl border border-border bg-card p-4">

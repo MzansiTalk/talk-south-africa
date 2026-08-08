@@ -758,10 +758,6 @@ export async function fetchAppSettings() {
 }
 
 export type AppSettings = {
-  meta_app_id: string | null;
-  meta_banner_placement_id: string | null;
-  meta_interstitial_placement_id: string | null;
-  meta_rewarded_placement_id: string | null;
   ads_banner_enabled: boolean;
   ads_interstitial_enabled: boolean;
   ads_rewarded_enabled: boolean;

@@ -4,7 +4,6 @@ import { Pencil, Settings } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-import { BannerAd } from "@/components/Ads";
 import { CollectionPills, MediaGrid, ProfileTabs } from "@/components/MediaGrid";
 import { PostCard } from "@/components/PostCard";
 
@@ -267,9 +266,6 @@ function MyProfile() {
         />
       ) : null}
 
-      <div className="mt-6">
-        <BannerAd placement="profile_banner" />
-      </div>
     </Screen>
   );
 }

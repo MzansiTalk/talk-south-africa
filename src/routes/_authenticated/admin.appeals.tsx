@@ -206,7 +206,7 @@ function AppealCard({ appeal }: { appeal: AppealItem }) {
           </div>
           {!lowRisk ? (
             <p className="text-xs text-muted-foreground">
-              High-risk content (≥50%) cannot be published from this inbox — Meta Audience Network
+              High-risk content (≥50%) cannot be published from this inbox — ad network
               policy.
             </p>
           ) : null}

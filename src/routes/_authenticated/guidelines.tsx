@@ -94,7 +94,7 @@ function GuidelinesPage() {
 
       <Section title="Ads and monetisation">
         <p>
-          Ads are served by Meta Audience Network and are never placed on flagged content, on banned
+          Ads are served by ExoClick as a skippable pre-roll and are never placed on flagged content, on banned
           accounts, or during a live stream. Content that breaks these guidelines is not eligible
           for monetisation or creator earnings.
         </p>

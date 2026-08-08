@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/admin/ad-earnings")({
       {
         name: "description",
         content:
-          "Owner-only MzansiTalk ad earnings: estimated ad revenue, impressions, eCPM and clicks from Meta Audience Network.",
+          "Owner-only MzansiTalk ad earnings: estimated ad revenue, impressions, eCPM and clicks from ExoClick pre-roll ads.",
       },
       { property: "og:title", content: "Ad Earnings — MzansiTalk Admin" },
       { property: "og:description", content: "Estimated ad revenue and impressions for MzansiTalk." },
@@ -110,19 +110,19 @@ function AdEarningsPage() {
       </section>
 
       <p className="mt-4 rounded-2xl border border-gold/50 bg-gold/10 p-4 text-xs font-semibold">
-        Actual payments are sent directly by Meta Audience Network to the bank account linked in your
-        Meta monetization account. MzansiTalk does not handle ad payments. Google AdMob is no longer
-        used by this app.
+        Actual payments are sent directly by ExoClick to the payout method linked in your ExoClick
+        account. MzansiTalk does not handle ad payments. ExoClick is the only ad network used by this
+        app.
       </p>
 
       <div className="mt-4 grid gap-2">
         <a
-          href="https://business.facebook.com/monetization"
+          href="https://admin.exoclick.com/"
           target="_blank"
           rel="noreferrer"
           className="btn-base bg-secondary text-secondary-foreground"
         >
-          <ExternalLink className="size-4" /> Open Meta Audience Network
+          <ExternalLink className="size-4" /> Open ExoClick Dashboard
         </a>
       </div>
     </Screen>
