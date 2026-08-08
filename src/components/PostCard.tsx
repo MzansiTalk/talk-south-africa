@@ -218,6 +218,9 @@ export function PostCard({ item }: { item: FeedItem }) {
           className="max-h-[70vh] w-full object-cover"
           autoPlay
           loop={item.kind === "reel"}
+          ownerId={item.user_id}
+          postId={item.id}
+          contentKind={item.kind}
         />
       ) : null}
 
