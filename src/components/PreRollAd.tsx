@@ -30,7 +30,8 @@ export function PreRollAd({ target, onDone }: Props) {
   const finish = () => {
     if (doneRef.current) return;
     doneRef.current = true;
-    onDone();
+    // Small delay so the ad server can register the impression before content starts.
+    window.setTimeout(onDone, PREROLL_POST_AD_DELAY_MS);
   };
 
   useEffect(() => {
