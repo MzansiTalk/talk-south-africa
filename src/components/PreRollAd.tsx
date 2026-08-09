@@ -5,6 +5,7 @@ import type { AdTarget } from "@/lib/ads";
 import {
   firePixels,
   loadVastCreative,
+  PREROLL_POST_AD_DELAY_MS,
   PREROLL_SKIP_AFTER_SECONDS,
   type VastCreative,
 } from "@/lib/preroll";
