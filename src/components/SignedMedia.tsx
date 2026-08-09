@@ -119,50 +119,33 @@ export function SignedMedia({
   const isVideo = type === "video";
   const onAutoplayBlocked = useCallback(() => setMuted(true), []);
 
-  // ExoClick pre-roll gate: "idle" = not checked yet, "ad" = ad on screen,
-  // "clear" = content may play (also the state after any ad failure).
-  const [gate, setGate] = useState<"idle" | "ad" | "clear">("idle");
+  // ExoClick pre-roll runs ONLY on an intentional click, every single click.
+  // Auto-play while scrolling never triggers an ad.
+  const [showAd, setShowAd] = useState(false);
   const pendingFullscreen = useRef(false);
 
-  useEffect(() => {
-    if (!isVideo || !url || gate !== "idle") return;
-    let cancelled = false;
-    void shouldShowPreRoll(ownerId).then((show) => {
-      if (!cancelled) setGate(show ? "ad" : "clear");
-    });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isVideo, url]);
-
   const videoRef = useViewportPlayback(
-    Boolean(url) && isVideo && !fullscreen,
-    autoPlay && gate === "clear",
+    Boolean(url) && isVideo && !fullscreen && !showAd,
+    autoPlay && !showAd,
     muted,
     onAutoplayBlocked,
   );
 
   const openFullscreen = () => {
-    if (gate === "clear") {
-      setFullscreen(true);
-      return;
-    }
-    if (gate === "ad") return;
+    if (showAd) return;
     pendingFullscreen.current = true;
     void shouldShowPreRoll(ownerId).then((show) => {
       if (show) {
-        setGate("ad");
+        setShowAd(true);
         return;
       }
-      setGate("clear");
       pendingFullscreen.current = false;
       setFullscreen(true);
     });
   };
 
   const finishAd = useCallback(() => {
-    setGate("clear");
+    setShowAd(false);
     if (pendingFullscreen.current) {
       pendingFullscreen.current = false;
       setFullscreen(true);
@@ -211,7 +194,7 @@ export function SignedMedia({
             </span>
           ) : null}
         </button>
-        {gate === "ad" ? (
+        {showAd ? (
           <PreRollAd
             target={{
               ...(postId ? { postId } : {}),
@@ -221,7 +204,7 @@ export function SignedMedia({
             onDone={finishAd}
           />
         ) : null}
-        {isVideo && gate === "clear" ? (
+        {isVideo && !showAd ? (
           <button
             type="button"
             onClick={() => setMuted((value) => !value)}
