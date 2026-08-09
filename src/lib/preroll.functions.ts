@@ -21,10 +21,12 @@ export const fetchVastXml = createServerFn({ method: "GET" })
     try {
       const response = await fetch(parsed.toString(), {
         headers: { "user-agent": "Mozilla/5.0 (Linux; Android 12) MzansiTalk", accept: "*/*" },
+        cache: "no-store",
       });
       if (!response.ok) return { xml: "" };
       return { xml: await response.text() };
     } catch {
       return { xml: "" };
     }
+
   });

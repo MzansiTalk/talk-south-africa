@@ -83,17 +83,21 @@ export async function loadVastCreative(
     const doc = new DOMParser().parseFromString(xml, "text/xml");
     if (doc.querySelector("parsererror")) return null;
 
-
     const wrapper = (doc.querySelector("VASTAdTagURI")?.textContent ?? "").trim();
     if (wrapper && !doc.querySelector("MediaFile")) {
-      return loadVastCreative(signal, wrapper, depth + 1);
+      const wrapperSep = wrapper.includes("?") ? "&" : "?";
+      return loadVastCreative(signal, `${wrapper}${wrapperSep}cb=${Date.now()}`, depth + 1);
     }
 
     const mediaUrl = pickMediaFile(doc);
     if (!mediaUrl) return null;
 
+    // Prevent browser caching of the creative so every click/replay can serve a fresh ad.
+    const mediaSep = mediaUrl.includes("?") ? "&" : "?";
+    const freshMediaUrl = `${mediaUrl}${mediaSep}mzcb=${Date.now()}`;
+
     return {
-      mediaUrl,
+      mediaUrl: freshMediaUrl,
       clickThrough: (doc.querySelector("ClickThrough")?.textContent ?? "").trim() || null,
       impressionUrls: textList(doc, "Impression"),
       clickTrackingUrls: textList(doc, "ClickTracking"),
@@ -102,6 +106,7 @@ export async function loadVastCreative(
     return null;
   }
 }
+
 
 /** Fires VAST tracking pixels without letting a blocked request surface an error. */
 export function firePixels(urls: string[]) {
