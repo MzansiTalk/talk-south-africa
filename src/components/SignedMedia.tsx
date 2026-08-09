@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { PreRollAd } from "@/components/PreRollAd";
 import { signedUrl } from "@/lib/api";
-import { shouldShowPreRoll } from "@/lib/preroll";
+import { pauseAllVideos, shouldShowPreRoll } from "@/lib/preroll";
 
 
 export function useMediaUrl(path: string | null | undefined) {
@@ -133,6 +133,7 @@ export function SignedMedia({
 
   const openFullscreen = () => {
     if (showAd) return;
+    pauseAllVideos();
     pendingFullscreen.current = true;
     void shouldShowPreRoll(ownerId).then((show) => {
       if (show) {

@@ -22,6 +22,22 @@ export async function shouldShowPreRoll(_ownerId?: string | null | undefined) {
   return true;
 }
 
+/**
+ * Stops every video currently playing on the page (feed / reels / status previews)
+ * so only the clicked content (or its pre-roll) has audio.
+ */
+export function pauseAllVideos() {
+  if (typeof document === "undefined") return;
+  for (const video of Array.from(document.querySelectorAll("video"))) {
+    try {
+      video.muted = true;
+      video.pause();
+    } catch {
+      // Ignore videos that are mid-teardown.
+    }
+  }
+}
+
 
 export type VastCreative = {
   mediaUrl: string;
