@@ -8,6 +8,14 @@
 
 import { fetchVastXml } from "@/lib/preroll.functions";
 
+/** Unique nonce for every single ad request / replay so nothing is ever cached or reused. */
+export function adNonce() {
+  return `${Date.now()}_${Math.random()}`;
+}
+
+/** Delay between ad finish and content start so the ad server can count the impression. */
+export const PREROLL_POST_AD_DELAY_MS = 500;
+
 export const VAST_TAG_URL = "https://s.magsrv.com/v1/vast.php?idz=5998148";
 
 /** Ad is skippable once this many seconds of the ad have played. */
@@ -76,7 +84,7 @@ export async function loadVastCreative(
   if (depth > 2) return null;
   try {
     const separator = tagUrl.includes("?") ? "&" : "?";
-    const result = await fetchVastXml({ data: { url: `${tagUrl}${separator}cb=${Date.now()}` } });
+    const result = await fetchVastXml({ data: { url: `${tagUrl}${separator}cb=${adNonce()}` } });
     if (signal?.aborted) return null;
     const xml = result?.xml ?? "";
     if (!xml.trim()) return null;
@@ -86,7 +94,7 @@ export async function loadVastCreative(
     const wrapper = (doc.querySelector("VASTAdTagURI")?.textContent ?? "").trim();
     if (wrapper && !doc.querySelector("MediaFile")) {
       const wrapperSep = wrapper.includes("?") ? "&" : "?";
-      return loadVastCreative(signal, `${wrapper}${wrapperSep}cb=${Date.now()}`, depth + 1);
+      return loadVastCreative(signal, `${wrapper}${wrapperSep}cb=${adNonce()}`, depth + 1);
     }
 
     const mediaUrl = pickMediaFile(doc);
@@ -94,7 +102,7 @@ export async function loadVastCreative(
 
     // Prevent browser caching of the creative so every click/replay can serve a fresh ad.
     const mediaSep = mediaUrl.includes("?") ? "&" : "?";
-    const freshMediaUrl = `${mediaUrl}${mediaSep}mzcb=${Date.now()}`;
+    const freshMediaUrl = `${mediaUrl}${mediaSep}mzcb=${adNonce()}`;
 
     return {
       mediaUrl: freshMediaUrl,

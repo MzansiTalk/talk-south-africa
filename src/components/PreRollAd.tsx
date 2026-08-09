@@ -5,6 +5,7 @@ import type { AdTarget } from "@/lib/ads";
 import {
   firePixels,
   loadVastCreative,
+  PREROLL_POST_AD_DELAY_MS,
   PREROLL_SKIP_AFTER_SECONDS,
   type VastCreative,
 } from "@/lib/preroll";
@@ -29,7 +30,8 @@ export function PreRollAd({ target, onDone }: Props) {
   const finish = () => {
     if (doneRef.current) return;
     doneRef.current = true;
-    onDone();
+    // Small delay so the ad server can register the impression before content starts.
+    window.setTimeout(onDone, PREROLL_POST_AD_DELAY_MS);
   };
 
   useEffect(() => {

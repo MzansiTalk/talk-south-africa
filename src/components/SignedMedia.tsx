@@ -122,6 +122,8 @@ export function SignedMedia({
   // ExoClick pre-roll runs ONLY on an intentional click, every single click.
   // Auto-play while scrolling never triggers an ad.
   const [showAd, setShowAd] = useState(false);
+  // Bumped on every play/replay so the ad component is destroyed and rebuilt from scratch.
+  const [adKey, setAdKey] = useState(0);
   const pendingFullscreen = useRef(false);
 
   const videoRef = useViewportPlayback(
@@ -137,6 +139,7 @@ export function SignedMedia({
     pendingFullscreen.current = true;
     void shouldShowPreRoll(ownerId).then((show) => {
       if (show) {
+        setAdKey((value) => value + 1);
         setShowAd(true);
         return;
       }
@@ -197,6 +200,7 @@ export function SignedMedia({
         </button>
         {showAd ? (
           <PreRollAd
+            key={adKey}
             target={{
               ...(postId ? { postId } : {}),
               ...(contentKind ? { contentKind } : {}),
@@ -228,9 +232,14 @@ export function SignedMedia({
               src={url}
               className="max-h-full max-w-full"
               autoPlay
-              loop
               controls
               playsInline
+              onEnded={(event) => {
+                // Replay counts as a new intentional play: fresh ad first.
+                event.currentTarget.pause();
+                setFullscreen(false);
+                openFullscreen();
+              }}
             />
           ) : (
             <img src={url} alt="MzansiTalk media full screen" className="max-h-full max-w-full" />
