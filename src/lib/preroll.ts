@@ -10,7 +10,7 @@
 
 import { getCurrentUserId } from "@/lib/api";
 
-export const VAST_TAG_URL = "https://s.magsrv.com/v1/vast.php?idz=5998094";
+export const VAST_TAG_URL = "https://s.magsrv.com/v1/vast.php?idz=5998148";
 
 /** Ad is skippable once this many seconds of the ad have played. */
 export const PREROLL_SKIP_AFTER_SECONDS = 5;
