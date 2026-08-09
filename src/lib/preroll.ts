@@ -51,7 +51,7 @@ function textList(doc: Document, selector: string) {
     .filter(Boolean);
 }
 
-/** Loads the ExoClick VAST tag. Resolves null whenever no ad can be played. */
+/** Loads the ExoClick VAST tag through the server proxy. Resolves null when no ad can play. */
 export async function loadVastCreative(
   signal?: AbortSignal,
   tagUrl: string = VAST_TAG_URL,
@@ -60,14 +60,13 @@ export async function loadVastCreative(
   if (depth > 2) return null;
   try {
     const separator = tagUrl.includes("?") ? "&" : "?";
-    const response = await fetch(`${tagUrl}${separator}cb=${Date.now()}`, {
-      ...(signal ? { signal } : {}),
-      credentials: "omit",
-    });
-    if (!response.ok) return null;
-    const xml = await response.text();
+    const result = await fetchVastXml({ data: { url: `${tagUrl}${separator}cb=${Date.now()}` } });
+    if (signal?.aborted) return null;
+    const xml = result?.xml ?? "";
+    if (!xml.trim()) return null;
     const doc = new DOMParser().parseFromString(xml, "text/xml");
     if (doc.querySelector("parsererror")) return null;
+
 
     const wrapper = (doc.querySelector("VASTAdTagURI")?.textContent ?? "").trim();
     if (wrapper && !doc.querySelector("MediaFile")) {
