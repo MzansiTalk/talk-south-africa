@@ -74,6 +74,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "6a97888e-site-verification", content: "07b9d4d39e765d1adfd8e4b7122c2755" },
+      { name: "6a97888e-site-verification", content: "e22b7cd34abb694d1d4e6caa614367ac" },
       { title: "MzansiTalk — South Africa's Social App" },
       {
         name: "description",
