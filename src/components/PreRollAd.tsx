@@ -36,7 +36,7 @@ export function PreRollAd({ target, onDone }: Props) {
     const controller = new AbortController();
     let timeout = 0;
     // Never let a slow ad server hold the content hostage.
-    timeout = window.setTimeout(finish, 8_000);
+    timeout = window.setTimeout(finish, 12_000);
     void loadVastCreative(controller.signal).then((result) => {
       window.clearTimeout(timeout);
       if (controller.signal.aborted) return;

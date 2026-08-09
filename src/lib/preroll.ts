@@ -1,57 +1,27 @@
 /**
  * ExoClick VAST 3.0 pre-roll support for MzansiTalk.
  *
- * A 5 second skippable in-stream video ad plays before a member watches a reel,
- * a long video or a status. Rules that never change:
- *  - never on the member's own upload
- *  - at most one ad per 3 pieces of content
- *  - any VAST failure silently plays the content instead (never crashes)
+ * A skippable in-stream video ad plays before EVERY reel, long video, status
+ * and before a live stream starts. The ad is skippable after 5 seconds.
+ * Any VAST failure silently plays the content instead (never crashes).
  */
 
-import { getCurrentUserId } from "@/lib/api";
+import { fetchVastXml } from "@/lib/preroll.functions";
 
 export const VAST_TAG_URL = "https://s.magsrv.com/v1/vast.php?idz=5998148";
 
 /** Ad is skippable once this many seconds of the ad have played. */
 export const PREROLL_SKIP_AFTER_SECONDS = 5;
 
-/** One pre-roll for every N pieces of content watched. */
-export const PREROLL_EVERY_N_CONTENT = 3;
+/** Pre-roll runs on every piece of content (no frequency cap). */
+export const PREROLL_EVERY_N_CONTENT = 1;
 
-const COUNTER_KEY = "mzansitalk:preroll-content-count";
-
-function readCounter() {
-  try {
-    return Number(window.localStorage.getItem(COUNTER_KEY) ?? "0") || 0;
-  } catch {
-    return 0;
-  }
-}
-
-function writeCounter(value: number) {
-  try {
-    window.localStorage.setItem(COUNTER_KEY, String(value));
-  } catch {
-    // Private mode / webview storage blocked: fall back to no capping state.
-  }
-}
-
-/**
- * Decides whether this piece of content gets a pre-roll, and counts it.
- * Returns false for the member's own content and for 2 out of every 3 items.
- */
-export async function shouldShowPreRoll(ownerId: string | null | undefined) {
+/** Pre-roll now plays before every piece of content, with no exceptions. */
+export async function shouldShowPreRoll(_ownerId?: string | null | undefined) {
   if (typeof window === "undefined") return false;
-  try {
-    const userId = await getCurrentUserId();
-    if (userId && ownerId && userId === ownerId) return false;
-  } catch {
-    // Session lookup failure must never block playback.
-  }
-  const next = readCounter() + 1;
-  writeCounter(next);
-  return next % PREROLL_EVERY_N_CONTENT === 1;
+  return true;
 }
+
 
 export type VastCreative = {
   mediaUrl: string;
@@ -81,7 +51,7 @@ function textList(doc: Document, selector: string) {
     .filter(Boolean);
 }
 
-/** Loads the ExoClick VAST tag. Resolves null whenever no ad can be played. */
+/** Loads the ExoClick VAST tag through the server proxy. Resolves null when no ad can play. */
 export async function loadVastCreative(
   signal?: AbortSignal,
   tagUrl: string = VAST_TAG_URL,
@@ -90,14 +60,13 @@ export async function loadVastCreative(
   if (depth > 2) return null;
   try {
     const separator = tagUrl.includes("?") ? "&" : "?";
-    const response = await fetch(`${tagUrl}${separator}cb=${Date.now()}`, {
-      ...(signal ? { signal } : {}),
-      credentials: "omit",
-    });
-    if (!response.ok) return null;
-    const xml = await response.text();
+    const result = await fetchVastXml({ data: { url: `${tagUrl}${separator}cb=${Date.now()}` } });
+    if (signal?.aborted) return null;
+    const xml = result?.xml ?? "";
+    if (!xml.trim()) return null;
     const doc = new DOMParser().parseFromString(xml, "text/xml");
     if (doc.querySelector("parsererror")) return null;
+
 
     const wrapper = (doc.querySelector("VASTAdTagURI")?.textContent ?? "").trim();
     if (wrapper && !doc.querySelector("MediaFile")) {
