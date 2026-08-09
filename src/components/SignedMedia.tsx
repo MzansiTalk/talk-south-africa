@@ -194,7 +194,7 @@ export function SignedMedia({
             </span>
           ) : null}
         </button>
-        {gate === "ad" ? (
+        {showAd ? (
           <PreRollAd
             target={{
               ...(postId ? { postId } : {}),
@@ -204,7 +204,7 @@ export function SignedMedia({
             onDone={finishAd}
           />
         ) : null}
-        {isVideo && gate === "clear" ? (
+        {isVideo && !showAd ? (
           <button
             type="button"
             onClick={() => setMuted((value) => !value)}
