@@ -13,10 +13,10 @@ export const VAST_TAG_URL = "https://s.magsrv.com/v1/vast.php?idz=5998148";
 /** Ad is skippable once this many seconds of the ad have played. */
 export const PREROLL_SKIP_AFTER_SECONDS = 5;
 
-/** Pre-roll runs on every piece of content (no frequency cap). */
+/** Pre-roll runs on every intentional click (no frequency cap). */
 export const PREROLL_EVERY_N_CONTENT = 1;
 
-/** Pre-roll now plays before every piece of content, with no exceptions. */
+/** Pre-roll plays on every intentional click to watch, with no exceptions. */
 export async function shouldShowPreRoll(_ownerId?: string | null | undefined) {
   if (typeof window === "undefined") return false;
   return true;
