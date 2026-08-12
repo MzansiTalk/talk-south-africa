@@ -12,7 +12,12 @@ import { signUpWithPassKey } from "@/lib/passkey.functions";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      {
+        name: "048039a7b7ac776ea7a9f23d6559fb6cc8b38983",
+        content: "048039a7b7ac776ea7a9f23d6559fb6cc8b38983",
+      },
       { title: "Sign Up or Log In — MzansiTalk" },
+
       {
         name: "description",
         content:
