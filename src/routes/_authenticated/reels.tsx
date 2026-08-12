@@ -4,9 +4,12 @@ import { Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { PostCard } from "@/components/PostCard";
+import { ReelPreRollAd } from "@/components/ReelPreRollAd";
 import { Screen } from "@/components/Shell";
 import { fetchFeed } from "@/lib/api";
 import { countView } from "@/lib/creators";
+import { pauseAllVideos } from "@/lib/reel-preroll";
+
 
 
 export const Route = createFileRoute("/_authenticated/reels")({
@@ -63,6 +66,44 @@ function Reels() {
     observer.observe(node);
   };
 
+  const [adKey, setAdKey] = useState(0);
+  const [showAd, setShowAd] = useState(false);
+  const pending = useRef<HTMLElement | null>(null);
+  const bypass = useRef(false);
+
+  /**
+   * Reels page only: plays a fresh HilltopAds VAST pre-roll, then opens the
+   * reel the member clicked. Autoplay previews while scrolling are untouched.
+   */
+  const playReelWithAd = (trigger: HTMLElement) => {
+    pauseAllVideos();
+    pending.current = trigger;
+    setAdKey((key) => key + 1);
+    setShowAd(true);
+  };
+
+  const onAdDone = () => {
+    setShowAd(false);
+    const trigger = pending.current;
+    pending.current = null;
+    if (!trigger) return;
+    bypass.current = true;
+    trigger.click();
+    setTimeout(() => {
+      bypass.current = false;
+    }, 0);
+  };
+
+  const interceptWatchClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (bypass.current || showAd) return;
+    const target = event.target as HTMLElement | null;
+    const trigger = target?.closest<HTMLElement>('button[aria-label="Open in full screen"]');
+    if (!trigger) return;
+    event.preventDefault();
+    event.stopPropagation();
+    playReelWithAd(trigger);
+  };
+
   return (
     <Screen title="Reels">
       <div className="field field-focus mb-4 flex items-center gap-2">
@@ -80,7 +121,7 @@ function Reels() {
           No reels yet. Create one from the Create tab.
         </p>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4" onClickCapture={interceptWatchClick}>
           {items.map((item) => (
             <div key={item.id} ref={observe(item.id)} className="space-y-4">
               <PostCard item={item} />
@@ -88,7 +129,10 @@ function Reels() {
           ))}
         </div>
       )}
+
+      {showAd ? <ReelPreRollAd key={adKey} onDone={onAdDone} /> : null}
     </Screen>
   );
 }
+
 
