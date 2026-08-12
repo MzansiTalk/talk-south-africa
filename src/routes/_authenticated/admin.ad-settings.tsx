@@ -4,7 +4,6 @@ import { ShieldAlert } from "lucide-react";
 
 import { Screen } from "@/components/Shell";
 import { getMyEmail, OWNER_EMAIL } from "@/lib/api";
-import { PREROLL_EVERY_N_CONTENT, PREROLL_SKIP_AFTER_SECONDS, VAST_TAG_URL } from "@/lib/preroll";
 
 export const Route = createFileRoute("/_authenticated/admin/ad-settings")({
   head: () => ({
@@ -70,9 +69,6 @@ function AdSettingsPage() {
         </p>
         <Row label="Ad network" value="ExoClick (VAST 3.0)" />
         <Row label="Ad type" value="In-stream video pre-roll" />
-        <Row label="VAST tag" value={VAST_TAG_URL} />
-        <Row label="Skip after" value={`${PREROLL_SKIP_AFTER_SECONDS} seconds`} />
-        <Row label="Frequency cap" value={`1 ad per ${PREROLL_EVERY_N_CONTENT} pieces of content`} />
         <Row label="Surfaces" value="Reels · Videos · Status · Live" />
       </section>
 

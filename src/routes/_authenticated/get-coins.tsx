@@ -4,8 +4,9 @@ import { BadgeCheck, Coins, Rocket } from "lucide-react";
 import { toast } from "sonner";
 
 import { Screen } from "@/components/Shell";
-import { REWARDED_COINS } from "@/config/ads";
 import {
+
+const REWARDED_COINS = 5;
   addRewardCoins,
   billingAvailable,
   fetchEntitlements,
