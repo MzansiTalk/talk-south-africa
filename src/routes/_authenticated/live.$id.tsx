@@ -46,7 +46,6 @@ function LiveViewer() {
   const [comment, setComment] = useState("");
   const [limited, setLimited] = useState(false);
   // ExoClick pre-roll runs once before the stream is revealed.
-  const [adState, setAdState] = useState<"idle" | "playing" | "done">("idle");
   // Meta policy: no ads anywhere in the app while watching a live stream.
   useAdsPausedForLive(true);
 
