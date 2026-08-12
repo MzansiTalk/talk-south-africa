@@ -5,8 +5,6 @@ import { toast } from "sonner";
 
 import { Screen } from "@/components/Shell";
 import {
-
-const REWARDED_COINS = 5;
   addRewardCoins,
   billingAvailable,
   fetchEntitlements,
@@ -14,6 +12,8 @@ const REWARDED_COINS = 5;
   requestPurchase,
   type ProductId,
 } from "@/lib/billing";
+
+const REWARDED_COINS = 5;
 
 export const Route = createFileRoute("/_authenticated/get-coins")({
   head: () => ({
