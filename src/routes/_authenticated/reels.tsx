@@ -4,9 +4,12 @@ import { Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { PostCard } from "@/components/PostCard";
+import { ReelPreRollAd } from "@/components/ReelPreRollAd";
 import { Screen } from "@/components/Shell";
 import { fetchFeed } from "@/lib/api";
 import { countView } from "@/lib/creators";
+import { pauseAllVideos } from "@/lib/reel-preroll";
+
 
 
 export const Route = createFileRoute("/_authenticated/reels")({
