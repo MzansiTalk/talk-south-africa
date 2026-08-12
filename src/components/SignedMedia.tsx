@@ -2,9 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Play, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { PreRollAd } from "@/components/PreRollAd";
 import { signedUrl } from "@/lib/api";
-import { pauseAllVideos, shouldShowPreRoll } from "@/lib/preroll";
 
 
 export function useMediaUrl(path: string | null | undefined) {
@@ -119,42 +117,16 @@ export function SignedMedia({
   const isVideo = type === "video";
   const onAutoplayBlocked = useCallback(() => setMuted(true), []);
 
-  // ExoClick pre-roll runs ONLY on an intentional click, every single click.
-  // Auto-play while scrolling never triggers an ad.
-  const [showAd, setShowAd] = useState(false);
-  // Bumped on every play/replay so the ad component is destroyed and rebuilt from scratch.
-  const [adKey, setAdKey] = useState(0);
-  const pendingFullscreen = useRef(false);
-
   const videoRef = useViewportPlayback(
-    Boolean(url) && isVideo && !fullscreen && !showAd,
-    autoPlay && !showAd,
+    Boolean(url) && isVideo && !fullscreen,
+    autoPlay,
     muted,
     onAutoplayBlocked,
   );
 
   const openFullscreen = () => {
-    if (showAd) return;
-    pauseAllVideos();
-    pendingFullscreen.current = true;
-    void shouldShowPreRoll(ownerId).then((show) => {
-      if (show) {
-        setAdKey((value) => value + 1);
-        setShowAd(true);
-        return;
-      }
-      pendingFullscreen.current = false;
-      setFullscreen(true);
-    });
+    setFullscreen(true);
   };
-
-  const finishAd = useCallback(() => {
-    setShowAd(false);
-    if (pendingFullscreen.current) {
-      pendingFullscreen.current = false;
-      setFullscreen(true);
-    }
-  }, []);
 
   if (!path) return null;
 
@@ -198,18 +170,7 @@ export function SignedMedia({
             </span>
           ) : null}
         </button>
-        {showAd ? (
-          <PreRollAd
-            key={adKey}
-            target={{
-              ...(postId ? { postId } : {}),
-              ...(contentKind ? { contentKind } : {}),
-              ...(ownerId ? { ownerId } : {}),
-            }}
-            onDone={finishAd}
-          />
-        ) : null}
-        {isVideo && !showAd ? (
+        {isVideo ? (
           <button
             type="button"
             onClick={() => setMuted((value) => !value)}

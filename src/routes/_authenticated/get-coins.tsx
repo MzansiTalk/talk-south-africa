@@ -4,7 +4,6 @@ import { BadgeCheck, Coins, Rocket } from "lucide-react";
 import { toast } from "sonner";
 
 import { Screen } from "@/components/Shell";
-import { REWARDED_COINS } from "@/config/ads";
 import {
   addRewardCoins,
   billingAvailable,
@@ -13,6 +12,8 @@ import {
   requestPurchase,
   type ProductId,
 } from "@/lib/billing";
+
+const REWARDED_COINS = 5;
 
 export const Route = createFileRoute("/_authenticated/get-coins")({
   head: () => ({

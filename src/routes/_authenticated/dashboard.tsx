@@ -5,10 +5,11 @@ import { toast } from "sonner";
 
 import { Screen } from "@/components/Shell";
 import { formatCount } from "@/components/MediaGrid";
-import { REWARDED_COINS } from "@/config/ads";
 import { fetchMyBoosts } from "@/lib/api";
 import { addRewardCoins, fetchEntitlements } from "@/lib/billing";
 import { fetchMyEarnings } from "@/lib/live";
+
+const REWARDED_COINS = 5;
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
