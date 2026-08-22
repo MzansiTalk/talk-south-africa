@@ -8,8 +8,6 @@ import {
   Flame,
   Gavel,
   Inbox,
-  LineChart,
-  Megaphone,
 
   Music,
   Rocket,
