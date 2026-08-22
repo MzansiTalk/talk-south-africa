@@ -54,12 +54,11 @@ function GuidelinesPage() {
         </ul>
       </Section>
 
-      <Section title="Content next to ads">
+      <Section title="Monetisation">
         <p>
-          MzansiTalk is monetised with skippable ExoClick pre-roll video ads. Ads are never placed on
-          content that breaks these guidelines, on flagged or hidden posts, on banned accounts, or during
-          a live stream. Content that breaks these rules is not eligible for monetisation or creator
-          earnings.
+          MzansiTalk carries no advertising anywhere in the app. Monetisation comes from in-app
+          purchases and sponsored placements, and content that breaks these guidelines is not
+          eligible for monetisation or creator earnings.
         </p>
       </Section>
 

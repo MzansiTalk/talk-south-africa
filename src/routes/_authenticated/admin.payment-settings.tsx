@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/admin/payment-settings")({
       {
         name: "description",
         content:
-          "Owner-only MzansiTalk money control centre: ExoClick ad revenue, Paystack sponsored and boost payments, and your own pricing.",
+          "Owner-only MzansiTalk money control centre: Paystack sponsored and boost payments, and your own pricing.",
       },
       { property: "og:title", content: "Owner Money Center — MzansiTalk" },
       { property: "og:description", content: "One page to control every way MzansiTalk earns money." },
@@ -199,28 +199,9 @@ function MoneyCenter() {
         WARNING: OWNER ONLY. This controls ALL app revenue.
       </div>
       <p className="mt-2 rounded-2xl border border-gold/50 bg-gold/10 p-4 text-xs font-semibold">
-        This controls ALL app revenue. ExoClick for ads. Paystack for Sponsored, Boosts and in-app
-        purchases. All money goes directly to you.
+        This controls ALL app revenue. Paystack for Sponsored, Boosts and in-app purchases. All
+        money goes directly to you.
       </p>
-
-      {/* SECTION A */}
-      <section className="mt-4 space-y-3 rounded-2xl border border-border bg-card p-4">
-        <h2 className="text-sm font-bold uppercase tracking-wide">
-          Ad Revenue from Reels, Videos, Status and Live
-        </h2>
-        <p className="text-xs text-muted-foreground">
-          ExoClick is the only ad network in MzansiTalk. A 5 second skippable pre-roll video plays
-          before a reel, video, status or live stream — at most one ad every 3 pieces of content, and
-          never on a member&apos;s own upload. ExoClick pays you directly. There are no banner,
-          interstitial, native or rewarded ads, and no Meta or Google AdMob code anywhere.
-        </p>
-        <p className="rounded-xl bg-secondary/60 p-3 text-[0.68rem] font-semibold">
-          VAST tag in use: https://s.magsrv.com/v1/vast.php?idz=5998094
-        </p>
-
-
-
-      </section>
 
       {/* SECTION B */}
       <section className="mt-4 space-y-3 rounded-2xl border border-border bg-card p-4">
@@ -363,18 +344,13 @@ function MoneyCenter() {
       <section className="mt-4 space-y-2 rounded-2xl border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
         <h2 className="text-sm font-bold uppercase tracking-wide text-foreground">How Money Flows</h2>
         <p>
-          <strong>Ad money:</strong> a member opens a reel, video, status or live → a 5 second
-          skippable ExoClick pre-roll plays → ExoClick collects the money → ExoClick pays you directly
-          into your own bank account. No other ad network is used anywhere in MzansiTalk.
-        </p>
-        <p>
           <strong>Sponsored / Boost money:</strong> a brand or member pays at Paystack checkout → money
           goes directly into your Paystack account → your bank in 1–2 days.
         </p>
         <p>
-          Only the Owner ({OWNER_EMAIL}) can edit these keys. There are 2 payment systems: ExoClick
-          for ads and Paystack for Sponsored, Boosts and in-app purchases. MzansiTalk never stores
-          your bank details — only the keys above.
+          Only the Owner ({OWNER_EMAIL}) can edit these keys. Paystack handles Sponsored, Boosts
+          and in-app purchases. MzansiTalk carries no advertising and never stores your bank details
+          — only the keys above.
         </p>
 
       </section>

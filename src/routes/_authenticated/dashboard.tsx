@@ -115,7 +115,7 @@ function DashboardPage() {
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
           Boost Live (R50), 100 Coins (R29) and Premium Monthly (R29) are sold through Google Play
-          Billing only. Ads are served by ExoClick as a 5 second skippable pre-roll video only.
+          Billing only. MzansiTalk shows no advertising.
         </p>
         <Link to="/get-coins" className="btn-base btn-primary mt-3 w-full">
           <Coins className="size-4" /> Get Coins &amp; Premium

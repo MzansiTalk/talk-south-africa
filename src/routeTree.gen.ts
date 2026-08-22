@@ -28,7 +28,6 @@ import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/h
 import { Route as AuthenticatedMyBoostsRouteImport } from './routes/_authenticated/my-boosts'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedPaymentMethodsRouteImport } from './routes/_authenticated/payment-methods'
-import { Route as AuthenticatedPrivacyRouteImport } from './routes/_authenticated/privacy'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedReelsRouteImport } from './routes/_authenticated/reels'
 import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated/search'
@@ -37,8 +36,6 @@ import { Route as AuthenticatedStatusRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as RUsernameRouteImport } from './routes/r.$username'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as AuthenticatedAdminAdEarningsRouteImport } from './routes/_authenticated/admin.ad-earnings'
-import { Route as AuthenticatedAdminAdSettingsRouteImport } from './routes/_authenticated/admin.ad-settings'
 import { Route as AuthenticatedAdminAppealsRouteImport } from './routes/_authenticated/admin.appeals'
 import { Route as AuthenticatedAdminBoostsRouteImport } from './routes/_authenticated/admin.boosts'
 import { Route as AuthenticatedAdminCopyrightRouteImport } from './routes/_authenticated/admin.copyright'
@@ -155,11 +152,6 @@ const AuthenticatedPaymentMethodsRoute =
     path: '/payment-methods',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedPrivacyRoute = AuthenticatedPrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -200,18 +192,6 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAdminAdEarningsRoute =
-  AuthenticatedAdminAdEarningsRouteImport.update({
-    id: '/admin/ad-earnings',
-    path: '/admin/ad-earnings',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAdminAdSettingsRoute =
-  AuthenticatedAdminAdSettingsRouteImport.update({
-    id: '/admin/ad-settings',
-    path: '/admin/ad-settings',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedAdminAppealsRoute =
   AuthenticatedAdminAppealsRouteImport.update({
     id: '/admin/appeals',
@@ -328,7 +308,6 @@ export interface FileRoutesByFullPath {
   '/my-boosts': typeof AuthenticatedMyBoostsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/payment-methods': typeof AuthenticatedPaymentMethodsRoute
-  '/privacy': typeof AuthenticatedPrivacyRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/reels': typeof AuthenticatedReelsRoute
   '/search': typeof AuthenticatedSearchRoute
@@ -336,8 +315,6 @@ export interface FileRoutesByFullPath {
   '/status': typeof AuthenticatedStatusRoute
   '/support': typeof AuthenticatedSupportRoute
   '/r/$username': typeof RUsernameRoute
-  '/admin/ad-earnings': typeof AuthenticatedAdminAdEarningsRoute
-  '/admin/ad-settings': typeof AuthenticatedAdminAdSettingsRoute
   '/admin/appeals': typeof AuthenticatedAdminAppealsRoute
   '/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
@@ -376,7 +353,6 @@ export interface FileRoutesByTo {
   '/my-boosts': typeof AuthenticatedMyBoostsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/payment-methods': typeof AuthenticatedPaymentMethodsRoute
-  '/privacy': typeof AuthenticatedPrivacyRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/reels': typeof AuthenticatedReelsRoute
   '/search': typeof AuthenticatedSearchRoute
@@ -384,8 +360,6 @@ export interface FileRoutesByTo {
   '/status': typeof AuthenticatedStatusRoute
   '/support': typeof AuthenticatedSupportRoute
   '/r/$username': typeof RUsernameRoute
-  '/admin/ad-earnings': typeof AuthenticatedAdminAdEarningsRoute
-  '/admin/ad-settings': typeof AuthenticatedAdminAdSettingsRoute
   '/admin/appeals': typeof AuthenticatedAdminAppealsRoute
   '/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
@@ -426,7 +400,6 @@ export interface FileRoutesById {
   '/_authenticated/my-boosts': typeof AuthenticatedMyBoostsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/payment-methods': typeof AuthenticatedPaymentMethodsRoute
-  '/_authenticated/privacy': typeof AuthenticatedPrivacyRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/reels': typeof AuthenticatedReelsRoute
   '/_authenticated/search': typeof AuthenticatedSearchRoute
@@ -434,8 +407,6 @@ export interface FileRoutesById {
   '/_authenticated/status': typeof AuthenticatedStatusRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/r/$username': typeof RUsernameRoute
-  '/_authenticated/admin/ad-earnings': typeof AuthenticatedAdminAdEarningsRoute
-  '/_authenticated/admin/ad-settings': typeof AuthenticatedAdminAdSettingsRoute
   '/_authenticated/admin/appeals': typeof AuthenticatedAdminAppealsRoute
   '/_authenticated/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/_authenticated/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
@@ -476,7 +447,6 @@ export interface FileRouteTypes {
     | '/my-boosts'
     | '/notifications'
     | '/payment-methods'
-    | '/privacy'
     | '/profile'
     | '/reels'
     | '/search'
@@ -484,8 +454,6 @@ export interface FileRouteTypes {
     | '/status'
     | '/support'
     | '/r/$username'
-    | '/admin/ad-earnings'
-    | '/admin/ad-settings'
     | '/admin/appeals'
     | '/admin/boosts'
     | '/admin/copyright'
@@ -524,7 +492,6 @@ export interface FileRouteTypes {
     | '/my-boosts'
     | '/notifications'
     | '/payment-methods'
-    | '/privacy'
     | '/profile'
     | '/reels'
     | '/search'
@@ -532,8 +499,6 @@ export interface FileRouteTypes {
     | '/status'
     | '/support'
     | '/r/$username'
-    | '/admin/ad-earnings'
-    | '/admin/ad-settings'
     | '/admin/appeals'
     | '/admin/boosts'
     | '/admin/copyright'
@@ -573,7 +538,6 @@ export interface FileRouteTypes {
     | '/_authenticated/my-boosts'
     | '/_authenticated/notifications'
     | '/_authenticated/payment-methods'
-    | '/_authenticated/privacy'
     | '/_authenticated/profile'
     | '/_authenticated/reels'
     | '/_authenticated/search'
@@ -581,8 +545,6 @@ export interface FileRouteTypes {
     | '/_authenticated/status'
     | '/_authenticated/support'
     | '/r/$username'
-    | '/_authenticated/admin/ad-earnings'
-    | '/_authenticated/admin/ad-settings'
     | '/_authenticated/admin/appeals'
     | '/_authenticated/admin/boosts'
     | '/_authenticated/admin/copyright'
@@ -748,13 +710,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPaymentMethodsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/privacy': {
-      id: '/_authenticated/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof AuthenticatedPrivacyRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -809,20 +764,6 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/admin/ad-earnings': {
-      id: '/_authenticated/admin/ad-earnings'
-      path: '/admin/ad-earnings'
-      fullPath: '/admin/ad-earnings'
-      preLoaderRoute: typeof AuthenticatedAdminAdEarningsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/admin/ad-settings': {
-      id: '/_authenticated/admin/ad-settings'
-      path: '/admin/ad-settings'
-      fullPath: '/admin/ad-settings'
-      preLoaderRoute: typeof AuthenticatedAdminAdSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/appeals': {
@@ -961,15 +902,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyBoostsRoute: typeof AuthenticatedMyBoostsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedPaymentMethodsRoute: typeof AuthenticatedPaymentMethodsRoute
-  AuthenticatedPrivacyRoute: typeof AuthenticatedPrivacyRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReelsRoute: typeof AuthenticatedReelsRoute
   AuthenticatedSearchRoute: typeof AuthenticatedSearchRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedStatusRoute: typeof AuthenticatedStatusRoute
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
-  AuthenticatedAdminAdEarningsRoute: typeof AuthenticatedAdminAdEarningsRoute
-  AuthenticatedAdminAdSettingsRoute: typeof AuthenticatedAdminAdSettingsRoute
   AuthenticatedAdminAppealsRoute: typeof AuthenticatedAdminAppealsRoute
   AuthenticatedAdminBoostsRoute: typeof AuthenticatedAdminBoostsRoute
   AuthenticatedAdminCopyrightRoute: typeof AuthenticatedAdminCopyrightRoute
@@ -1004,15 +942,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyBoostsRoute: AuthenticatedMyBoostsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedPaymentMethodsRoute: AuthenticatedPaymentMethodsRoute,
-  AuthenticatedPrivacyRoute: AuthenticatedPrivacyRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReelsRoute: AuthenticatedReelsRoute,
   AuthenticatedSearchRoute: AuthenticatedSearchRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedStatusRoute: AuthenticatedStatusRoute,
   AuthenticatedSupportRoute: AuthenticatedSupportRoute,
-  AuthenticatedAdminAdEarningsRoute: AuthenticatedAdminAdEarningsRoute,
-  AuthenticatedAdminAdSettingsRoute: AuthenticatedAdminAdSettingsRoute,
   AuthenticatedAdminAppealsRoute: AuthenticatedAdminAppealsRoute,
   AuthenticatedAdminBoostsRoute: AuthenticatedAdminBoostsRoute,
   AuthenticatedAdminCopyrightRoute: AuthenticatedAdminCopyrightRoute,
