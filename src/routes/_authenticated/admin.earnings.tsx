@@ -155,14 +155,6 @@ function EarningsPage() {
 
       <div className="mt-4 grid gap-2">
         <a
-          href="https://admin.exoclick.com/"
-          target="_blank"
-          rel="noreferrer"
-          className="btn-base btn-primary"
-        >
-          <ExternalLink className="size-4" /> Open ExoClick Dashboard
-        </a>
-        <a
           href="https://dashboard.paystack.com"
           target="_blank"
           rel="noreferrer"
