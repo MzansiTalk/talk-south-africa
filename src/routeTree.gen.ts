@@ -37,8 +37,6 @@ import { Route as AuthenticatedStatusRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as RUsernameRouteImport } from './routes/r.$username'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as AuthenticatedAdminAdEarningsRouteImport } from './routes/_authenticated/admin.ad-earnings'
-import { Route as AuthenticatedAdminAdSettingsRouteImport } from './routes/_authenticated/admin.ad-settings'
 import { Route as AuthenticatedAdminAppealsRouteImport } from './routes/_authenticated/admin.appeals'
 import { Route as AuthenticatedAdminBoostsRouteImport } from './routes/_authenticated/admin.boosts'
 import { Route as AuthenticatedAdminCopyrightRouteImport } from './routes/_authenticated/admin.copyright'
@@ -200,18 +198,6 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAdminAdEarningsRoute =
-  AuthenticatedAdminAdEarningsRouteImport.update({
-    id: '/admin/ad-earnings',
-    path: '/admin/ad-earnings',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAdminAdSettingsRoute =
-  AuthenticatedAdminAdSettingsRouteImport.update({
-    id: '/admin/ad-settings',
-    path: '/admin/ad-settings',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedAdminAppealsRoute =
   AuthenticatedAdminAppealsRouteImport.update({
     id: '/admin/appeals',
@@ -336,8 +322,6 @@ export interface FileRoutesByFullPath {
   '/status': typeof AuthenticatedStatusRoute
   '/support': typeof AuthenticatedSupportRoute
   '/r/$username': typeof RUsernameRoute
-  '/admin/ad-earnings': typeof AuthenticatedAdminAdEarningsRoute
-  '/admin/ad-settings': typeof AuthenticatedAdminAdSettingsRoute
   '/admin/appeals': typeof AuthenticatedAdminAppealsRoute
   '/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
@@ -384,8 +368,6 @@ export interface FileRoutesByTo {
   '/status': typeof AuthenticatedStatusRoute
   '/support': typeof AuthenticatedSupportRoute
   '/r/$username': typeof RUsernameRoute
-  '/admin/ad-earnings': typeof AuthenticatedAdminAdEarningsRoute
-  '/admin/ad-settings': typeof AuthenticatedAdminAdSettingsRoute
   '/admin/appeals': typeof AuthenticatedAdminAppealsRoute
   '/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
@@ -434,8 +416,6 @@ export interface FileRoutesById {
   '/_authenticated/status': typeof AuthenticatedStatusRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/r/$username': typeof RUsernameRoute
-  '/_authenticated/admin/ad-earnings': typeof AuthenticatedAdminAdEarningsRoute
-  '/_authenticated/admin/ad-settings': typeof AuthenticatedAdminAdSettingsRoute
   '/_authenticated/admin/appeals': typeof AuthenticatedAdminAppealsRoute
   '/_authenticated/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/_authenticated/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
@@ -484,8 +464,6 @@ export interface FileRouteTypes {
     | '/status'
     | '/support'
     | '/r/$username'
-    | '/admin/ad-earnings'
-    | '/admin/ad-settings'
     | '/admin/appeals'
     | '/admin/boosts'
     | '/admin/copyright'
@@ -532,8 +510,6 @@ export interface FileRouteTypes {
     | '/status'
     | '/support'
     | '/r/$username'
-    | '/admin/ad-earnings'
-    | '/admin/ad-settings'
     | '/admin/appeals'
     | '/admin/boosts'
     | '/admin/copyright'
@@ -581,8 +557,6 @@ export interface FileRouteTypes {
     | '/_authenticated/status'
     | '/_authenticated/support'
     | '/r/$username'
-    | '/_authenticated/admin/ad-earnings'
-    | '/_authenticated/admin/ad-settings'
     | '/_authenticated/admin/appeals'
     | '/_authenticated/admin/boosts'
     | '/_authenticated/admin/copyright'
@@ -811,20 +785,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin/ad-earnings': {
-      id: '/_authenticated/admin/ad-earnings'
-      path: '/admin/ad-earnings'
-      fullPath: '/admin/ad-earnings'
-      preLoaderRoute: typeof AuthenticatedAdminAdEarningsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/admin/ad-settings': {
-      id: '/_authenticated/admin/ad-settings'
-      path: '/admin/ad-settings'
-      fullPath: '/admin/ad-settings'
-      preLoaderRoute: typeof AuthenticatedAdminAdSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/admin/appeals': {
       id: '/_authenticated/admin/appeals'
       path: '/admin/appeals'
@@ -968,8 +928,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedStatusRoute: typeof AuthenticatedStatusRoute
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
-  AuthenticatedAdminAdEarningsRoute: typeof AuthenticatedAdminAdEarningsRoute
-  AuthenticatedAdminAdSettingsRoute: typeof AuthenticatedAdminAdSettingsRoute
   AuthenticatedAdminAppealsRoute: typeof AuthenticatedAdminAppealsRoute
   AuthenticatedAdminBoostsRoute: typeof AuthenticatedAdminBoostsRoute
   AuthenticatedAdminCopyrightRoute: typeof AuthenticatedAdminCopyrightRoute
@@ -1011,8 +969,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedStatusRoute: AuthenticatedStatusRoute,
   AuthenticatedSupportRoute: AuthenticatedSupportRoute,
-  AuthenticatedAdminAdEarningsRoute: AuthenticatedAdminAdEarningsRoute,
-  AuthenticatedAdminAdSettingsRoute: AuthenticatedAdminAdSettingsRoute,
   AuthenticatedAdminAppealsRoute: AuthenticatedAdminAppealsRoute,
   AuthenticatedAdminBoostsRoute: AuthenticatedAdminBoostsRoute,
   AuthenticatedAdminCopyrightRoute: AuthenticatedAdminCopyrightRoute,

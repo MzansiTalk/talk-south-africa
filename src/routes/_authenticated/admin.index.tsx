@@ -101,16 +101,6 @@ function AdminPage() {
             <Wallet className="size-4 text-gold" /> Owner Money Center
           </Link>
         ) : null}
-        {isOwner ? (
-          <Link to="/admin/ad-settings" className="btn-base bg-secondary text-secondary-foreground">
-            <Megaphone className="size-4 text-gold" /> Ad Settings
-          </Link>
-        ) : null}
-        {isOwner ? (
-          <Link to="/admin/ad-earnings" className="btn-base bg-secondary text-secondary-foreground">
-            <LineChart className="size-4 text-gold" /> Ad Earnings
-          </Link>
-        ) : null}
 
         <Link to="/admin/management" className="btn-base bg-secondary text-secondary-foreground">
           <UserCog className="size-4" /> Admin Management

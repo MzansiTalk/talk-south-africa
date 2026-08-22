@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { Avatar } from "@/components/SignedMedia";
 import { Screen } from "@/components/Shell";
 import { supabase } from "@/integrations/supabase/client";
-import { useAdsPausedForLive } from "@/lib/ads";
 import { fetchMyProfile } from "@/lib/api";
 import {
   addLiveComment,
@@ -45,9 +44,6 @@ function LiveViewer() {
   const queryClient = useQueryClient();
   const [comment, setComment] = useState("");
   const [limited, setLimited] = useState(false);
-  // ExoClick pre-roll runs once before the stream is revealed.
-  // Meta policy: no ads anywhere in the app while watching a live stream.
-  useAdsPausedForLive(true);
 
   const me = useQuery({ queryKey: ["my-profile"], queryFn: fetchMyProfile });
   const live = useQuery({ queryKey: ["live", id], queryFn: () => fetchLive(id), refetchInterval: 15_000 });

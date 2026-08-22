@@ -5,7 +5,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Screen } from "@/components/Shell";
-import { fetchCreatorAdStats } from "@/lib/ads";
 import { fetchMyProfile } from "@/lib/api";
 import {
   CREATOR_INVITE_TARGET,
@@ -67,7 +66,6 @@ function CreatorProgramPage() {
     queryFn: fetchMyCreatorApplication,
   });
   const payouts = useQuery({ queryKey: ["my-payouts"], queryFn: fetchMyPayouts });
-  const adStats = useQuery({ queryKey: ["creator-ad-stats"], queryFn: fetchCreatorAdStats });
 
   const [form, setForm] = useState({
     full_name: "",
@@ -133,51 +131,6 @@ function CreatorProgramPage() {
         ) : null}
       </section>
 
-      <section className="mt-4 rounded-2xl border border-border bg-card p-4">
-        <h2 className="flex items-center gap-2 text-sm font-bold">
-          <Wallet className="size-4 text-gold" /> Ad Earnings (20% of ad revenue)
-        </h2>
-        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-          <div className="rounded-xl bg-secondary/60 p-3">
-            <p className="text-[0.66rem] text-muted-foreground">Total Views</p>
-            <p className="font-display text-lg font-bold">
-              {(adStats.data?.totals.views ?? 0).toLocaleString()}
-            </p>
-          </div>
-          <div className="rounded-xl bg-secondary/60 p-3">
-            <p className="text-[0.66rem] text-muted-foreground">Ad Clicks</p>
-            <p className="font-display text-lg font-bold">
-              {(adStats.data?.totals.clicks ?? 0).toLocaleString()}
-            </p>
-          </div>
-          <div className="rounded-xl bg-secondary/60 p-3">
-            <p className="text-[0.66rem] text-muted-foreground">Estimated Earnings</p>
-            <p className="font-display text-lg font-bold text-gold">
-              R{(adStats.data?.totals.creator_earnings ?? 0).toFixed(2)}
-            </p>
-          </div>
-        </div>
-        <ul className="mt-3 space-y-2 text-xs">
-          {(adStats.data?.breakdown ?? []).map((row) => (
-            <li
-              key={row.kind}
-              className="flex items-center justify-between rounded-xl bg-secondary/40 p-2"
-            >
-              <span className="font-semibold capitalize">
-                {row.kind === "reel" ? "Reels" : row.kind === "post" ? "Posts" : row.kind === "video" ? "Videos" : "Status"}
-              </span>
-              <span className="text-muted-foreground">
-                {row.views.toLocaleString()} views · {row.clicks.toLocaleString()} ad clicks · R
-                {row.creator_earnings.toFixed(2)}
-              </span>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-3 text-[0.7rem] text-muted-foreground">
-          Every ad shown on your content earns you {Math.round(CREATOR_SHARE * 100)}% of its revenue;
-          MzansiTalk keeps {Math.round(PLATFORM_SHARE * 100)}%.
-        </p>
-      </section>
 
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold">Your Invite Link</h2>
