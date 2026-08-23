@@ -37,6 +37,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedStatusRouteImport } from './routes/_authenticated/status'
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as RUsernameRouteImport } from './routes/r.$username'
+import { Route as WatchIdRouteImport } from './routes/watch.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAppealsRouteImport } from './routes/_authenticated/admin.appeals'
 import { Route as AuthenticatedAdminBoostsRouteImport } from './routes/_authenticated/admin.boosts'
@@ -199,6 +200,11 @@ const RUsernameRoute = RUsernameRouteImport.update({
   path: '/r/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WatchIdRoute = WatchIdRouteImport.update({
+  id: '/watch/$id',
+  path: '/watch/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -329,6 +335,7 @@ export interface FileRoutesByFullPath {
   '/status': typeof AuthenticatedStatusRoute
   '/support': typeof AuthenticatedSupportRoute
   '/r/$username': typeof RUsernameRoute
+  '/watch/$id': typeof WatchIdRoute
   '/admin/appeals': typeof AuthenticatedAdminAppealsRoute
   '/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
@@ -376,6 +383,7 @@ export interface FileRoutesByTo {
   '/status': typeof AuthenticatedStatusRoute
   '/support': typeof AuthenticatedSupportRoute
   '/r/$username': typeof RUsernameRoute
+  '/watch/$id': typeof WatchIdRoute
   '/admin/appeals': typeof AuthenticatedAdminAppealsRoute
   '/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
@@ -425,6 +433,7 @@ export interface FileRoutesById {
   '/_authenticated/status': typeof AuthenticatedStatusRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/r/$username': typeof RUsernameRoute
+  '/watch/$id': typeof WatchIdRoute
   '/_authenticated/admin/appeals': typeof AuthenticatedAdminAppealsRoute
   '/_authenticated/admin/boosts': typeof AuthenticatedAdminBoostsRoute
   '/_authenticated/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
@@ -474,6 +483,7 @@ export interface FileRouteTypes {
     | '/status'
     | '/support'
     | '/r/$username'
+    | '/watch/$id'
     | '/admin/appeals'
     | '/admin/boosts'
     | '/admin/copyright'
@@ -521,6 +531,7 @@ export interface FileRouteTypes {
     | '/status'
     | '/support'
     | '/r/$username'
+    | '/watch/$id'
     | '/admin/appeals'
     | '/admin/boosts'
     | '/admin/copyright'
@@ -569,6 +580,7 @@ export interface FileRouteTypes {
     | '/_authenticated/status'
     | '/_authenticated/support'
     | '/r/$username'
+    | '/watch/$id'
     | '/_authenticated/admin/appeals'
     | '/_authenticated/admin/boosts'
     | '/_authenticated/admin/copyright'
@@ -599,6 +611,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   WelcomeRoute: typeof WelcomeRoute
   RUsernameRoute: typeof RUsernameRoute
+  WatchIdRoute: typeof WatchIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -797,6 +810,13 @@ declare module '@tanstack/react-router' {
       path: '/r/$username'
       fullPath: '/r/$username'
       preLoaderRoute: typeof RUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/watch/$id': {
+      id: '/watch/$id'
+      path: '/watch/$id'
+      fullPath: '/watch/$id'
+      preLoaderRoute: typeof WatchIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
@@ -1022,6 +1042,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   WelcomeRoute: WelcomeRoute,
   RUsernameRoute: RUsernameRoute,
+  WatchIdRoute: WatchIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
