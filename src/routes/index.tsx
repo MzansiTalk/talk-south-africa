@@ -1,225 +1,124 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff, Lock, ShieldCheck } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Eye, PlayCircle } from "lucide-react";
 
-import logo from "@/assets/mzansitalk-logo.png";
-import { supabase } from "@/integrations/supabase/client";
-import { claimStoredReferral } from "@/lib/creators";
-import { signUpWithPassKey } from "@/lib/passkey.functions";
-
+import { PublicPage } from "@/components/PublicShell";
+import { fetchPublicVideos, type PublicVideo } from "@/lib/public-videos.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      {
-        name: "048039a7b7ac776ea7a9f23d6559fb6cc8b38983",
-        content: "048039a7b7ac776ea7a9f23d6559fb6cc8b38983",
-      },
-      { title: "Sign Up or Log In — MzansiTalk" },
-
+      { title: "MzansiTalk — Watch Free South African Videos" },
       {
         name: "description",
         content:
-          "Please Sign Up or Log In to view MzansiTalk. Free forever — posts, reels and status from all over South Africa.",
+          "Watch free South African videos and reels on MzansiTalk — no login needed. Sign up free to post, comment, like and follow Mzansi creators.",
       },
-      { property: "og:title", content: "Sign Up or Log In — MzansiTalk" },
+      { property: "og:title", content: "MzansiTalk — Watch Free South African Videos" },
       {
         property: "og:description",
-        content: "MzansiTalk is members-only. Create a free account to watch reels, posts and status.",
+        content:
+          "Free video entertainment from across South Africa. Press play instantly, no account required.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: AuthWall,
+  component: PublicHome,
 });
 
-function PasswordField({
-  value,
-  onChange,
-  placeholder,
-  minLength = 8,
-}: {
-  value: string;
-  onChange: (next: string) => void;
-  placeholder: string;
-  minLength?: number;
-}) {
-  const [show, setShow] = useState(false);
-  return (
-    <div className="relative">
-      <input
-        className="field field-focus pr-11"
-        type={show ? "text" : "password"}
-        placeholder={placeholder}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required
-        minLength={minLength}
-        maxLength={72}
-      />
-      <button
-        type="button"
-        onClick={() => setShow((prev) => !prev)}
-        aria-label={show ? "Hide password" : "Show password"}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-      >
-        {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-      </button>
-    </div>
-  );
+function formatViews(views: number) {
+  if (views >= 1000) return `${(views / 1000).toFixed(1)}k views`;
+  return `${views} view${views === 1 ? "" : "s"}`;
 }
 
-function AuthWall() {
-  const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [passKey, setPassKey] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    void supabase.auth.getSession().then(({ data }) => {
-      if (data.session) void navigate({ to: "/home", replace: true });
-    });
-  }, [navigate]);
-
-  const signIn = async (welcome: boolean) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
-      password,
-    });
-    if (error) throw new Error("Incorrect email or password");
-    if (welcome) {
-      await claimStoredReferral();
-      toast.success("Welcome to MzansiTalk");
-    }
-    void navigate({ to: "/home", replace: true });
-  };
-
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setBusy(true);
-    try {
-      if (mode === "signup") {
-        if (password.length < 8) throw new Error("Password must be at least 8 characters");
-        if (passKey.trim().length < 6) throw new Error("Pass Key must be at least 6 characters");
-        const result = await signUpWithPassKey({
-          data: {
-            name: name.trim(),
-            email: email.trim().toLowerCase(),
-            password,
-            passKey: passKey.trim(),
-          },
-        });
-        if (!result.ok) throw new Error(result.message);
-        await signIn(true);
-        return;
-      }
-
-      await signIn(false);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong");
-    } finally {
-      setBusy(false);
-    }
-  };
-
+function VideoCard({ video }: { video: PublicVideo }) {
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background px-4 py-10">
-      <div className="pointer-events-none absolute -top-40 left-1/2 size-[32rem] -translate-x-1/2 rounded-full bg-brand opacity-30 blur-3xl" />
-
-      <div className="relative w-full max-w-sm">
-        <div className="flex flex-col items-center text-center">
-          <img
-            src={logo}
-            alt="MzansiTalk logo"
-            width={84}
-            height={84}
-            className="rounded-2xl shadow-brand"
-          />
-          <h1 className="mt-4 font-display text-3xl font-extrabold">
-            Mzansi<span className="text-gold">Talk</span>
-          </h1>
-          <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Lock className="size-3.5" />
-            Please Sign Up or Log In to view MzansiTalk
-          </p>
-        </div>
-
-        <div className="mt-6 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
-          {(["login", "signup"] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setMode(value)}
-              className={`btn-base py-2 text-sm ${
-                mode === value ? "btn-primary" : "bg-transparent text-muted-foreground"
-              }`}
-            >
-              {value === "login" ? "Log In" : "Sign Up"}
-            </button>
-          ))}
-        </div>
-
-        <form onSubmit={submit} className="mt-4 space-y-3">
-          {mode === "signup" ? (
-            <input
-              className="field field-focus"
-              placeholder="Full name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              required
-              maxLength={60}
-            />
-          ) : null}
-          <input
-            className="field field-focus"
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-            maxLength={255}
-          />
-          <PasswordField
-            value={password}
-            onChange={setPassword}
-            placeholder={mode === "signup" ? "Password (min 8 characters)" : "Password"}
-            minLength={mode === "signup" ? 8 : 6}
-          />
-          {mode === "signup" ? (
-            <div className="space-y-1.5">
-              <PasswordField
-                value={passKey}
-                onChange={setPassKey}
-                placeholder="Create Pass Key (min 6 characters)"
-                minLength={6}
-              />
-              <p className="text-xs text-gold">
-                ⚠️ Never share this Pass Key or forget it. You will need it to reset your password.
-              </p>
-            </div>
-          ) : null}
-          <button type="submit" disabled={busy} className="btn-base btn-gold w-full">
-            {busy ? "Please wait…" : mode === "login" ? "Log In" : "Create Account"}
-          </button>
-        </form>
-
-        <div className="mt-4 flex items-center justify-between text-sm">
-          <Link to="/forgot-password" className="text-muted-foreground underline">
-            Forgot Password?
-          </Link>
-          <span className="flex items-center gap-1 text-xs text-muted-foreground">
-            <ShieldCheck className="size-3.5" /> 100% free to watch
-          </span>
-        </div>
-
-        <p className="mt-3 text-center text-xs text-muted-foreground">
-          Want to advertise? Sign in first — pricing and checkout live inside the app.
+    <article className="overflow-hidden rounded-2xl border border-border bg-card">
+      <Link
+        to="/watch/$id"
+        params={{ id: video.id }}
+        className="relative block aspect-video w-full overflow-hidden bg-muted"
+        aria-label={`Play ${video.caption}`}
+      >
+        <video
+          src={video.url}
+          className="h-full w-full object-cover"
+          preload="metadata"
+          muted
+          playsInline
+        />
+        <span className="absolute inset-0 flex items-center justify-center bg-background/25">
+          <PlayCircle className="size-12 text-foreground drop-shadow" />
+        </span>
+        <span className="absolute bottom-2 right-2 rounded-md bg-background/80 px-1.5 py-0.5 text-[0.66rem] font-bold uppercase">
+          {video.kind === "reel" ? "Reel" : "Video"}
+        </span>
+      </Link>
+      <div className="p-3">
+        <h3 className="truncate font-display text-sm font-bold">{video.caption}</h3>
+        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+          {video.caption} — shared on MzansiTalk by {video.authorName}. Free to watch, no account
+          needed.
+        </p>
+        <p className="mt-2 flex items-center gap-1.5 text-[0.68rem] text-muted-foreground">
+          <Eye className="size-3.5" /> {formatViews(video.views)} · @{video.authorUsername}
         </p>
       </div>
-    </div>
+    </article>
   );
 }
 
+function PublicHome() {
+  const videos = useQuery({ queryKey: ["public-videos"], queryFn: () => fetchPublicVideos() });
+  const items = videos.data ?? [];
+
+  return (
+    <PublicPage>
+      <section className="rounded-3xl border border-border bg-card p-6 text-center sm:p-10">
+        <h1 className="font-display text-3xl font-extrabold sm:text-4xl">
+          Free South African video entertainment
+        </h1>
+        <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+          MzansiTalk is where South Africa watches and shares short videos, reels and everyday
+          moments. Press play on anything below — watching is free and open to everyone. Create a
+          free account when you want to upload, comment, like and follow creators.
+        </p>
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
+          <Link to="/register" className="btn-base btn-gold px-4 py-2 font-bold">
+            Sign Up Free
+          </Link>
+          <Link
+            to="/login"
+            className="btn-base border border-border bg-secondary px-4 py-2 font-bold text-secondary-foreground"
+          >
+            Login
+          </Link>
+        </div>
+      </section>
+
+      <h2 className="mt-10 font-display text-xl font-bold">Watch now</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Tap any video to play it straight away — no login, no pop-ups.
+      </p>
+
+      {videos.isLoading ? (
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[0, 1, 2, 3, 4, 5].map((key) => (
+            <div key={key} className="h-56 animate-pulse rounded-2xl bg-muted" />
+          ))}
+        </div>
+      ) : items.length === 0 ? (
+        <p className="mt-4 rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          New videos are being uploaded right now. Please check back in a moment.
+        </p>
+      ) : (
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((video) => (
+            <VideoCard key={video.id} video={video} />
+          ))}
+        </div>
+      )}
+    </PublicPage>
+  );
+}
