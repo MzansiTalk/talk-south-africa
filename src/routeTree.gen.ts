@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as AuthenticatedAdvertiseRouteImport } from './routes/_authenticated/advertise'
@@ -77,6 +78,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -300,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/admin-login': typeof AdminLoginRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/welcome': typeof WelcomeRoute
   '/advertise': typeof AuthenticatedAdvertiseRoute
@@ -346,6 +353,7 @@ export interface FileRoutesByTo {
   '/admin-login': typeof AdminLoginRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/welcome': typeof WelcomeRoute
   '/advertise': typeof AuthenticatedAdvertiseRoute
@@ -394,6 +402,7 @@ export interface FileRoutesById {
   '/admin-login': typeof AdminLoginRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/welcome': typeof WelcomeRoute
   '/_authenticated/advertise': typeof AuthenticatedAdvertiseRoute
@@ -442,6 +451,7 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/forgot-password'
     | '/login'
+    | '/register'
     | '/reset-password'
     | '/welcome'
     | '/advertise'
@@ -488,6 +498,7 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/forgot-password'
     | '/login'
+    | '/register'
     | '/reset-password'
     | '/welcome'
     | '/advertise'
@@ -535,6 +546,7 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/forgot-password'
     | '/login'
+    | '/register'
     | '/reset-password'
     | '/welcome'
     | '/_authenticated/advertise'
@@ -583,6 +595,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   WelcomeRoute: typeof WelcomeRoute
   RUsernameRoute: typeof RUsernameRoute
@@ -623,6 +636,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -998,6 +1018,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   WelcomeRoute: WelcomeRoute,
   RUsernameRoute: RUsernameRoute,
