@@ -43,17 +43,18 @@ async function loadVideos(limit: number, id?: string): Promise<PublicVideo[]> {
   const authorIds = [...new Set(visible.map((row) => row.user_id))];
   const { data: profiles } = await supabaseAdmin
     .from("profiles")
-    .select("id, name, username, is_hidden")
+    .select("id, name, username")
     .in("id", authorIds);
 
   const byId = new Map((profiles ?? []).map((row) => [row.id, row]));
 
   const results: PublicVideo[] = [];
+  const seenPaths = new Set<string>();
   for (const row of visible) {
     const author = byId.get(row.user_id);
-    if (author?.is_hidden) continue;
     const path = row.media_url;
-    if (!path) continue;
+    if (!path || seenPaths.has(path)) continue;
+    seenPaths.add(path);
     const { data: signed } = await supabaseAdmin.storage
       .from("media")
       .createSignedUrl(path, SIGN_SECONDS);

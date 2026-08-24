@@ -1,19 +1,22 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link, useRouter } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import {
   Bell,
   ChevronLeft,
   Film,
   Home,
+  LogOut,
   MessageCircle,
   Radio,
   Search,
   Shield,
+  User,
   Users,
 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 
 import logo from "@/assets/mzansitalk-logo.png";
+import { supabase } from "@/integrations/supabase/client";
 import { fetchMyRoles, fetchUnreadNotificationCount } from "@/lib/api";
 import { touchPresence } from "@/lib/creators";
 
@@ -46,6 +49,14 @@ export function TopBar({
   showSearch?: boolean | undefined;
 }) {
   const router = useRouter();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const signOut = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    void navigate({ to: "/login", replace: true });
+  };
   const unread = useQuery({
     queryKey: ["notifications-unread"],
     queryFn: fetchUnreadNotificationCount,
@@ -105,6 +116,21 @@ export function TopBar({
               </span>
             ) : null}
           </Link>
+          <Link
+            to="/profile"
+            aria-label="My profile"
+            className="btn-base bg-transparent px-2 text-muted-foreground"
+          >
+            <User className="size-5" />
+          </Link>
+          <button
+            type="button"
+            onClick={() => void signOut()}
+            aria-label="Log out"
+            className="btn-base bg-transparent px-2 text-muted-foreground"
+          >
+            <LogOut className="size-5" />
+          </button>
         </div>
       </div>
 
