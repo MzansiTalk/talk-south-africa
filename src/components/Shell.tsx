@@ -105,6 +105,21 @@ export function TopBar({
               </span>
             ) : null}
           </Link>
+          <Link
+            to="/profile"
+            aria-label="My profile"
+            className="btn-base bg-transparent px-2 text-muted-foreground"
+          >
+            <User className="size-5" />
+          </Link>
+          <button
+            type="button"
+            onClick={() => void signOut()}
+            aria-label="Log out"
+            className="btn-base bg-transparent px-2 text-muted-foreground"
+          >
+            <LogOut className="size-5" />
+          </button>
         </div>
       </div>
 
