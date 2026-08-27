@@ -26,7 +26,6 @@ import { Route as AuthenticatedAppealRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedCommunityGuidelinesRouteImport } from './routes/_authenticated/community-guidelines'
 import { Route as AuthenticatedCreateRouteImport } from './routes/_authenticated/create'
 import { Route as AuthenticatedCreatorProgramRouteImport } from './routes/_authenticated/creator-program'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDashboardAffiliateRouteImport } from './routes/_authenticated/dashboard-affiliate'
 import { Route as AuthenticatedFriendsRouteImport } from './routes/_authenticated/friends'
 import { Route as AuthenticatedGetCoinsRouteImport } from './routes/_authenticated/get-coins'
@@ -148,11 +147,6 @@ const AuthenticatedCreatorProgramRoute =
     path: '/creator-program',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedDashboardAffiliateRoute =
   AuthenticatedDashboardAffiliateRouteImport.update({
     id: '/dashboard-affiliate',
@@ -355,7 +349,6 @@ export interface FileRoutesByFullPath {
   '/community-guidelines': typeof AuthenticatedCommunityGuidelinesRoute
   '/create': typeof AuthenticatedCreateRoute
   '/creator-program': typeof AuthenticatedCreatorProgramRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
   '/dashboard-affiliate': typeof AuthenticatedDashboardAffiliateRoute
   '/friends': typeof AuthenticatedFriendsRoute
   '/get-coins': typeof AuthenticatedGetCoinsRoute
@@ -408,7 +401,6 @@ export interface FileRoutesByTo {
   '/community-guidelines': typeof AuthenticatedCommunityGuidelinesRoute
   '/create': typeof AuthenticatedCreateRoute
   '/creator-program': typeof AuthenticatedCreatorProgramRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
   '/dashboard-affiliate': typeof AuthenticatedDashboardAffiliateRoute
   '/friends': typeof AuthenticatedFriendsRoute
   '/get-coins': typeof AuthenticatedGetCoinsRoute
@@ -463,7 +455,6 @@ export interface FileRoutesById {
   '/_authenticated/community-guidelines': typeof AuthenticatedCommunityGuidelinesRoute
   '/_authenticated/create': typeof AuthenticatedCreateRoute
   '/_authenticated/creator-program': typeof AuthenticatedCreatorProgramRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/dashboard-affiliate': typeof AuthenticatedDashboardAffiliateRoute
   '/_authenticated/friends': typeof AuthenticatedFriendsRoute
   '/_authenticated/get-coins': typeof AuthenticatedGetCoinsRoute
@@ -518,7 +509,6 @@ export interface FileRouteTypes {
     | '/community-guidelines'
     | '/create'
     | '/creator-program'
-    | '/dashboard'
     | '/dashboard-affiliate'
     | '/friends'
     | '/get-coins'
@@ -571,7 +561,6 @@ export interface FileRouteTypes {
     | '/community-guidelines'
     | '/create'
     | '/creator-program'
-    | '/dashboard'
     | '/dashboard-affiliate'
     | '/friends'
     | '/get-coins'
@@ -625,7 +614,6 @@ export interface FileRouteTypes {
     | '/_authenticated/community-guidelines'
     | '/_authenticated/create'
     | '/_authenticated/creator-program'
-    | '/_authenticated/dashboard'
     | '/_authenticated/dashboard-affiliate'
     | '/_authenticated/friends'
     | '/_authenticated/get-coins'
@@ -798,13 +786,6 @@ declare module '@tanstack/react-router' {
       path: '/creator-program'
       fullPath: '/creator-program'
       preLoaderRoute: typeof AuthenticatedCreatorProgramRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard-affiliate': {
@@ -1054,7 +1035,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommunityGuidelinesRoute: typeof AuthenticatedCommunityGuidelinesRoute
   AuthenticatedCreateRoute: typeof AuthenticatedCreateRoute
   AuthenticatedCreatorProgramRoute: typeof AuthenticatedCreatorProgramRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDashboardAffiliateRoute: typeof AuthenticatedDashboardAffiliateRoute
   AuthenticatedFriendsRoute: typeof AuthenticatedFriendsRoute
   AuthenticatedGetCoinsRoute: typeof AuthenticatedGetCoinsRoute
@@ -1095,7 +1075,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommunityGuidelinesRoute: AuthenticatedCommunityGuidelinesRoute,
   AuthenticatedCreateRoute: AuthenticatedCreateRoute,
   AuthenticatedCreatorProgramRoute: AuthenticatedCreatorProgramRoute,
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDashboardAffiliateRoute: AuthenticatedDashboardAffiliateRoute,
   AuthenticatedFriendsRoute: AuthenticatedFriendsRoute,
   AuthenticatedGetCoinsRoute: AuthenticatedGetCoinsRoute,
