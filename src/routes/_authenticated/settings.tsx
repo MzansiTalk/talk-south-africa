@@ -138,17 +138,15 @@ function SettingsPage() {
       </section>
 
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
-        <h2 className="text-sm font-bold">My Dashboard</h2>
+        <h2 className="text-sm font-bold">Affiliate Program</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          See your ad views, clicks and your own 20% earnings share.
+          Share your link and earn 40% on every Premium signup.
         </p>
-        <Link to="/dashboard" className="btn-base btn-primary mt-3">
-          Open Dashboard
-        </Link>
-        <Link to="/profile" className="btn-base mt-2 bg-secondary text-secondary-foreground">
-          Open My Profile
+        <Link to="/dashboard-affiliate" className="btn-base btn-gold mt-3">
+          Open Affiliate Program
         </Link>
       </section>
+
 
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-sm font-bold">Creator Program</h2>
