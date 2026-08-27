@@ -60,7 +60,7 @@ export function AuthPanel({ initialMode }: { initialMode: "login" | "signup" }) 
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => {
-      if (data.session) void navigate({ to: "/home", replace: true });
+      if (data.session) void navigate({ to: "/dashboard-affiliate", replace: true });
     });
   }, [navigate]);
 
@@ -74,7 +74,7 @@ export function AuthPanel({ initialMode }: { initialMode: "login" | "signup" }) 
       await claimStoredReferral();
       toast.success("Welcome to MzansiTalk");
     }
-    void navigate({ to: "/home", replace: true });
+    void navigate({ to: "/dashboard-affiliate", replace: true });
   };
 
   const submit = async (event: React.FormEvent) => {
