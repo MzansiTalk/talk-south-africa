@@ -77,16 +77,15 @@ function PublicHome() {
     <PublicPage>
       <section className="rounded-3xl border border-border bg-card p-6 text-center sm:p-10">
         <h1 className="font-display text-3xl font-extrabold sm:text-4xl">
-          Free South African video entertainment
+          South African video entertainment
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-          MzansiTalk is where South Africa watches and shares short videos, reels and everyday
-          moments. Press play on anything below — watching is free and open to everyone. Create a
-          free account when you want to upload, comment, like and follow creators.
+          Watch 10 trending reels free. Full app is Premium R50/6 months or free
+          with 3 referrals.
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-2">
           <Link to="/register" className="btn-base btn-gold px-4 py-2 font-bold">
-            Sign Up Free
+            Join Premium
           </Link>
           <Link
             to="/login"
@@ -95,6 +94,9 @@ function PublicHome() {
             Login
           </Link>
         </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          R50 / 6 months | 3 referrals = free access
+        </p>
       </section>
 
       <h2 className="mt-10 font-display text-xl font-bold">Watch now</h2>
